@@ -32,6 +32,16 @@ class Coverage:
 
 
 @dataclass(frozen=True)
+class YearlyCoverage:
+    """Viajes de un buque con y sin observador en un año."""
+
+    vessel: str
+    year: int
+    with_observer: int
+    without_observer: int
+
+
+@dataclass(frozen=True)
 class AisGap:
     """Un apagón de AIS: el buque dejó de transmitir su posición."""
 

@@ -1,6 +1,8 @@
 from datetime import date
 
-from openmar.adapters.inidep import parse_observer_coverage, parse_trips_annex
+import pytest
+
+from openmar.adapters.inidep import parse_observer_coverage, parse_observer_coverage_by_year, parse_trips_annex
 
 ANEXO = """
 Texto previo con 12/1/2025 y números 1 2 3 que no es el anexo.
@@ -99,3 +101,31 @@ def test_tabla_9_lee_totales_por_buque_y_corta_en_total():
 
 def test_tabla_9_sin_titulo_devuelve_vacio():
     assert parse_observer_coverage("nada") == []
+
+
+def test_tabla_9_lee_cada_anio_por_posicion_de_columna():
+    rows = parse_observer_coverage_by_year(TABLA_9)
+
+    natalia = [(r.year, r.with_observer, r.without_observer) for r in rows if r.vessel == "NATALIA"]
+    assert natalia == [(2021, 2, 1), (2022, 1, 1), (2023, 2, 3), (2024, 2, 2)]
+    tae = [(r.year, r.with_observer, r.without_observer) for r in rows if r.vessel == "TAE BAEK 75"]
+    assert tae == [(2021, 0, 4), (2022, 0, 6), (2023, 0, 6), (2024, 0, 5)]
+    assert len(rows) == 12
+
+
+def test_tabla_9_por_anio_falla_si_los_anios_no_suman_el_total():
+    roto = TABLA_9.replace("2     1      1      1      2        3     2      2   7", "2     1      1      1      2        3     2      9   7")
+
+    with pytest.raises(ValueError, match="NATALIA"):
+        parse_observer_coverage_by_year(roto)
+
+
+def test_tabla_9_por_anio_sin_titulo_devuelve_vacio():
+    assert parse_observer_coverage_by_year("nada") == []
+
+
+def test_tabla_9_por_anio_falla_sin_encabezado_de_columnas():
+    sin_encabezado = "Tabla 9.\n TAE BAEK 75        4     6     6     5     0      21     21     0.0   100.0\n"
+
+    with pytest.raises(ValueError, match="encabezado"):
+        parse_observer_coverage_by_year(sin_encabezado)

@@ -11,7 +11,7 @@ import subprocess
 from datetime import date, datetime
 from pathlib import Path
 
-from openmar.domain.model import Coverage, Trip
+from openmar.domain.model import Coverage, Trip, YearlyCoverage
 from openmar.domain.names import normalize_vessel_name
 
 # Informes usados por el demo de la flota potera.
@@ -89,6 +89,64 @@ def parse_observer_coverage(text: str) -> list[Coverage]:
                 without_observer=int(without_obs),
                 pct_with_observer=float(pct_with),
             )
+        )
+    return rows
+
+
+COVERAGE_YEARS = (2021, 2022, 2023, 2024)
+_HEADER_TOKENS = {"C", "S", "Total"}
+# Encabezado de columnas de la Tabla 9: C y S por año, y luego C, S, Total, C %, S %.
+_HEADER_COLUMNS = 2 * len(COVERAGE_YEARS) + 5
+
+
+def _column_centers(line: str) -> list[float] | None:
+    tokens = list(re.finditer(r"\S+", line))
+    if len(tokens) == _HEADER_COLUMNS and all(t.group() in _HEADER_TOKENS for t in tokens):
+        return [(t.start() + t.end()) / 2 for t in tokens]
+    return None
+
+
+def _cells_by_column(line: str, numbers_start: int, centers: list[float]) -> list[float]:
+    """Asigna cada número a la columna del encabezado más cercana; las celdas vacías valen 0."""
+    cells = [0.0] * len(centers)
+    for token in re.finditer(r"\S+", line[numbers_start:]):
+        middle = numbers_start + (token.start() + token.end()) / 2
+        column = min(range(len(centers)), key=lambda k: abs(centers[k] - middle))
+        cells[column] = float(token.group())
+    return cells
+
+
+def parse_observer_coverage_by_year(text: str) -> list[YearlyCoverage]:
+    """Lee la Tabla 9 año por año. Las celdas vacías del PDF se ubican por posición.
+
+    Cada fila se valida contra sus totales: si los años no suman, falla en lugar de
+    publicar una serie equivocada.
+    """
+    start = text.find("Tabla 9.")
+    if start < 0:
+        return []
+    rows: list[YearlyCoverage] = []
+    centers: list[float] | None = None
+    years = len(COVERAGE_YEARS)
+    for line in text[start:].splitlines():
+        if line.strip().startswith("TOTAL"):
+            break
+        header = _column_centers(line)
+        if header:
+            centers = header
+            continue
+        match = _FILA_COBERTURA.match(line)
+        if not match:
+            continue
+        if centers is None:
+            raise ValueError("Tabla 9: hay filas de buques antes del encabezado de columnas C/S.")
+        cells = _cells_by_column(line, match.start("numeros"), centers)
+        with_obs, without_obs = cells[0 : 2 * years : 2], cells[1 : 2 * years : 2]
+        vessel = normalize_vessel_name(match["buque"])
+        if sum(with_obs) != cells[2 * years] or sum(without_obs) != cells[2 * years + 1]:
+            raise ValueError(f"Tabla 9: los años de {vessel} no suman el total de la fila.")
+        rows.extend(
+            YearlyCoverage(vessel, year, int(c), int(s)) for year, c, s in zip(COVERAGE_YEARS, with_obs, without_obs)
         )
     return rows
 

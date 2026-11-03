@@ -6,7 +6,7 @@ from pathlib import Path
 
 from openmar.adapters import geo
 from openmar.adapters.gfw import parse_fishing_event, parse_gap_event
-from openmar.adapters.inidep import parse_observer_coverage, parse_trips_annex
+from openmar.adapters.inidep import parse_observer_coverage, parse_observer_coverage_by_year, parse_trips_annex
 from openmar.adapters.rfp import parse_registry_html
 from openmar.adapters.tabular import write_items, write_rows
 from openmar.application.download import BRONZE
@@ -17,6 +17,7 @@ from openmar.ports import RawStore
 SILVER = {
     "trips": "mareas.csv",
     "coverage": "cobertura.csv",
+    "coverage_by_year": "cobertura-anual.csv",
     "registry": "registro.csv",
     "vessels": "buques.csv",
     "gaps": "apagones.csv",
@@ -64,9 +65,11 @@ def build_silver(store: RawStore, silver_dir: Path) -> dict[str, int]:
     gaps = [unify(parse_gap_event(e)) for e in json.loads(store.read_text(BRONZE["gfw_gaps"]))]
     fishing = [unify(parse_fishing_event(e)) for e in json.loads(store.read_text(BRONZE["gfw_fishing"]))]
 
+    coverage_text = store.read_text(BRONZE["inidep_coverage"])
     counts = {
         "mareas": write_items(out["trips"], parse_trips_annex(store.read_text(BRONZE["inidep_trips"]))),
-        "cobertura": write_items(out["coverage"], parse_observer_coverage(store.read_text(BRONZE["inidep_coverage"]))),
+        "cobertura": write_items(out["coverage"], parse_observer_coverage(coverage_text)),
+        "cobertura_anual": write_items(out["coverage_by_year"], parse_observer_coverage_by_year(coverage_text)),
         "registro": write_items(out["registry"], parse_registry_html(store.read_text(BRONZE["registry"]))),
         "identidades": write_rows(out["vessels"], identities),
         "apagones": write_items(out["gaps"], gaps),

@@ -19,6 +19,8 @@ Anexo 1. Detalle de las mareas. *Marea con observador a bordo.
 
 TABLA_9 = """
 Tabla 9. Designación de observadores.
+                                 2021          2022          2023           2024         TOTAL 4 años     TOTAL (%)
+                                C S          C    S        C     S        C     S    C      S     Total    C      S
  TAE BAEK 75                          4             6              6             5     0      21     21     0.0   100.0
            TOTAL                3
 """
@@ -118,9 +120,13 @@ def test_gold_arma_semaforo_ficha_y_capas_del_mapa(bronze, tmp_path):
     assert relato["temporada"]["mareas"] == 3
     assert relato["temporada"]["mareas_con_observador"] == 1
     assert relato["historico_2021_2024"]["buques_nunca_con_observador"] == 1
+    assert [a["anio"] for a in relato["cobertura_por_anio"]] == [2021, 2022, 2023, 2024, 2025]
+    assert relato["cobertura_por_anio"][-1] == {"anio": 2025, "viajes": 3, "con_observador": 1, "pct_con_observador": 33.3}
     assert relato["horas_sin_ais"] == 52.0
     assert relato["apagones_por_marea"] == {"sin_observador": 1.5, "con_observador": 1.0}
     assert [v["buque"] for v in relato["senales_repetidas"]] == ["TAE BAEK 75"]
+    assert relato["senales_repetidas"][0]["en_marea_con_observador"] == 0
+    assert summary["reglas"]["horas_minimas_apagon"] == 12
     zee = json.loads((tmp_path / "gold" / "mapa" / "zee.geojson").read_text())
     assert zee["features"][0]["properties"]["nombre"] == "Argentinian Exclusive Economic Zone"
 

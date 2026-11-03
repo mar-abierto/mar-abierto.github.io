@@ -7,7 +7,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from openmar.adapters import geo
-from openmar.adapters.tabular import read_coverage, read_fishing, read_gaps, read_registry, read_trips, write_rows
+from openmar.adapters.tabular import (
+    read_coverage,
+    read_fishing,
+    read_gaps,
+    read_registry,
+    read_trips,
+    read_yearly_coverage,
+    write_rows,
+)
 from openmar.application.silver import SILVER
 from openmar.domain import signals
 from openmar.domain.matching import (
@@ -16,6 +24,7 @@ from openmar.domain.matching import (
     STATUS_UNMATCHED,
     STATUS_WITH_OBSERVER,
     STATUS_WITHOUT_OBSERVER,
+    TRIP_TOLERANCE_DAYS,
     is_near_200nm,
     local_date,
     match_gaps_to_trips,
@@ -24,7 +33,12 @@ from openmar.domain.matching import (
 from openmar.domain.model import RegistryRecord
 from openmar.domain.names import vessel_key
 from openmar.domain.positions import fishing_grid, vessel_position
-from openmar.domain.story import history_figures, season_figures
+from openmar.domain.story import coverage_by_year, history_figures, season_figures
+
+SEASON_YEAR = 2025
+
+# Criterio del conjunto público de apagones de Global Fishing Watch (no lo elegimos nosotros).
+GFW_GAP_MIN_HOURS = 12
 
 # Celdas de la capa de actividad de pesca: ~25 km, liviana para el navegador.
 FISHING_GRID_DEGREES = 0.25
@@ -152,20 +166,23 @@ def _per_trip(gaps: int, trips: int) -> float:
 
 def _story(vessels: list[dict], gaps: list[dict], silver_dir: Path) -> dict:
     """Cifras de la portada: mareas, observadores y apagones, con su contexto."""
-    season = season_figures(read_trips(silver_dir / SILVER["trips"]))
+    trips = read_trips(silver_dir / SILVER["trips"])
+    season = season_figures(trips)
+    yearly = read_yearly_coverage(silver_dir / SILVER["coverage_by_year"])
     history = history_figures(read_coverage(silver_dir / SILVER["coverage"]))
     by_status = {s: sum(g["estado"] == s for g in gaps) for s in (STATUS_WITHOUT_OBSERVER, STATUS_WITH_OBSERVER)}
     red = sorted((v for v in vessels if v["semaforo"] == signals.RED), key=lambda v: -v["apagones"])
     return {
         "temporada": season,
         "historico_2021_2024": history,
+        "cobertura_por_anio": coverage_by_year(yearly, trips, season_year=SEASON_YEAR),
         "horas_sin_ais": round(sum(g["horas"] for g in gaps), 1),
         "apagones_por_marea": {
             "sin_observador": _per_trip(by_status[STATUS_WITHOUT_OBSERVER], season["mareas_sin_observador"]),
             "con_observador": _per_trip(by_status[STATUS_WITH_OBSERVER], season["mareas_con_observador"]),
         },
         "senales_repetidas": [
-            {k: v[k] for k in ("buque", "armador", "apagones", STATUS_WITHOUT_OBSERVER, STATUS_NO_TRIP,
+            {k: v[k] for k in ("buque", "armador", "apagones", STATUS_WITHOUT_OBSERVER, STATUS_WITH_OBSERVER, STATUS_NO_TRIP,
                                 "viajes_2021_2024", "viajes_con_observador_2021_2024")}
             for v in red
         ],
@@ -176,7 +193,7 @@ def _summary(vessels: list[dict], gaps: list[dict], silver_dir: Path) -> dict:
     by_color = {c: sum(v["semaforo"] == c for v in vessels) for c in (signals.GREEN, signals.YELLOW, signals.RED)}
     return {
         "generado": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "temporada": "Calamar 2025",
+        "temporada": f"Calamar {SEASON_YEAR}",
         "buques": len(vessels),
         "buques_en_mapa": sum(v["lat_zona_pesca"] != "" for v in vessels),
         "por_color": by_color,
@@ -191,7 +208,8 @@ def _summary(vessels: list[dict], gaps: list[dict], silver_dir: Path) -> dict:
         "reglas": {
             "umbral_senales_repetidas": signals.REPEATED_SIGNALS,
             "franja_milla_200_km": list(NEAR_200NM_KM),
-            "tolerancia_dias_marea": 3,
+            "tolerancia_dias_marea": TRIP_TOLERANCE_DAYS,
+            "horas_minimas_apagon": GFW_GAP_MIN_HOURS,
         },
         "relato": _story(vessels, gaps, silver_dir),
         "fuentes": SOURCES,

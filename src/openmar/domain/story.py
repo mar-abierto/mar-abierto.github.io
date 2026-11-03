@@ -1,6 +1,8 @@
 """Cifras del relato: lo que la portada cuenta, calculado desde los datos."""
 
-from openmar.domain.model import Coverage, Trip
+from collections import defaultdict
+
+from openmar.domain.model import Coverage, Trip, YearlyCoverage
 
 
 def _pct(part: int, total: int) -> float:
@@ -32,3 +34,16 @@ def history_figures(coverage: list[Coverage]) -> dict:
         "pct_con_observador": _pct(observed, trips),
         "buques_nunca_con_observador": sum(c.with_observer == 0 for c in coverage),
     }
+
+
+def coverage_by_year(yearly: list[YearlyCoverage], season: list[Trip], season_year: int) -> list[dict]:
+    """Serie anual de viajes con observador: el histórico más la temporada en curso."""
+    totals: dict[int, list[int]] = defaultdict(lambda: [0, 0])
+    for row in yearly:
+        totals[row.year][0] += row.with_observer + row.without_observer
+        totals[row.year][1] += row.with_observer
+    totals[season_year] = [len(season), sum(t.observer for t in season)]
+    return [
+        {"anio": year, "viajes": trips, "con_observador": observed, "pct_con_observador": _pct(observed, trips)}
+        for year, (trips, observed) in sorted(totals.items())
+    ]

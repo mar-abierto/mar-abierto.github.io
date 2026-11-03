@@ -11,6 +11,9 @@ body {
 }
 a { color: inherit; }
 :focus-visible { outline: 2px solid var(--zee); outline-offset: 3px; border-radius: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: 16px; top: -60px; z-index: 20; padding: 10px 16px; border-radius: 8px; background: var(--zee); color: var(--sea-0); font-weight: 600; }
+.skip:focus { top: 12px; }
 
 /* ---------- Barra superior ---------- */
 .top {
@@ -67,13 +70,13 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px); }
 /* ---------- Gráficos ---------- */
 .waffle, .dots, .strip { display: grid; gap: 5px; justify-content: start; }
 .waffle { grid-template-columns: repeat(auto-fill, 14px); }
-.waffle .cell { width: 14px; height: 14px; border-radius: 3px; background: rgba(148, 178, 214, 0.13); }
+.waffle .cell { width: 14px; height: 14px; border-radius: 3px; background: rgba(148, 178, 214, 0.30); }
 .waffle .cell--obs { background: var(--zee); box-shadow: 0 0 12px rgba(95, 180, 217, 0.75); }
 
 .dots { grid-template-columns: repeat(auto-fill, 26px); gap: 10px; }
 .dots .dot { width: 26px; height: 26px; border-radius: 50%; }
 .dots .dot--obs { background: var(--zee); box-shadow: 0 0 10px rgba(95, 180, 217, 0.55); }
-.dots .dot--never { border: 1.5px solid var(--line-strong); }
+.dots .dot--never { border: 1.5px solid rgba(148, 178, 214, 0.55); }
 
 .strip { grid-template-columns: repeat(auto-fill, 18px); gap: 6px; }
 .strip .gap { width: 18px; height: 30px; border-radius: 4px; }
@@ -95,6 +98,21 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px); }
 .sw--sin { background: var(--gap); }
 .sw--con { background: var(--zee); }
 .sw--fuera { border: 1.5px solid var(--amarillo); }
+
+.viz-stack { display: grid; gap: 36px; }
+.series { margin: 0; }
+.series__title { margin: 0 0 14px; color: var(--ink-3); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; }
+.series__bars { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; align-items: end; }
+.series__year { display: grid; gap: 6px; justify-items: center; }
+.series__track { position: relative; width: 100%; max-width: 56px; height: 140px; border-radius: 6px; background: rgba(148, 178, 214, 0.10); border: 1px solid var(--line); overflow: hidden; }
+.series__fill { position: absolute; inset: auto 0 0 0; height: var(--h); min-height: 2px; background: var(--zee); box-shadow: 0 0 12px rgba(95, 180, 217, 0.7); transform-origin: bottom; }
+.series__year:last-child .series__fill { background: repeating-linear-gradient(135deg, var(--zee) 0 6px, rgba(95, 180, 217, 0.55) 6px 12px); }
+.series__pct { font: 700 18px/1 var(--font-display); }
+.series__label { color: var(--ink-3); font-size: 13px; }
+.series__note { margin: 10px 0 0; color: var(--ink-3); font-size: 12.5px; }
+.is-ready .chapter .series__fill { transform: scaleY(0); transition: transform 900ms var(--ease) 300ms; }
+.is-ready .chapter.is-in .series__fill { transform: none; }
+.caveat { padding: 12px 14px; border-left: 2px solid var(--amarillo); background: rgba(251, 191, 36, 0.06); border-radius: 0 8px 8px 0; font-size: 15px; }
 
 .chapter--turn { background: linear-gradient(90deg, transparent, rgba(95, 180, 217, 0.04), transparent); }
 .bars { display: grid; gap: 18px; padding: 28px; border: 1px solid var(--line); border-radius: 16px; background: rgba(12, 24, 40, 0.6); }
@@ -150,9 +168,16 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px); }
   .bar { grid-template-columns: 100px 1fr 44px; }
 }
 
+@media (max-width: 480px) {
+  .bar { grid-template-columns: 1fr auto; row-gap: 6px; }
+  .bar__track { grid-column: 1 / -1; grid-row: 2; }
+  .bars { padding: 20px; }
+  .series__track { height: 90px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .is-ready .chapter > *, .is-ready .chapter .cell, .is-ready .chapter .dot, .is-ready .chapter .gap, .is-ready .chapter .bar__fill {
+  .is-ready .chapter > *, .is-ready .chapter .cell, .is-ready .chapter .dot, .is-ready .chapter .gap, .is-ready .chapter .bar__fill, .is-ready .chapter .series__fill {
     opacity: 1; transform: none; transition: none;
   }
 }

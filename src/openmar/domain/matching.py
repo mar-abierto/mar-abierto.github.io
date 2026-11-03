@@ -18,6 +18,7 @@ STATUS_UNMATCHED = "sin_mareas_del_buque"
 NEAR_200NM_KM = (300.0, 450.0)
 
 # Las mareas del INIDEP están en fechas locales; los eventos de GFW, en UTC.
+TRIP_TOLERANCE_DAYS = 3  # un apagón cerca del inicio o fin de marea se asigna a esa marea
 LOCAL_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
 
 
@@ -77,7 +78,7 @@ def resolve_vessel_name(name: str, mmsi: str, names_by_mmsi: dict[str, str] | No
 def match_gaps_to_trips(
     gaps: Iterable[AisGap],
     trips: Iterable[Trip],
-    tolerance_days: int = 3,
+    tolerance_days: int = TRIP_TOLERANCE_DAYS,
     names_by_mmsi: dict[str, str] | None = None,
 ) -> list[GapMatch]:
     """Ubica cada apagón en la marea en curso del mismo buque."""
