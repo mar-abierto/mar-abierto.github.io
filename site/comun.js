@@ -38,7 +38,7 @@
     return series
       .map(
         (y) => `<li class="series__year">
-          <span class="series__track"><span class="series__fill" style="--h:${y.pct_con_observador}%"></span></span>
+          <span class="series__track"><span class="series__fill" style="--h:${Number(y.pct_con_observador)}%"></span></span>
           <span class="series__pct">${num(y.pct_con_observador, 1)} %</span>
           <span class="series__label">${esc(y.anio)}</span>
           <span class="sr-only">: ${num(y.con_observador)} de ${num(y.viajes)} viajes con observador</span>
@@ -60,7 +60,7 @@
       `<strong>${plural(missing.length, "buque pescó", "buques pescaron")}</strong> según el INIDEP pero no tienen recorrido en Global Fishing Watch: no aparecen en el mapa (la lista está en el panel del mapa).`,
       `<strong>${plural(noOwner.length, "buque no figura", "buques no figuran")}</strong> en el Registro de Flota Pesquera${noOwner.length ? `: ${noOwner.map(esc).join(", ")}` : ""}.`,
       "<strong>Dueños reales:</strong> el armador es la empresa titular del permiso. Quiénes son sus socios no está publicado.",
-      "<strong>Escalas en puerto:</strong> las detecta Global Fishing Watch por AIS. Una escala no es necesariamente una descarga (puede ser reparación, abastecimiento o cambio de tripulación), y los transbordos en el mar no se cuentan.",
+      "<strong>Escalas en puerto:</strong> las detecta Global Fishing Watch por AIS, sólo en buques que lo tienen encendido. Una escala no es necesariamente una descarga (puede ser reparación, abastecimiento o cambio de tripulación), y los transbordos en el mar no se cuentan.",
       "<strong>VMS:</strong> las posiciones que los buques reportan a las autoridades no son públicas. Este mapa sólo usa AIS.",
       `<strong>Apagones:</strong> sólo cortes de ${num(summary.reglas?.horas_minimas_apagon)} horas o más en zonas con buena recepción satelital (criterio de Global Fishing Watch). Los cortes más cortos no aparecen.`,
       `<strong>Mareas y observadores:</strong> vienen del informe técnico 026/2025 del INIDEP, con datos hasta el 5 de junio de 2025. Las mareas posteriores no están. La prensa citó 9 mareas con observador; este informe marca ${num(summary.relato?.temporada?.mareas_con_observador)}. La diferencia está sin resolver hasta que se publique el informe final.`,

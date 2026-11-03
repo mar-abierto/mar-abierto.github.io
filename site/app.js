@@ -66,7 +66,7 @@
           <dt>Mareas 2025</dt><dd>${num(p.mareas_temporada)} (${num(p.mareas_con_observador)} con observador)</dd>
           <dt>Captura 2025</dt><dd>${num(p.captura_t)} t</dd>
           <dt>Viajes con observador 2021–24</dt><dd>${observed2124}</dd>
-          <dt>Escalas en puerto 2025</dt><dd>${ports}</dd>
+          <dt>Llegadas a puerto 2025</dt><dd>${ports}</dd>
           <dt>Sanciones</dt><dd>${sanctions}</dd>
           <dt>Posición</dt><dd>${position}</dd>
         </dl>

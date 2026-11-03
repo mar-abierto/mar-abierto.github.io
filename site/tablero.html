@@ -52,7 +52,7 @@
       </article>
       <article class="kpi">
         <p class="kpi__value kpi__value--port"><span data-n="tablero.escalas_exterior">–</span><small> de <span data-n="tablero.escalas">–</span></small></p>
-        <p class="kpi__label">escalas en puertos fuera de la Argentina</p>
+        <p class="kpi__label">llegadas a puerto fuera de la Argentina detectadas en <span data-n="temporada">–</span></p>
         <p class="kpi__meta">Buques con alguna escala afuera: <span data-n="tablero.buques_con_escalas_exterior">–</span></p>
       </article>
     </section>
@@ -77,7 +77,8 @@
         <h2>¿Dónde paran los barcos?</h2>
         <p class="card-ind__q">Escalas en puerto de los buques de la temporada. Responde a una pregunta concreta: si el trabajo en tierra queda en el país.</p>
         <ol class="ports" id="ports"></ol>
-        <p class="how"><strong>Cómo se calcula:</strong> escalas de confianza alta de Global Fishing Watch (entrada y salida del puerto detectadas por AIS). Una escala no es necesariamente una descarga, y los transbordos en el mar no se cuentan.</p>
+        <p class="how"><strong>Cómo se calcula:</strong> <span data-n="tablero.periodo_escalas">–</span>, de confianza alta en Global Fishing Watch (entrada y salida del puerto detectadas por AIS). Se cuentan <span data-n="tablero.calidad_escalas.contadas">–</span>. Quedaron afuera <span data-n="tablero.calidad_escalas.de_otros_anios">–</span> estadías que empezaron antes del año y <span data-n="tablero.calidad_escalas.baja_confianza">–</span> de baja confianza. En <span data-n="tablero.calidad_escalas.nombre_completado">–</span> escalas el nombre del puerto se completó con el de otras escalas del mismo puerto.</p>
+        <p class="how how--warn"><strong>Lo que este dato no dice:</strong> sólo ve buques con el AIS encendido. Una escala no es necesariamente una descarga, y los transbordos en el mar no aparecen. Que no se detecten escalas afuera no prueba que no haya descargas en el exterior.</p>
       </article>
     </section>
 
@@ -92,7 +93,7 @@
           <input type="search" id="owner-search" placeholder="Buscar empresa" autocomplete="off">
         </label>
       </div>
-      <div class="table-wrap">
+      <div class="table-wrap" tabindex="0" role="region" aria-labelledby="owners-title">
         <table class="table" id="owners-table">
           <caption class="sr-only">Indicadores por armador. Los encabezados ordenan la tabla.</caption>
           <thead>

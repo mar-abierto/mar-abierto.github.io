@@ -75,7 +75,7 @@ No se discute: se convierte en indicador, igual para todas las empresas.
 
 | Pregunta | Dato | Estado |
 |---|---|---|
-| ¿Dónde paran? | Escalas en puerto de Global Fishing Watch | **Hecho.** 2025: 530 escalas, 1 fuera del país (ver `hallazgos-2025.md`) |
+| ¿Dónde paran? | Escalas en puerto de Global Fishing Watch | **Hecho.** 2025: 470 llegadas a puerto, 1 detectada fuera del país (ver `hallazgos-2025.md`) |
 | ¿Cuánto se procesa en tierra? | Desembarques y exportaciones por especie y producto | Datos públicos, a buscar |
 | ¿Tripulación argentina? | Rol de tripulación | No es público; los gremios (SOMU) podrían aportar |
 
@@ -110,7 +110,7 @@ según el ADR 0012.
 | Idea | Decisión | Por qué |
 |---|---|---|
 | Portada infográfica con los datos actuales | Sumar primero | No necesita datos nuevos; es lo que se muestra |
-| Visitas a puerto | Hecho | En 2025 la flota para en puertos argentinos; no confirma la hipótesis de Montevideo |
+| Visitas a puerto | Hecho | En 2025 no se detectan escalas en Montevideo; no prueba que no haya descargas afuera |
 | Flota extranjera en la milla 201 | Sumar sólo en relación | Verla sola ya existe; vale si se vincula a grupos con buques adentro (ADR 0011) |
 | Incursiones en la ZEE | Sumar con revisión manual | Exige cálculo contra la línea real y una decisión sobre Malvinas (ADR 0011) |
 | Actualización diaria | Sumar | Gratis; GFW publica con unos 4 días de demora |

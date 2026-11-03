@@ -185,3 +185,12 @@ def test_parse_port_visit_sin_puerto_deja_vacio():
     visit = parse_port_visit(raw)
 
     assert (visit.port_name, visit.port_country, visit.confidence) == ("", "", 2)
+
+
+def test_parse_port_visit_tolera_campos_faltantes():
+    raw = {"id": "pv2", "start": "2025-02-10T11:00:00Z", "end": "2025-02-10T12:00:00Z",
+           "port_visit": {"durationHrs": None, "startAnchorage": {"id": "arg-x"}}}
+
+    visit = parse_port_visit(raw)
+
+    assert (visit.hours, visit.port_id, visit.vessel_name, visit.lat) == (0.0, "arg-x", "", 0.0)

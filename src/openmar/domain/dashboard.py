@@ -3,7 +3,7 @@
 from collections import defaultdict
 
 from openmar.domain.model import PortVisit
-from openmar.domain.port_visits import HOME_COUNTRY, MIN_CONFIDENCE
+from openmar.domain.port_visits import MIN_CONFIDENCE, counts, is_abroad
 from openmar.domain.signals import RED
 
 NO_OWNER = "Sin armador en el registro"
@@ -47,15 +47,13 @@ def by_owner(vessels: list[dict]) -> list[dict]:
 
 def port_ranking(visits: list[PortVisit], foreign_only: bool = False, min_confidence: int = MIN_CONFIDENCE) -> list[dict]:
     """Puertos donde hicieron escala los buques, de más a menos escalas."""
-    counts: dict[tuple[str, str], list[str]] = defaultdict(list)
+    by_port: dict[tuple[str, str], list[str]] = defaultdict(list)
     for v in visits:
-        if v.confidence < min_confidence or not v.port_name:
+        if not counts(v, min_confidence) or (foreign_only and not is_abroad(v)):
             continue
-        if foreign_only and v.port_country == HOME_COUNTRY:
-            continue
-        counts[(v.port_name, v.port_country)].append(v.vessel_name)
+        by_port[(v.port_name, v.port_country)].append(v.vessel_name)
     rows = [
         {"puerto": port, "pais": country, "escalas": len(names), "buques": len(set(names))}
-        for (port, country), names in counts.items()
+        for (port, country), names in by_port.items()
     ]
     return sorted(rows, key=lambda r: (-r["escalas"], r["puerto"]))

@@ -34,7 +34,7 @@ from openmar.domain.matching import (
 )
 from openmar.domain.model import RegistryRecord
 from openmar.domain.names import vessel_key
-from openmar.domain.port_visits import port_summary
+from openmar.domain.port_visits import arrivals_in_year, port_summary, visit_quality
 from openmar.domain.positions import fishing_grid, vessel_position
 from openmar.domain.story import coverage_by_year, history_figures, season_figures
 
@@ -55,7 +55,7 @@ EMPTY_COUNTS = {
     STATUS_UNMATCHED: 0,
 }
 
-NO_PORTS = {"escalas": 0, "escalas_exterior": 0, "puertos_exterior": "", "puerto_principal": ""}
+NO_PORTS = {"escalas": 0, "escalas_exterior": 0, "escalas_pais_desconocido": 0, "puertos_exterior": "", "puerto_principal": ""}
 
 SOURCES = [
     {"nombre": "Global Fishing Watch", "url": "https://globalfishingwatch.org", "aporta": "identidad de buques, apagones de AIS y eventos de pesca"},
@@ -76,13 +76,18 @@ def _registry_index(records: list[RegistryRecord]) -> dict[str, RegistryRecord]:
     return index
 
 
+def _season_visits(silver_dir: Path) -> list:
+    """Escalas con llegada en la temporada: la API trae también estadías que empezaron antes."""
+    return arrivals_in_year(read_port_visits(silver_dir / SILVER["port_visits"]), SEASON_YEAR)
+
+
 def _vessel_rows(silver_dir: Path) -> tuple[list[dict], list]:
     trips = read_trips(silver_dir / SILVER["trips"])
     coverage = {vessel_key(c.vessel): c for c in read_coverage(silver_dir / SILVER["coverage"])}
     registry = _registry_index(read_registry(silver_dir / SILVER["registry"]))
     gaps = read_gaps(silver_dir / SILVER["gaps"])
     fishing = read_fishing(silver_dir / SILVER["fishing"])
-    ports = {vessel_key(name): data for name, data in port_summary(read_port_visits(silver_dir / SILVER["port_visits"])).items()}
+    ports = port_summary(_season_visits(silver_dir))
 
     matches = match_gaps_to_trips(gaps, trips)
     summary = summarize_by_vessel(matches)
@@ -199,16 +204,21 @@ def _story(vessels: list[dict], gaps: list[dict], silver_dir: Path) -> dict:
 
 def _dashboard(vessels: list[dict], silver_dir: Path) -> dict:
     """Indicadores comparables entre empresas y escalas fuera del país."""
-    # Sólo escalas de buques de la temporada (los que tienen mareas o apagones cruzados).
+    # Sólo escalas de buques de la temporada (los que tienen mareas o apagones cruzados),
+    # con llegada en el año de la temporada.
     fleet = {vessel_key(v["buque"]) for v in vessels}
-    visits = [p for p in read_port_visits(silver_dir / SILVER["port_visits"]) if vessel_key(p.vessel_name) in fleet]
+    downloaded = read_port_visits(silver_dir / SILVER["port_visits"])
+    fleet_visits = [p for p in downloaded if vessel_key(p.vessel_name) in fleet]
+    visits = arrivals_in_year(fleet_visits, SEASON_YEAR)
     return {
+        "periodo_escalas": f"Llegadas a puerto en {SEASON_YEAR} (hora argentina)",
         "por_armador": by_owner(vessels),
         "escalas": sum(v["escalas"] for v in vessels),
         "escalas_exterior": sum(v["escalas_exterior"] for v in vessels),
         "buques_con_escalas_exterior": sum(v["escalas_exterior"] > 0 for v in vessels),
         "puertos": port_ranking(visits),
         "puertos_exterior": port_ranking(visits, foreign_only=True),
+        "calidad_escalas": visit_quality(fleet_visits, SEASON_YEAR),
     }
 
 

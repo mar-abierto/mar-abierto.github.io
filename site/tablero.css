@@ -24,6 +24,8 @@
 .card-ind__q { margin: 0 0 22px; color: var(--ink-2); font-size: 15px; max-width: 70ch; }
 .how { margin: auto 0 0; padding-top: 20px; color: var(--ink-3); font-size: 13px; line-height: 1.5; }
 .how strong { color: var(--ink-2); font-weight: 600; }
+.how--warn { margin-top: 0; padding-top: 10px; }
+.how--warn strong { color: var(--amarillo); }
 
 .stack { display: flex; height: 40px; border-radius: 10px; overflow: hidden; background: rgba(148, 178, 214, 0.08); }
 .stack__part { width: var(--w); }
@@ -55,6 +57,7 @@
 }
 .search input:focus-visible { outline: 2px solid var(--zee); outline-offset: 1px; }
 .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+.table-wrap:focus-visible { outline: 2px solid var(--zee); outline-offset: 2px; }
 .table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
 .table thead th { background: var(--sea-2); text-align: right; padding: 0; border-bottom: 1px solid var(--line-strong); }
 .table thead th:first-child { text-align: left; }
@@ -65,11 +68,12 @@
 .table thead th:first-child button { justify-content: flex-start; }
 .table thead button:hover { color: var(--ink); }
 .table thead button:focus-visible { outline: 2px solid var(--zee); outline-offset: -2px; }
-.sort::after { content: "↕"; color: var(--ink-3); }
+.sort::after { content: "↕"; color: var(--ink-2); }
 th[aria-sort="descending"] .sort::after { content: "↓"; color: var(--zee); }
 th[aria-sort="ascending"] .sort::after { content: "↑"; color: var(--zee); }
 .table tbody th, .table td { padding: 11px 14px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
-.table tbody th { text-align: left; font-weight: 500; white-space: normal; min-width: 220px; }
+.table tbody th { text-align: left; font-weight: 500; white-space: normal; min-width: 220px; position: sticky; left: 0; background: var(--sea-1); }
+.table thead th:first-child { position: sticky; left: 0; z-index: 1; }
 .table tbody tr:hover { background: rgba(148, 178, 214, 0.05); }
 .table tbody tr.is-aggregate th { color: var(--ink-3); font-style: italic; }
 .meter { display: inline-block; width: 46px; height: 6px; margin-right: 8px; vertical-align: middle; border-radius: 3px;
@@ -91,5 +95,6 @@ th[aria-sort="ascending"] .sort::after { content: "↑"; color: var(--zee); }
   .port { grid-template-columns: 1fr auto; row-gap: 6px; }
   .port__track { grid-column: 1 / -1; grid-row: 2; }
   .search input { width: 100%; }
+  .table tbody th { min-width: 150px; }
   .owners__head label { width: 100%; }
 }

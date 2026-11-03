@@ -17,7 +17,7 @@
     buques: (o) => num(o.buques),
     mareas: (o) => num(o.mareas),
     pct_con_observador: (o) =>
-      `<span class="meter" style="--w:${o.pct_con_observador}%"></span>${num(o.pct_con_observador, 1)} %`,
+      `<span class="meter" style="--w:${Number(o.pct_con_observador)}%"></span>${num(o.pct_con_observador, 1)} %`,
     apagones_sin_observador: (o) => num(o.apagones_sin_observador),
     buques_senales_repetidas: (o) =>
       o.buques_senales_repetidas ? `<span class="pill pill--rojo">${num(o.buques_senales_repetidas)}</span>` : "0",
@@ -33,7 +33,7 @@
     const parts = GAP_PARTS.filter((p) => byStatus[p.key]);
     const total = parts.reduce((sum, p) => sum + byStatus[p.key], 0) || 1;
     $("#stack-apagones").innerHTML = parts
-      .map((p) => `<span class="stack__part stack__part--${p.cls}" style="--w:${(100 * byStatus[p.key]) / total}%"></span>`)
+      .map((p) => `<span class="stack__part stack__part--${p.cls}" style="--w:${Number((100 * byStatus[p.key]) / total)}%"></span>`)
       .join("");
     $("#stack-apagones").setAttribute("role", "img");
     $("#stack-apagones").setAttribute(
@@ -52,7 +52,7 @@
         const abroad = p.pais !== "ARG";
         return `<li class="port${abroad ? " port--abroad" : ""}">
           <span class="port__name">${esc(p.puerto)}${abroad ? ` <em>(${esc(p.pais)})</em>` : ""}</span>
-          <span class="port__track"><span class="port__fill" style="--w:${(100 * p.escalas) / max}%"></span></span>
+          <span class="port__track"><span class="port__fill" style="--w:${Number((100 * p.escalas) / max)}%"></span></span>
           <span class="port__value">${num(p.escalas)}<small> · ${num(p.buques)} ${p.buques === 1 ? "buque" : "buques"}</small></span>
         </li>`;
       })
@@ -64,8 +64,11 @@
     const sign = dir === "ascending" ? 1 : -1;
     return state.owners
       .filter((o) => !query || o.armador.toLowerCase().includes(query))
-      .sort((a, b) =>
-        typeof a[key] === "string" ? sign * a[key].localeCompare(b[key]) : sign * (a[key] - b[key]) || b.mareas - a.mareas,
+      .sort(
+        (a, b) =>
+          // La fila de buques sin armador no es una empresa: siempre al final.
+          (a.armador === NO_OWNER) - (b.armador === NO_OWNER) ||
+          (typeof a[key] === "string" ? sign * a[key].localeCompare(b[key]) : sign * (a[key] - b[key]) || b.mareas - a.mareas),
       );
   }
 
@@ -82,7 +85,9 @@
       if (th.dataset.key === state.key) th.setAttribute("aria-sort", state.dir);
       else th.removeAttribute("aria-sort");
     });
-    $("#owners-count").textContent = `${num(rows.length)} de ${num(state.owners.length)} empresas.`;
+    const column = document.querySelector(`#owners-table thead th[data-key="${state.key}"]`)?.textContent.trim() || "";
+    const order = state.dir === "ascending" ? "de menor a mayor" : "de mayor a menor";
+    $("#owners-count").textContent = `${num(rows.length)} de ${num(state.owners.length)} filas, ordenadas por ${column.toLowerCase()} ${order}.`;
   }
 
   function bindTable() {

@@ -112,3 +112,4 @@ class PortVisit:
     lat: float
     lon: float
     port_id: str = ""
+    port_name_inferred: bool = False

@@ -40,3 +40,17 @@ def test_ranking_de_puertos_cuenta_escalas_y_buques():
 
     assert port_ranking(visits, foreign_only=True) == [{"puerto": "MONTEVIDEO", "pais": "URY", "escalas": 2, "buques": 2}]
     assert [p["puerto"] for p in port_ranking(visits)] == ["MONTEVIDEO", "MAR DEL PLATA"]
+
+
+def test_por_armador_sin_mareas_no_divide_por_cero_y_acepta_celdas_vacias():
+    owners = by_owner([row("X1", "TRES S.A.", mareas=0, escalas="", exterior="")])
+
+    assert owners[0]["pct_con_observador"] == 0.0
+    assert owners[0]["escalas"] == 0
+
+
+def test_ranking_exterior_no_incluye_pais_desconocido():
+    when = datetime(2025, 3, 1, tzinfo=timezone.utc)
+    unknown = PortVisit("u", "A", "", when, when, 1.0, "PUERTO X", "", 4, 0.0, 0.0, "")
+
+    assert port_ranking([unknown], foreign_only=True) == []

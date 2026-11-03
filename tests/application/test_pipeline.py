@@ -65,8 +65,8 @@ def fishing_event(event_id, name, mmsi, lat, lon):
             "vessel": {"name": name, "ssvid": mmsi}}
 
 
-def port_visit(event_id, name, mmsi, port, country):
-    return {"id": event_id, "start": "2025-02-01T00:00:00Z", "end": "2025-02-02T00:00:00Z",
+def port_visit(event_id, name, mmsi, port, country, start="2025-02-01T00:00:00Z"):
+    return {"id": event_id, "start": start, "end": "2025-02-02T00:00:00Z",
             "position": {"lat": -38.0, "lon": -57.5}, "vessel": {"name": name, "ssvid": mmsi},
             "port_visit": {"confidence": "4", "durationHrs": 24,
                            "endAnchorage": {"name": port, "flag": country}}}
@@ -92,6 +92,7 @@ def bronze(tmp_path):
         port_visit("p1", "75 TAE BAEK", "701", "MONTEVIDEO", "URY"),
         port_visit("p2", "", "701", "MAR DEL PLATA", "ARG"),
         port_visit("p3", "## NANINA ##", "702", "MAR DEL PLATA", "ARG"),
+        port_visit("p4", "75 TAE BAEK", "701", "MONTEVIDEO", "URY", start="2024-06-10T00:00:00Z"),  # estadía vieja
     ]
     store.save(BRONZE["gfw_port_visits"], json.dumps(visits), source="test")
     store.save(BRONZE["eez"], json.dumps(EEZ), source="test")
@@ -144,6 +145,7 @@ def test_gold_arma_semaforo_ficha_y_capas_del_mapa(bronze, tmp_path):
     assert tae["puertos_exterior"] == "MONTEVIDEO (URY)"
     tablero = summary["tablero"]
     assert tablero["escalas_exterior"] == 1
+    assert tablero["calidad_escalas"]["de_otros_anios"] == 1
     assert tablero["puertos_exterior"] == [{"puerto": "MONTEVIDEO", "pais": "URY", "escalas": 1, "buques": 1}]
     assert tablero["por_armador"][0]["armador"] == "ILLEX FISHING S.A."
     zee = json.loads((tmp_path / "gold" / "mapa" / "zee.geojson").read_text())
