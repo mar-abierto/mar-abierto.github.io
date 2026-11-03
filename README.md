@@ -103,6 +103,7 @@ los descarga de la fuente original, y cada usuario los baja por su cuenta.
 | Archivo | Qué es |
 |---|---|
 | [`docs/adr/`](docs/adr/) | Decisiones de arquitectura, con su porqué |
+| [`docs/propuesta-de-valor.md`](docs/propuesta-de-valor.md) | Qué aporta openMar, qué no hace y qué sumar |
 | [`docs/contexto.md`](docs/contexto.md) | El problema y quién ya trabaja en esto |
 | [`docs/arquitectura.md`](docs/arquitectura.md) | Fuentes, modelo y flujo |
 | [`docs/hallazgos-2025.md`](docs/hallazgos-2025.md) | Resultados de la primera corrida |

@@ -15,6 +15,9 @@ probablemente esté en uno de estos archivos.
 | [0007](0007-fechas-locales-en-los-cruces.md) | Fechas en hora argentina para cruzar fuentes | Aceptada |
 | [0008](0008-senales-no-acusaciones.md) | Señales, no acusaciones: el semáforo | Aceptada |
 | [0009](0009-capa-de-presentacion.md) | Mapa estático con MapLibre, publicado en Vercel | Aceptada |
+| [0010](0010-conductas-no-pasaportes.md) | Conductas, no pasaportes | Aceptada |
+| [0011](0011-alcance-flota-extranjera-y-malvinas.md) | Alcance: flota extranjera, incursiones y Malvinas | Propuesta |
+| [0012](0012-personas-en-datos-societarios.md) | Personas en los datos societarios | Propuesta |
 
 ## Cómo escribir uno nuevo
 
