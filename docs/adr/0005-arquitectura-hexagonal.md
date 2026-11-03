@@ -47,3 +47,12 @@ aplicación recibe los adaptadores por parámetro.
   pueda sumar piezas sin romper el resto.
 - No se agregan microservicios, base de datos ni frameworks mientras un CSV
   alcance (YAGNI).
+
+## Deuda conocida
+
+Hoy los casos de uso de `application/` importan adaptadores concretos (lectores
+de CSV, GeoJSON y de cada fuente) en lugar de recibirlos por parámetro. No rompe
+la regla de dependencias (el dominio sigue sin conocer a nadie), pero se aparta de
+esta decisión. Cuando haga falta una segunda implementación de algún adaptador
+(por ejemplo, PostGIS en lugar de CSV), se definen los puertos correspondientes en
+`ports.py` y se inyectan.

@@ -127,3 +127,15 @@ def test_publicar_copia_las_capas_al_sitio(bronze, tmp_path):
     assert sorted(p.name for p in copied) == [
         "apagones.geojson", "buques.geojson", "pesca.geojson", "resumen.json", "zee.geojson",
     ]
+
+
+def test_publicar_borra_capas_viejas(bronze, tmp_path):
+    build_silver(bronze, tmp_path / "silver")
+    build_gold(tmp_path / "silver", tmp_path / "gold")
+    site = tmp_path / "site" / "data"
+    site.mkdir(parents=True)
+    (site / "vieja.geojson").write_text("{}")
+
+    publish_site(tmp_path / "gold", site)
+
+    assert not (site / "vieja.geojson").exists()

@@ -58,3 +58,12 @@ def test_clave_solo_convierte_el_ultimo_numero():
     # "VIEIRASA" no tiene numeral romano; "MIX" al final sí se lee como 1009 sin querer
     assert vessel_key("DOMAIO") == "DOMAIO"
     assert vessel_key("HUYU 908") == "HUYU 908"
+
+
+@pytest.mark.parametrize(("a", "b"), [("CÓNDOR", "CONDOR"), ("NIÑO", "NINO"), ("Dieciséis", "DIECISEIS")])
+def test_acentos_y_enie_no_parten_el_nombre(a, b):
+    assert normalize_vessel_name(a) == normalize_vessel_name(b)
+
+
+def test_numero_en_letras_con_tilde():
+    assert vessel_key("ESTRELLA DIECISÉIS") == "ESTRELLA 16"

@@ -152,6 +152,7 @@
       .map((v) => `<li><span class="dot dot--${esc(v.semaforo)}"></span> ${esc(v.buque)} · ${esc(v.armador || "sin armador en el registro")}</li>`)
       .join("");
     $("#sources").innerHTML = (summary.fuentes || [])
+      .filter((s) => /^https:\/\//.test(s.url || ""))
       .map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.nombre)}</a>: ${esc(s.aporta)}</li>`)
       .join("");
     const generated = summary.generado ? new Date(summary.generado) : null;
@@ -272,6 +273,19 @@
     for (const id of LAYER_GROUPS.buques) if (map.getLayer(id)) map.setFilter(id, filter);
   }
 
+  function applyLayer(map, input) {
+    for (const id of LAYER_GROUPS[input.dataset.layer]) {
+      if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", input.checked ? "visible" : "none");
+    }
+  }
+
+  function setPanelCollapsed(collapsed) {
+    $("#panel").classList.toggle("is-collapsed", collapsed);
+    $("#panel-toggle").setAttribute("aria-expanded", String(!collapsed));
+    // Plegado, el contenido no debe recibir foco ni leerse con lector de pantalla.
+    $("#panel-body").inert = collapsed && window.matchMedia("(max-width: 760px)").matches;
+  }
+
   function showPopup(map, lngLat, html, pinned) {
     const popup = new maplibregl.Popup({ closeButton: pinned, closeOnClick: pinned, maxWidth: "320px", offset: 14 })
       .setLngLat(lngLat)
@@ -290,7 +304,7 @@
     map.flyTo({ center: coords, zoom: Math.max(map.getZoom(), 6.5), duration: 1200, essential: true, padding });
     if (pinnedPopup) pinnedPopup.remove();
     pinnedPopup = showPopup(map, coords, vesselCard(feature.properties), true);
-    if (mobile) $("#panel").classList.add("is-collapsed");
+    if (mobile) setPanelCollapsed(true);
   }
 
   function bindMapEvents(map) {
@@ -331,17 +345,12 @@
       }),
     );
     document.querySelectorAll("[data-layer]").forEach((input) =>
-      input.addEventListener("change", () => {
-        for (const id of LAYER_GROUPS[input.dataset.layer]) {
-          if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", input.checked ? "visible" : "none");
-        }
-      }),
+      input.addEventListener("change", () => applyLayer(map, input)),
     );
     $("#search").addEventListener("input", () => renderList(map));
-    $("#panel-toggle").addEventListener("click", () => {
-      const collapsed = $("#panel").classList.toggle("is-collapsed");
-      $("#panel-toggle").setAttribute("aria-expanded", String(!collapsed));
-    });
+    $("#panel-toggle").addEventListener("click", () =>
+      setPanelCollapsed(!$("#panel").classList.contains("is-collapsed")),
+    );
     $("#limits-toggle").addEventListener("click", () => {
       const list = $("#limits-list");
       const open = list.hidden;
@@ -363,10 +372,7 @@
     );
     renderCounts(summary);
     renderStatic(summary);
-    if (window.matchMedia("(max-width: 760px)").matches) {
-      $("#panel").classList.add("is-collapsed");
-      $("#panel-toggle").setAttribute("aria-expanded", "false");
-    }
+    if (window.matchMedia("(max-width: 760px)").matches) setPanelCollapsed(true);
 
     const map = new maplibregl.Map({
       container: "map",
@@ -385,7 +391,15 @@
       tuneBase(map);
       addLayers(map, { buques, apagones, pesca, zee });
       bindMapEvents(map);
+      // El panel pudo cambiar filtros o capas antes de que el mapa cargara.
+      applyColorFilter(map);
+      document.querySelectorAll("[data-layer]").forEach((input) => applyLayer(map, input));
       status.classList.add("is-hidden");
+    });
+    map.on("error", (event) => {
+      if (map.loaded()) return; // un error aislado de una tesela no frena el mapa
+      status.classList.remove("is-hidden");
+      status.textContent = `No se pudo cargar el mapa base${event.error?.message ? `: ${event.error.message}` : ""}. Probá recargar la página.`;
     });
     bindPanel(map);
     renderList(map);

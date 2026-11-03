@@ -187,6 +187,9 @@ def publish_site(gold_dir: Path, site_data_dir: Path) -> list[Path]:
     """Copia los GeoJSON y el resumen del mapa a la carpeta del sitio."""
     site_data_dir = Path(site_data_dir)
     site_data_dir.mkdir(parents=True, exist_ok=True)
+    for stale in site_data_dir.iterdir():
+        if stale.is_file():
+            stale.unlink()
     copied = []
     for source in sorted((Path(gold_dir) / "mapa").iterdir()):
         target = site_data_dir / source.name

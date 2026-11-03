@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+  <link href="vendor/maplibre-gl@4.7.1/maplibre-gl.css" rel="stylesheet">
   <link href="styles.css" rel="stylesheet">
 </head>
 <body>
@@ -64,7 +64,7 @@
         <section class="block block--list" aria-labelledby="buques-title">
           <div class="block__head">
             <h2 class="block__title" id="buques-title">Buques</h2>
-            <span class="block__meta" id="list-count"></span>
+            <span class="block__meta" id="list-count" aria-live="polite"></span>
           </div>
           <label class="search">
             <span class="sr-only">Buscar buque o armador</span>
@@ -106,7 +106,7 @@
     </footer>
   </main>
 
-  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="vendor/maplibre-gl@4.7.1/maplibre-gl.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

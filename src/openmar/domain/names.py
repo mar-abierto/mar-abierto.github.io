@@ -6,6 +6,7 @@ lleva a una única forma comparable.
 """
 
 import re
+import unicodedata
 
 _NUMERO_PREFIJO = re.compile(r"\bN\s*[º°]\s*")
 _NUMERO_PEGADO = re.compile(r"\bN(\d+)\b")
@@ -21,8 +22,11 @@ def normalize_vessel_name(name: str | None) -> str:
     """Devuelve el nombre en mayúsculas, sin símbolos y con el número al final."""
     if not name:
         return ""
-    text = name.upper()
-    text = _NUMERO_PREFIJO.sub("", text)
+    # "Nº" se quita antes de normalizar: NFKD convierte "º" en "o".
+    text = _NUMERO_PREFIJO.sub("", name.upper())
+    # Sin tildes ni eñe: CÓNDOR y CONDOR son el mismo buque en distintas fuentes.
+    text = unicodedata.normalize("NFKD", text)
+    text = "".join(c for c in text if not unicodedata.combining(c))
     text = _NO_ALFANUMERICO.sub(" ", text)
     text = _NUMERO_PEGADO.sub(r"\1", text)
     text = _ESPACIOS.sub(" ", text).strip()

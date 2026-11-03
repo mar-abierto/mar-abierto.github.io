@@ -100,13 +100,14 @@ button, input { font: inherit; color: inherit; }
   background: var(--sea-2); outline: none; transition: border-color 200ms var(--ease);
 }
 .search input::placeholder { color: var(--ink-3); }
-.search input:focus { border-color: var(--zee); }
+.search input:focus-visible { border-color: var(--zee); outline: 2px solid var(--zee); outline-offset: 1px; }
 .vessels { list-style: none; margin: 10px 0 0; padding: 0; }
 .vessel {
   display: grid; grid-template-columns: 10px 1fr auto; align-items: center; gap: 12px;
   width: 100%; padding: 9px 8px; border: 0; border-radius: 10px; background: none; text-align: left; cursor: pointer;
 }
-.vessel:hover, .vessel:focus-visible { background: var(--sea-2); outline: none; }
+.vessel:hover { background: var(--sea-2); }
+.vessel:focus-visible { background: var(--sea-2); outline: 2px solid var(--zee); outline-offset: -2px; }
 .vessel__name { font-weight: 500; }
 .vessel__owner { display: block; color: var(--ink-3); font-size: 12px; }
 .vessel__metric { color: var(--ink-2); font-size: 12px; font-variant-numeric: tabular-nums; text-align: right; }
