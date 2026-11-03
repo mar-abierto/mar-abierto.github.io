@@ -7,7 +7,7 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import TypeVar
 
-from openmar.domain.model import AisGap, Coverage, FishingEvent, RegistryRecord, Trip, YearlyCoverage
+from openmar.domain.model import AisGap, Coverage, FishingEvent, PortVisit, RegistryRecord, Trip, YearlyCoverage
 
 T = TypeVar("T")
 
@@ -76,6 +76,10 @@ def read_coverage(path: Path) -> list[Coverage]:
 
 def read_yearly_coverage(path: Path) -> list[YearlyCoverage]:
     return _read_items(path, YearlyCoverage)
+
+
+def read_port_visits(path: Path) -> list[PortVisit]:
+    return _read_items(path, PortVisit)
 
 
 def read_gaps(path: Path) -> list[AisGap]:

@@ -10,12 +10,13 @@ from datetime import datetime
 
 import requests
 
-from openmar.domain.model import AisGap, FishingEvent
+from openmar.domain.model import AisGap, FishingEvent, PortVisit
 
 BASE_URL = "https://gateway.api.globalfishingwatch.org/v3"
 IDENTITY_DATASET = "public-global-vessel-identity:latest"
 GAPS_DATASET = "public-global-gaps-events:latest"
 FISHING_DATASET = "public-global-fishing-events:latest"
+PORT_VISITS_DATASET = "public-global-port-visits-events:latest"
 EVENTS_PAGE_SIZE = 500
 
 
@@ -64,6 +65,31 @@ def parse_fishing_event(raw: dict) -> FishingEvent:
         start=_parse_time(raw["start"]),
         lat=float(position["lat"]),
         lon=float(position["lon"]),
+    )
+
+
+def parse_port_visit(raw: dict) -> PortVisit:
+    """Convierte una escala en puerto de la API en un `PortVisit`.
+
+    El puerto es el ancladero de llegada; si no está, el de salida.
+    """
+    vessel = raw.get("vessel", {})
+    position = raw.get("position", {})
+    visit = raw.get("port_visit", {})
+    anchorage = visit.get("endAnchorage") or visit.get("startAnchorage") or {}
+    return PortVisit(
+        event_id=raw["id"],
+        vessel_name=vessel.get("name") or "",
+        mmsi=vessel.get("ssvid", ""),
+        start=_parse_time(raw["start"]),
+        end=_parse_time(raw["end"]),
+        hours=float(visit.get("durationHrs") or 0),
+        port_name=anchorage.get("name") or "",
+        port_country=anchorage.get("flag") or "",
+        confidence=int(visit.get("confidence") or 0),
+        lat=float(position.get("lat", 0.0)),
+        lon=float(position.get("lon", 0.0)),
+        port_id=anchorage.get("id") or "",
     )
 
 

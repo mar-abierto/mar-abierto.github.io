@@ -25,10 +25,11 @@ def test_gfw_baja_apagones_y_pesca_de_buques_activos(tmp_path):
 
     stats = download_gfw(store, client, "2025-01-01", "2025-12-31")
 
-    assert stats == {"buques": 3, "activos": 2, "apagones": 1, "eventos_de_pesca": 1}
+    assert stats == {"buques": 3, "activos": 2, "apagones": 1, "eventos_de_pesca": 1, "escalas_en_puerto": 1}
     assert all(ids == ["activo", "sin-fecha"] for _, ids in client.requested)
     assert json.loads(store.read_text(BRONZE["gfw_gaps"])) == [{"id": "public-global-gaps-events:latest"}]
     assert store.path(BRONZE["gfw_fishing"] + ".meta.json").exists()
+    assert json.loads(store.read_text(BRONZE["gfw_port_visits"])) == [{"id": "public-global-port-visits-events:latest"}]
 
 
 def test_registro_y_zee_se_guardan_con_su_fuente(tmp_path):

@@ -65,6 +65,13 @@ def fishing_event(event_id, name, mmsi, lat, lon):
             "vessel": {"name": name, "ssvid": mmsi}}
 
 
+def port_visit(event_id, name, mmsi, port, country):
+    return {"id": event_id, "start": "2025-02-01T00:00:00Z", "end": "2025-02-02T00:00:00Z",
+            "position": {"lat": -38.0, "lon": -57.5}, "vessel": {"name": name, "ssvid": mmsi},
+            "port_visit": {"confidence": "4", "durationHrs": 24,
+                           "endAnchorage": {"name": port, "flag": country}}}
+
+
 @pytest.fixture
 def bronze(tmp_path):
     store = LocalRawStore(tmp_path / "bronze")
@@ -81,6 +88,12 @@ def bronze(tmp_path):
     store.save(BRONZE["gfw_gaps"], json.dumps(gaps), source="test")
     fishing = [fishing_event("f1", "75 TAE BAEK", "701", -45, -60), fishing_event("f2", "", "702", -46, -61)]
     store.save(BRONZE["gfw_fishing"], json.dumps(fishing), source="test")
+    visits = [
+        port_visit("p1", "75 TAE BAEK", "701", "MONTEVIDEO", "URY"),
+        port_visit("p2", "", "701", "MAR DEL PLATA", "ARG"),
+        port_visit("p3", "## NANINA ##", "702", "MAR DEL PLATA", "ARG"),
+    ]
+    store.save(BRONZE["gfw_port_visits"], json.dumps(visits), source="test")
     store.save(BRONZE["eez"], json.dumps(EEZ), source="test")
     return store
 
@@ -127,6 +140,12 @@ def test_gold_arma_semaforo_ficha_y_capas_del_mapa(bronze, tmp_path):
     assert [v["buque"] for v in relato["senales_repetidas"]] == ["TAE BAEK 75"]
     assert relato["senales_repetidas"][0]["en_marea_con_observador"] == 0
     assert summary["reglas"]["horas_minimas_apagon"] == 12
+    assert tae["escalas"] == "2" and tae["escalas_exterior"] == "1"
+    assert tae["puertos_exterior"] == "MONTEVIDEO (URY)"
+    tablero = summary["tablero"]
+    assert tablero["escalas_exterior"] == 1
+    assert tablero["puertos_exterior"] == [{"puerto": "MONTEVIDEO", "pais": "URY", "escalas": 1, "buques": 1}]
+    assert tablero["por_armador"][0]["armador"] == "ILLEX FISHING S.A."
     zee = json.loads((tmp_path / "gold" / "mapa" / "zee.geojson").read_text())
     assert zee["features"][0]["properties"]["nombre"] == "Argentinian Exclusive Economic Zone"
 

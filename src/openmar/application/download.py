@@ -4,7 +4,7 @@ import json
 from collections.abc import Callable
 
 from openmar.adapters import geo, inidep, rfp
-from openmar.adapters.gfw import BASE_URL, FISHING_DATASET, GAPS_DATASET, GFWClient
+from openmar.adapters.gfw import BASE_URL, FISHING_DATASET, GAPS_DATASET, PORT_VISITS_DATASET, GFWClient
 from openmar.ports import RawStore
 
 # Ubicación de cada dato crudo dentro de bronze. Un solo lugar para cambiarla.
@@ -12,6 +12,7 @@ BRONZE = {
     "gfw_vessels": "gfw/buques.json",
     "gfw_gaps": "gfw/apagones.json",
     "gfw_fishing": "gfw/pesca.json",
+    "gfw_port_visits": "gfw/puertos.json",
     "inidep_trips": "inidep/ito-026-2025.txt",
     "inidep_coverage": "inidep/observadores-2024.txt",
     "registry": "rfp/datos-de-pesca.html",
@@ -29,7 +30,7 @@ def _vessel_id(entry: dict) -> tuple[str, str]:
 
 
 def download_gfw(store: RawStore, client: GFWClient, start: str, end: str) -> dict[str, int]:
-    """Poteros con bandera argentina, sus apagones de AIS y sus eventos de pesca."""
+    """Poteros con bandera argentina: apagones de AIS, eventos de pesca y escalas en puerto."""
     vessels = client.search_vessels(SQUID_FLEET_QUERY)
     store.save(BRONZE["gfw_vessels"], json.dumps(vessels), source=f"{BASE_URL}/vessels/search", query=SQUID_FLEET_QUERY)
     # Un buque sin fecha de última transmisión se conserva: mejor de más que perderlo.
@@ -41,7 +42,17 @@ def download_gfw(store: RawStore, client: GFWClient, start: str, end: str) -> di
     store.save(
         BRONZE["gfw_fishing"], json.dumps(fishing), source=f"{BASE_URL}/events", dataset=FISHING_DATASET, period=period
     )
-    return {"buques": len(vessels), "activos": len(active), "apagones": len(gaps), "eventos_de_pesca": len(fishing)}
+    visits = client.get_events(PORT_VISITS_DATASET, active, start, end)
+    store.save(
+        BRONZE["gfw_port_visits"], json.dumps(visits), source=f"{BASE_URL}/events", dataset=PORT_VISITS_DATASET, period=period
+    )
+    return {
+        "buques": len(vessels),
+        "activos": len(active),
+        "apagones": len(gaps),
+        "eventos_de_pesca": len(fishing),
+        "escalas_en_puerto": len(visits),
+    }
 
 
 def download_inidep(store: RawStore, fetch: Fetch) -> dict[str, int]:

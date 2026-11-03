@@ -1,0 +1,61 @@
+"""Indicadores del tablero: los mismos números para todas las empresas (ADR 0010)."""
+
+from collections import defaultdict
+
+from openmar.domain.model import PortVisit
+from openmar.domain.port_visits import HOME_COUNTRY, MIN_CONFIDENCE
+from openmar.domain.signals import RED
+
+NO_OWNER = "Sin armador en el registro"
+_SUMS = {
+    "mareas": "mareas_temporada",
+    "mareas_con_observador": "mareas_con_observador",
+    "apagones": "apagones",
+    "apagones_sin_observador": "en_marea_sin_observador",
+    "escalas": "escalas",
+    "escalas_exterior": "escalas_exterior",
+    "captura_t": "captura_t",
+}
+
+
+def by_owner(vessels: list[dict]) -> list[dict]:
+    """Agrupa los buques por armador. Ordena por cantidad de mareas."""
+    groups: dict[str, list[dict]] = defaultdict(list)
+    for v in vessels:
+        groups[v["armador"] or NO_OWNER].append(v)
+    owners = []
+    for owner, items in groups.items():
+        totals = {key: sum(float(v[field] or 0) for v in items) for key, field in _SUMS.items()}
+        trips = int(totals["mareas"])
+        owners.append(
+            {
+                "armador": owner,
+                "buques": len(items),
+                "mareas": trips,
+                "mareas_con_observador": int(totals["mareas_con_observador"]),
+                "pct_con_observador": round(100 * totals["mareas_con_observador"] / trips, 1) if trips else 0.0,
+                "apagones": int(totals["apagones"]),
+                "apagones_sin_observador": int(totals["apagones_sin_observador"]),
+                "escalas": int(totals["escalas"]),
+                "escalas_exterior": int(totals["escalas_exterior"]),
+                "buques_senales_repetidas": sum(v["semaforo"] == RED for v in items),
+                "captura_t": round(totals["captura_t"], 1),
+            }
+        )
+    return sorted(owners, key=lambda o: (o["armador"] == NO_OWNER, -o["mareas"], o["armador"]))
+
+
+def port_ranking(visits: list[PortVisit], foreign_only: bool = False, min_confidence: int = MIN_CONFIDENCE) -> list[dict]:
+    """Puertos donde hicieron escala los buques, de más a menos escalas."""
+    counts: dict[tuple[str, str], list[str]] = defaultdict(list)
+    for v in visits:
+        if v.confidence < min_confidence or not v.port_name:
+            continue
+        if foreign_only and v.port_country == HOME_COUNTRY:
+            continue
+        counts[(v.port_name, v.port_country)].append(v.vessel_name)
+    rows = [
+        {"puerto": port, "pais": country, "escalas": len(names), "buques": len(set(names))}
+        for (port, country), names in counts.items()
+    ]
+    return sorted(rows, key=lambda r: (-r["escalas"], r["puerto"]))

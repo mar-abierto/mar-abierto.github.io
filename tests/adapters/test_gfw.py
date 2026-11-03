@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 import pytest
 
-from openmar.adapters.gfw import GFWClient, GFWError, parse_gap_event
+from openmar.adapters.gfw import GFWClient, GFWError, parse_gap_event, parse_port_visit
 
 
 class FakeResponse:
@@ -149,3 +149,39 @@ def test_parse_gap_event():
     assert gap.start_km_from_shore == 204
     assert gap.end_km_from_shore == 112
     assert gap.intentional is True
+
+
+PORT_VISIT = {
+    "id": "pv1",
+    "start": "2025-02-10T11:00:00.000Z",
+    "end": "2025-02-12T23:00:00.000Z",
+    "position": {"lat": -34.9, "lon": -56.2},
+    "vessel": {"id": "v", "name": "LU QING YUAN YU 279", "ssvid": "701155000", "flag": "ARG"},
+    "port_visit": {
+        "confidence": "4",
+        "durationHrs": 60.0,
+        "startAnchorage": {"id": "ury-montevideo", "name": "MONTEVIDEO", "flag": "URY"},
+        "endAnchorage": {"id": "ury-montevideo", "name": "MONTEVIDEO", "flag": "URY"},
+    },
+}
+
+
+def test_parse_port_visit_toma_puerto_pais_y_confianza():
+    visit = parse_port_visit(PORT_VISIT)
+
+    assert visit.event_id == "pv1"
+    assert visit.vessel_name == "LU QING YUAN YU 279"
+    assert visit.port_name == "MONTEVIDEO"
+    assert visit.port_country == "URY"
+    assert visit.confidence == 4
+    assert visit.port_id == "ury-montevideo"
+    assert visit.hours == 60.0
+    assert visit.start == datetime(2025, 2, 10, 11, tzinfo=timezone.utc)
+
+
+def test_parse_port_visit_sin_puerto_deja_vacio():
+    raw = {**PORT_VISIT, "port_visit": {"confidence": "2", "durationHrs": 3}}
+
+    visit = parse_port_visit(raw)
+
+    assert (visit.port_name, visit.port_country, visit.confidence) == ("", "", 2)

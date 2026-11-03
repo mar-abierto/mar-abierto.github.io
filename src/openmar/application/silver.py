@@ -5,13 +5,14 @@ import json
 from pathlib import Path
 
 from openmar.adapters import geo
-from openmar.adapters.gfw import parse_fishing_event, parse_gap_event
+from openmar.adapters.gfw import parse_fishing_event, parse_gap_event, parse_port_visit
 from openmar.adapters.inidep import parse_observer_coverage, parse_observer_coverage_by_year, parse_trips_annex
 from openmar.adapters.rfp import parse_registry_html
 from openmar.adapters.tabular import write_items, write_rows
 from openmar.application.download import BRONZE
 from openmar.domain.matching import resolve_vessel_name
 from openmar.domain.names import normalize_vessel_name
+from openmar.domain.port_visits import fill_port_names
 from openmar.ports import RawStore
 
 SILVER = {
@@ -22,6 +23,7 @@ SILVER = {
     "vessels": "buques.csv",
     "gaps": "apagones.csv",
     "fishing": "pesca.csv",
+    "port_visits": "puertos.csv",
     "eez": "zee.geojson",
 }
 
@@ -64,6 +66,7 @@ def build_silver(store: RawStore, silver_dir: Path) -> dict[str, int]:
 
     gaps = [unify(parse_gap_event(e)) for e in json.loads(store.read_text(BRONZE["gfw_gaps"]))]
     fishing = [unify(parse_fishing_event(e)) for e in json.loads(store.read_text(BRONZE["gfw_fishing"]))]
+    visits = fill_port_names([unify(parse_port_visit(e)) for e in json.loads(store.read_text(BRONZE["gfw_port_visits"]))])
 
     coverage_text = store.read_text(BRONZE["inidep_coverage"])
     counts = {
@@ -74,6 +77,7 @@ def build_silver(store: RawStore, silver_dir: Path) -> dict[str, int]:
         "identidades": write_rows(out["vessels"], identities),
         "apagones": write_items(out["gaps"], gaps),
         "eventos_de_pesca": write_items(out["fishing"], fishing),
+        "escalas_en_puerto": write_items(out["port_visits"], visits),
     }
     geo.write_geojson(out["eez"], geo.simplify_eez(store.read_text(BRONZE["eez"])))
     return counts

@@ -94,3 +94,21 @@ class RegistryRecord:
     @property
     def is_squid_jigger(self) -> bool:
         return "POTER" in self.technical.upper() or "CALAMAR" in self.authorization.upper()
+
+
+@dataclass(frozen=True)
+class PortVisit:
+    """Una escala en puerto detectada por AIS. No dice qué se hizo ahí."""
+
+    event_id: str
+    vessel_name: str
+    mmsi: str
+    start: datetime
+    end: datetime
+    hours: float
+    port_name: str
+    port_country: str
+    confidence: int
+    lat: float
+    lon: float
+    port_id: str = ""

@@ -11,6 +11,7 @@ from openmar.adapters.tabular import (
     read_coverage,
     read_fishing,
     read_gaps,
+    read_port_visits,
     read_registry,
     read_trips,
     read_yearly_coverage,
@@ -18,6 +19,7 @@ from openmar.adapters.tabular import (
 )
 from openmar.application.silver import SILVER
 from openmar.domain import signals
+from openmar.domain.dashboard import by_owner, port_ranking
 from openmar.domain.matching import (
     NEAR_200NM_KM,
     STATUS_NO_TRIP,
@@ -32,6 +34,7 @@ from openmar.domain.matching import (
 )
 from openmar.domain.model import RegistryRecord
 from openmar.domain.names import vessel_key
+from openmar.domain.port_visits import port_summary
 from openmar.domain.positions import fishing_grid, vessel_position
 from openmar.domain.story import coverage_by_year, history_figures, season_figures
 
@@ -51,6 +54,8 @@ EMPTY_COUNTS = {
     STATUS_NO_TRIP: 0,
     STATUS_UNMATCHED: 0,
 }
+
+NO_PORTS = {"escalas": 0, "escalas_exterior": 0, "puertos_exterior": "", "puerto_principal": ""}
 
 SOURCES = [
     {"nombre": "Global Fishing Watch", "url": "https://globalfishingwatch.org", "aporta": "identidad de buques, apagones de AIS y eventos de pesca"},
@@ -77,6 +82,7 @@ def _vessel_rows(silver_dir: Path) -> tuple[list[dict], list]:
     registry = _registry_index(read_registry(silver_dir / SILVER["registry"]))
     gaps = read_gaps(silver_dir / SILVER["gaps"])
     fishing = read_fishing(silver_dir / SILVER["fishing"])
+    ports = {vessel_key(name): data for name, data in port_summary(read_port_visits(silver_dir / SILVER["port_visits"])).items()}
 
     matches = match_gaps_to_trips(gaps, trips)
     summary = summarize_by_vessel(matches)
@@ -98,6 +104,7 @@ def _vessel_rows(silver_dir: Path) -> tuple[list[dict], list]:
         vessel_fishing = fishing_by_key.get(key, [])
         position = vessel_position(vessel_fishing, gap_points.get(vessel, []))
         color = signals.classify(counts)
+        port = ports.get(key, NO_PORTS)
         rows.append(
             {
                 "buque": vessel,
@@ -118,6 +125,7 @@ def _vessel_rows(silver_dir: Path) -> tuple[list[dict], list]:
                 "lat_zona_pesca": round(position[0], 4) if position else "",
                 "lon_zona_pesca": round(position[1], 4) if position else "",
                 "posicion_segun": position[2] if position else "",
+                **port,
             }
         )
     return rows, matches
@@ -189,6 +197,21 @@ def _story(vessels: list[dict], gaps: list[dict], silver_dir: Path) -> dict:
     }
 
 
+def _dashboard(vessels: list[dict], silver_dir: Path) -> dict:
+    """Indicadores comparables entre empresas y escalas fuera del país."""
+    # Sólo escalas de buques de la temporada (los que tienen mareas o apagones cruzados).
+    fleet = {vessel_key(v["buque"]) for v in vessels}
+    visits = [p for p in read_port_visits(silver_dir / SILVER["port_visits"]) if vessel_key(p.vessel_name) in fleet]
+    return {
+        "por_armador": by_owner(vessels),
+        "escalas": sum(v["escalas"] for v in vessels),
+        "escalas_exterior": sum(v["escalas_exterior"] for v in vessels),
+        "buques_con_escalas_exterior": sum(v["escalas_exterior"] > 0 for v in vessels),
+        "puertos": port_ranking(visits),
+        "puertos_exterior": port_ranking(visits, foreign_only=True),
+    }
+
+
 def _summary(vessels: list[dict], gaps: list[dict], silver_dir: Path) -> dict:
     by_color = {c: sum(v["semaforo"] == c for v in vessels) for c in (signals.GREEN, signals.YELLOW, signals.RED)}
     return {
@@ -212,6 +235,7 @@ def _summary(vessels: list[dict], gaps: list[dict], silver_dir: Path) -> dict:
             "horas_minimas_apagon": GFW_GAP_MIN_HOURS,
         },
         "relato": _story(vessels, gaps, silver_dir),
+        "tablero": _dashboard(vessels, silver_dir),
         "fuentes": SOURCES,
     }
 
