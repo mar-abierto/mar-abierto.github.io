@@ -12,7 +12,7 @@ proyecto no tiene presupuesto de infraestructura.
 ## Decisión
 
 - **Sitio estático** en `site/`: HTML, CSS y JavaScript sin paso de build.
-- **MapLibre GL JS** desde CDN, con fondo de mapa oscuro de CARTO (con su
+- **MapLibre GL JS** desde CDN, con fondo de mapa oscuro de OpenFreeMap (con su
   atribución). Un fondo oscuro hace que el semáforo se lea como luces en el mar.
 - El sitio sólo lee GeoJSON generados por el caso de uso de publicación en
   `gold/mapa/` y copiados a `site/data/` (ADR 0006).
@@ -21,6 +21,14 @@ proyecto no tiene presupuesto de infraestructura.
   permite buscar por nombre o armador.
 - **Publicación en Vercel** como sitio estático. Mientras el contenido no esté
   revisado, el despliegue queda **protegido** (sólo la cuenta del autor lo ve).
+
+**Malvinas.** El polígono de Marine Regions (MRGID 8466) excluye el área en
+disputa alrededor de las Islas Malvinas. El mapa lo aclara en pantalla: no es una
+posición sobre la soberanía. Las etiquetas del mapa base se muestran en castellano
+(`name:es` de OpenStreetMap: "Islas Malvinas", "Puerto Argentino").
+
+**Mapa base.** CARTO pasó a exigir clave de API; se usa OpenFreeMap (estilo
+`dark`), abierto y sin clave.
 
 ## Consecuencias
 

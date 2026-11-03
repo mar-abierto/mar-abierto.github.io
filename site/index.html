@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>openMar · El Mar Argentino, a la vista de todos</title>
+  <meta name="description" content="Mapa abierto de la flota potera argentina: apagones de AIS, mareas con y sin observador y armadores, barco por barco, con la fuente de cada dato.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#04080f">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2304080f'/%3E%3Ccircle cx='11' cy='19' r='4' fill='%2334d399'/%3E%3Ccircle cx='19' cy='12' r='3' fill='%23fbbf24'/%3E%3Ccircle cx='22' cy='21' r='3' fill='%23fb5a6e'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+  <main class="app">
+    <aside class="panel" id="panel" aria-label="Capas y buques">
+      <button class="panel__handle" id="panel-toggle" aria-expanded="true" aria-controls="panel-body">
+        <span class="panel__handle-bar" aria-hidden="true"></span>
+        <span class="sr-only">Mostrar u ocultar el panel</span>
+      </button>
+
+      <header class="brand">
+        <p class="brand__draft">Borrador · en revisión</p>
+        <h1 class="brand__title">open<span>Mar</span></h1>
+        <p class="brand__lede">La flota potera argentina en la temporada de calamar 2025, barco por barco. Cada luz es un buque en su zona habitual de pesca.</p>
+      </header>
+
+      <div class="panel__body" id="panel-body">
+        <section class="block" aria-labelledby="semaforo-title">
+          <h2 class="block__title" id="semaforo-title">Señales para revisar</h2>
+          <div class="lights" role="group" aria-label="Filtrar por color">
+            <button class="light light--rojo is-on" data-color="rojo" aria-pressed="true">
+              <span class="light__dot" aria-hidden="true"></span>
+              <span class="light__count" data-count="rojo">–</span>
+              <span class="light__label">Repetidas</span>
+            </button>
+            <button class="light light--amarillo is-on" data-color="amarillo" aria-pressed="true">
+              <span class="light__dot" aria-hidden="true"></span>
+              <span class="light__count" data-count="amarillo">–</span>
+              <span class="light__label">Aisladas</span>
+            </button>
+            <button class="light light--verde is-on" data-color="verde" aria-pressed="true">
+              <span class="light__dot" aria-hidden="true"></span>
+              <span class="light__count" data-count="verde">–</span>
+              <span class="light__label">Sin señales</span>
+            </button>
+          </div>
+          <p class="note">Un apagón de AIS es un corte de 12 horas o más en la señal de posición. <strong>No es una infracción</strong>: los buques también reportan por VMS, que no es público. El color indica dónde mirar primero.</p>
+        </section>
+
+        <section class="block" aria-labelledby="capas-title">
+          <h2 class="block__title" id="capas-title">Capas</h2>
+          <ul class="layers">
+            <li><label class="switch"><input type="checkbox" data-layer="buques" checked><span class="switch__ui" aria-hidden="true"></span>Buques y nombres</label></li>
+            <li><label class="switch"><input type="checkbox" data-layer="apagones" checked><span class="switch__ui" aria-hidden="true"></span>Apagones de AIS <span class="swatch swatch--ring" aria-hidden="true"></span></label></li>
+            <li><label class="switch"><input type="checkbox" data-layer="pesca"><span class="switch__ui" aria-hidden="true"></span>Actividad de pesca <span class="swatch swatch--glow" aria-hidden="true"></span></label></li>
+            <li><label class="switch"><input type="checkbox" data-layer="zee" checked><span class="switch__ui" aria-hidden="true"></span>Límite de la ZEE (milla 200) <span class="swatch swatch--line" aria-hidden="true"></span></label></li>
+          </ul>
+        </section>
+
+        <section class="block block--list" aria-labelledby="buques-title">
+          <div class="block__head">
+            <h2 class="block__title" id="buques-title">Buques</h2>
+            <span class="block__meta" id="list-count"></span>
+          </div>
+          <label class="search">
+            <span class="sr-only">Buscar buque o armador</span>
+            <input type="search" id="search" placeholder="Buscar buque o armador" autocomplete="off">
+          </label>
+          <ol class="vessels" id="vessels"></ol>
+          <details class="missing">
+            <summary>Sin datos de AIS en 2025 <span id="missing-count"></span></summary>
+            <p class="note">Pescaron según el INIDEP, pero Global Fishing Watch no tiene su recorrido. No aparecen en el mapa.</p>
+            <ul id="missing"></ul>
+          </details>
+        </section>
+
+        <section class="block block--about" aria-labelledby="leer-title">
+          <h2 class="block__title" id="leer-title">Cómo leer este mapa</h2>
+          <ul class="rules">
+            <li><span class="dot dot--rojo" aria-hidden="true"></span><strong>Señales repetidas:</strong> 3 o más apagones en mareas sin observador del INIDEP, o fuera de las fechas de marea.</li>
+            <li><span class="dot dot--amarillo" aria-hidden="true"></span><strong>Señales aisladas:</strong> 1 o 2 apagones así, o apagones sólo con observador a bordo.</li>
+            <li><span class="dot dot--verde" aria-hidden="true"></span><strong>Sin señales:</strong> sin apagones registrados por GFW. No significa "cumple": un buque que casi no transmite tampoco tiene apagones.</li>
+          </ul>
+          <p class="note">La posición es la mediana de sus eventos de pesca de 2025, no dónde está hoy. La "franja de la milla 200" se aproxima con la distancia a la costa (300 a 450 km).</p>
+          <h3 class="block__subtitle">Fuentes</h3>
+          <ul class="sources" id="sources"></ul>
+          <p class="foot">Código abierto (MIT) · Resultados CC BY 4.0 · <span id="generated"></span></p>
+        </section>
+      </div>
+    </aside>
+
+    <div class="map" id="map" role="region" aria-label="Mapa del Mar Argentino"></div>
+    <div class="map-status" id="map-status" role="status">Cargando el mar…</div>
+
+    <footer class="limits" id="limits" aria-labelledby="limits-title">
+      <button class="limits__toggle" id="limits-toggle" aria-expanded="false" aria-controls="limits-list">
+        <span class="limits__icon" aria-hidden="true">!</span>
+        <span id="limits-title"><strong>Lo que este mapa no muestra.</strong> <span id="limits-short">Datos faltantes y límites de las fuentes.</span></span>
+        <span class="limits__more">Ver detalle</span>
+      </button>
+      <ul class="limits__list" id="limits-list" hidden></ul>
+    </footer>
+  </main>
+
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

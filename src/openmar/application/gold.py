@@ -150,6 +150,12 @@ def _summary(vessels: list[dict], gaps: list[dict]) -> dict:
         "buques": len(vessels),
         "buques_en_mapa": sum(v["lat_zona_pesca"] != "" for v in vessels),
         "por_color": by_color,
+        "sin_posicion": [
+            {k: v[k] for k in ("buque", "armador", "matricula", "semaforo", "mareas_temporada", "apagones")}
+            for v in vessels
+            if v["lat_zona_pesca"] == ""
+        ],
+        "sin_armador": [v["buque"] for v in vessels if not v["armador"]],
         "apagones": len(gaps),
         "apagones_por_estado": {s: sum(g["estado"] == s for g in gaps) for s in EMPTY_COUNTS if s not in ("apagones", "franja_milla_200")},
         "reglas": {

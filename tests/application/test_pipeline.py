@@ -112,6 +112,8 @@ def test_gold_arma_semaforo_ficha_y_capas_del_mapa(bronze, tmp_path):
     buques = json.loads((tmp_path / "gold" / "mapa" / "buques.geojson").read_text())
     assert {f["properties"]["buque"] for f in buques["features"]} == {"TAE BAEK 75", "NANINA"}
     assert summary["buques_en_mapa"] == 2
+    assert [v["buque"] for v in summary["sin_posicion"]] == ["SIN APAGONES"]
+    assert summary["sin_armador"] == ["NANINA", "SIN APAGONES"]
     zee = json.loads((tmp_path / "gold" / "mapa" / "zee.geojson").read_text())
     assert zee["features"][0]["properties"]["nombre"] == "Argentinian Exclusive Economic Zone"
 
