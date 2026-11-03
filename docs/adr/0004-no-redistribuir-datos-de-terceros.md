@@ -28,6 +28,10 @@ algo que no nos corresponde.
 - Lo que sí se publica (el mapa, los informes) son **resultados derivados**, con
   la fuente de cada dato citada.
 
+**Excepción: `site/data/`.** Los GeoJSON del mapa son resultados derivados (lo
+que se publica) y se versionan para poder desplegar el sitio desde el repositorio.
+No contienen datos crudos de ninguna fuente ni nombres de personas.
+
 ## Consecuencias
 
 - No hay conflictos de licencia en el repositorio.
