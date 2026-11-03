@@ -15,6 +15,7 @@ from openmar.normalize import normalize_vessel_name
         ("MISHIMA MARU N°8", "MISHIMA MARU 8"),
         ("MISHIMA MARU N8", "MISHIMA MARU 8"),
         ("HU YU 908", "HUYU 908"),
+        ("SHU YU 12", "SHU YU 12"),
         ("Natalia", "NATALIA"),
         ("  lu   qing yuan yu 288 ", "LU QING YUAN YU 288"),
     ],

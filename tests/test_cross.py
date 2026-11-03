@@ -71,6 +71,47 @@ def test_tolerancia_de_dias_alrededor_de_la_marea():
     assert outside.status == STATUS_NO_TRIP
 
 
+def test_usa_la_fecha_argentina_del_apagon_no_la_utc():
+    # 2025-01-29 02:00 UTC es 2025-01-28 23:00 en Argentina: último día de la marea.
+    late = gap("TAE BAEK 75", "2025-01-29")
+    late = late.__class__(**{**late.__dict__, "start": datetime(2025, 1, 29, 2, 0, tzinfo=timezone.utc)})
+
+    [m] = match_gaps_to_trips([late], TRIPS, tolerance_days=0)
+
+    assert m.status == STATUS_WITHOUT_OBSERVER
+
+
+def test_la_marea_que_contiene_el_dia_gana_a_la_vecina_por_tolerancia():
+    trips = [
+        trip("NANINA", "2025-01-01", "2025-01-10", False),
+        trip("NANINA", "2025-01-12", "2025-01-20", True),
+    ]
+
+    [m] = match_gaps_to_trips([gap("NANINA", "2025-01-10")], trips, tolerance_days=3)
+
+    assert m.status == STATUS_WITHOUT_OBSERVER
+    assert m.trip.start == date(2025, 1, 1)
+
+
+def test_fuera_de_marea_se_asigna_a_la_mas_cercana():
+    trips = [
+        trip("NANINA", "2025-01-01", "2025-01-10", False),
+        trip("NANINA", "2025-01-14", "2025-01-20", True),
+    ]
+
+    [m] = match_gaps_to_trips([gap("NANINA", "2025-01-13")], trips, tolerance_days=3)
+
+    assert m.trip.start == date(2025, 1, 14)
+    assert m.status == STATUS_WITH_OBSERVER
+
+
+def test_distancia_desconocida_no_cuenta_como_franja():
+    unknown = gap("X", "2025-01-01")
+    unknown = unknown.__class__(**{**unknown.__dict__, "start_km_from_shore": None, "end_km_from_shore": None})
+
+    assert not is_near_200nm(unknown)
+
+
 def test_buque_sin_mareas_queda_sin_cruce():
     [m] = match_gaps_to_trips([gap("DESCONOCIDO", "2025-01-10")], TRIPS)
 

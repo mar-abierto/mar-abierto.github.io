@@ -90,6 +90,29 @@ def test_eventos_se_piden_en_lotes_y_siguen_next_offset():
     assert session.calls[2]["params"]["vessels[0]"] == "v3"
 
 
+def test_eventos_cortan_si_el_offset_no_avanza():
+    session = FakeSession(
+        [
+            FakeResponse({"entries": [{"id": "e1"}], "nextOffset": 500}),
+            FakeResponse({"entries": [{"id": "e2"}], "nextOffset": 500}),
+            FakeResponse({"entries": [{"id": "e3"}], "nextOffset": 500}),
+        ]
+    )
+    client = GFWClient("token", session=session)
+
+    events = client.get_events("ds", ["v1"], "2025-01-01", "2025-12-31")
+
+    assert [e["id"] for e in events] == ["e1", "e2"]
+    assert len(session.calls) == 2
+
+
+def test_parse_gap_sin_distancias_deja_none():
+    gap = parse_gap_event({"id": "g", "start": "2025-01-01T00:00:00Z", "end": "2025-01-01T13:00:00Z"})
+
+    assert gap.start_km_from_shore is None
+    assert gap.lat is None
+
+
 def test_error_http_se_informa_sin_mostrar_el_token():
     client = GFWClient("secreto", session=FakeSession([FakeResponse({}, status=401)]))
 

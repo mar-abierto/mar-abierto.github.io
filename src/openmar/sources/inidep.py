@@ -69,6 +69,8 @@ def parse_trips_annex(text: str) -> list[Trip]:
             continue
         if match["buque"]:
             current = normalize_vessel_name(match["buque"])
+        if not current:
+            continue  # fila sin buque conocido: no se adivina a quién pertenece
         trips.append(
             Trip(
                 vessel=current,
@@ -112,15 +114,25 @@ def parse_observer_coverage(text: str) -> list[Coverage]:
     return rows
 
 
+PDF_TIMEOUT_SECONDS = 120
+
+
 def pdf_to_text(pdf_path: Path) -> str:
     """Convierte un PDF a texto conservando columnas. Requiere poppler-utils."""
+    pdf_path = Path(pdf_path)
+    with pdf_path.open("rb") as f:
+        if f.read(5) != b"%PDF-":
+            raise RuntimeError(f"{pdf_path} no es un PDF (la descarga pudo haber fallado).")
     try:
         result = subprocess.run(
-            ["pdftotext", "-layout", str(pdf_path), "-"],
+            ["pdftotext", "-layout", "--", str(pdf_path), "-"],
             check=True,
             capture_output=True,
             text=True,
+            timeout=PDF_TIMEOUT_SECONDS,
         )
     except FileNotFoundError as exc:
         raise RuntimeError("Falta pdftotext: instalá poppler-utils (apt install poppler-utils).") from exc
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+        raise RuntimeError(f"pdftotext no pudo leer {pdf_path}.") from exc
     return result.stdout

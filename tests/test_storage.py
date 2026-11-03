@@ -35,6 +35,14 @@ def test_token_desde_archivo_env(monkeypatch, tmp_path):
     assert load_token(env) == "desde-archivo"
 
 
+def test_token_entre_comillas_o_con_export(monkeypatch, tmp_path):
+    monkeypatch.delenv("GFW_API_TOKEN", raising=False)
+    env = tmp_path / ".env"
+    env.write_text('export GFW_API_TOKEN="con-comillas"\n')
+
+    assert load_token(env) == "con-comillas"
+
+
 def test_token_ausente_da_error_claro(monkeypatch, tmp_path):
     monkeypatch.delenv("GFW_API_TOKEN", raising=False)
 

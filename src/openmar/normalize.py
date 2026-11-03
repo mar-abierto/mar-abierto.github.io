@@ -14,7 +14,7 @@ _ESPACIOS = re.compile(r"\s+")
 _NUMERO_ADELANTE = re.compile(r"^(\d+) (.+)$")
 
 # Variantes de escritura conocidas entre fuentes.
-_ALIAS = (("HU YU ", "HUYU "),)
+_ALIAS = ((re.compile(r"\bHU YU\b"), "HUYU"),)
 
 
 def normalize_vessel_name(name: str | None) -> str:
@@ -26,8 +26,8 @@ def normalize_vessel_name(name: str | None) -> str:
     text = _NO_ALFANUMERICO.sub(" ", text)
     text = _NUMERO_PEGADO.sub(r"\1", text)
     text = _ESPACIOS.sub(" ", text).strip()
-    for old, new in _ALIAS:
-        text = text.replace(old, new)
+    for pattern, replacement in _ALIAS:
+        text = pattern.sub(replacement, text)
     match = _NUMERO_ADELANTE.match(text)
     if match:
         text = f"{match.group(2)} {match.group(1)}"

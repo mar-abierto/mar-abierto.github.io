@@ -29,6 +29,23 @@ def test_error_conocido_sale_con_codigo_1_y_mensaje(monkeypatch, tmp_path, capsy
     assert "Falta raw/gfw/apagones.json" in capsys.readouterr().err
 
 
+def test_fecha_invalida_la_rechaza_argparse(tmp_path):
+    import pytest
+
+    with pytest.raises(SystemExit):
+        cli.main(["--datos", str(tmp_path), "descargar", "gfw", "--desde", "2025-13-01"])
+
+
+def test_datos_malformados_salen_con_error_claro(monkeypatch, tmp_path, capsys):
+    def fake_build(raw_dir, out_dir):
+        raise KeyError("start")
+
+    monkeypatch.setattr(cli, "build_outputs", fake_build)
+
+    assert cli.main(["--datos", str(tmp_path), "cruzar"]) == 1
+    assert "start" in capsys.readouterr().err
+
+
 def test_descargar_gfw_filtra_buques_activos_desde_la_fecha(monkeypatch, tmp_path):
     class FakeClient:
         def __init__(self, token):
@@ -38,6 +55,7 @@ def test_descargar_gfw_filtra_buques_activos_desde_la_fecha(monkeypatch, tmp_pat
             return [
                 {"selfReportedInfo": [{"id": "activo", "transmissionDateTo": "2025-06-01T00:00:00Z"}]},
                 {"selfReportedInfo": [{"id": "viejo", "transmissionDateTo": "2020-01-01T00:00:00Z"}]},
+                {"selfReportedInfo": [{"id": "sin-fecha", "transmissionDateTo": None}]},
             ]
 
         def get_events(self, dataset, vessel_ids, start, end):
@@ -56,6 +74,6 @@ def test_descargar_gfw_filtra_buques_activos_desde_la_fecha(monkeypatch, tmp_pat
     code = cli.main(["--datos", str(tmp_path), "descargar", "gfw", "--desde", "2025-01-01", "--hasta", "2025-12-31"])
 
     assert code == 0
-    assert created["client"].ids == ["activo"]
+    assert created["client"].ids == ["activo", "sin-fecha"]
     assert (tmp_path / "raw" / "gfw" / "apagones.json").exists()
     assert (tmp_path / "raw" / "gfw" / "buques.json.meta.json").exists()

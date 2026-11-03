@@ -2,7 +2,8 @@
 
 from collections.abc import Iterable
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import date, timedelta
+from zoneinfo import ZoneInfo
 
 from openmar.normalize import normalize_vessel_name
 from openmar.sources.gfw import Gap
@@ -17,6 +18,9 @@ STATUS_UNMATCHED = "sin_mareas_del_buque"
 # exacto debe hacerse contra la línea de la ZEE.
 NEAR_200NM_KM = (300.0, 450.0)
 
+# Las mareas del INIDEP están en fechas locales; los eventos de GFW, en UTC.
+LOCAL_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
+
 
 @dataclass(frozen=True)
 class GapMatch:
@@ -28,7 +32,20 @@ class GapMatch:
 
 def is_near_200nm(gap: Gap, band: tuple[float, float] = NEAR_200NM_KM) -> bool:
     low, high = band
-    return any(low <= km <= high for km in (gap.start_km_from_shore, gap.end_km_from_shore))
+    return any(
+        km is not None and low <= km <= high for km in (gap.start_km_from_shore, gap.end_km_from_shore)
+    )
+
+
+def local_date(gap: Gap) -> date:
+    """Fecha del inicio del apagón en hora argentina."""
+    return gap.start.astimezone(LOCAL_TZ).date()
+
+
+def _distance_days(day: date, trip: Trip) -> int:
+    if trip.start <= day <= trip.end:
+        return 0
+    return min(abs((trip.start - day).days), abs((day - trip.end).days))
 
 
 def _trips_by_vessel(trips: Iterable[Trip]) -> dict[str, list[Trip]]:
@@ -39,16 +56,15 @@ def _trips_by_vessel(trips: Iterable[Trip]) -> dict[str, list[Trip]]:
 
 
 def _match_one(gap: Gap, vessel_trips: list[Trip], tolerance: timedelta) -> tuple[Trip | None, str]:
+    """Elige la marea que contiene el día; si ninguna, la más cercana dentro de la tolerancia."""
     if not vessel_trips:
         return None, STATUS_UNMATCHED
-    day = gap.start.date()
-    in_range = [t for t in vessel_trips if t.start - tolerance <= day <= t.end + tolerance]
-    if not in_range:
+    day = local_date(gap)
+    candidates = [t for t in vessel_trips if _distance_days(day, t) <= tolerance.days]
+    if not candidates:
         return None, STATUS_NO_TRIP
-    with_observer = [t for t in in_range if t.observer]
-    if with_observer:
-        return with_observer[0], STATUS_WITH_OBSERVER
-    return in_range[0], STATUS_WITHOUT_OBSERVER
+    best = min(candidates, key=lambda t: (_distance_days(day, t), not t.observer))
+    return best, STATUS_WITH_OBSERVER if best.observer else STATUS_WITHOUT_OBSERVER
 
 
 def match_gaps_to_trips(gaps: Iterable[Gap], trips: Iterable[Trip], tolerance_days: int = 3) -> list[GapMatch]:

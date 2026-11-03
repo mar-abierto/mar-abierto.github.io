@@ -65,6 +65,24 @@ def test_anexo_convierte_fechas_captura_y_rendimiento():
     assert first.rate_t_per_day == 38.26
 
 
+def test_anexo_descarta_filas_sin_buque_conocido():
+    text = "Anexo 1.\n                                      2*      31/1/2025       22/2/2025    21     613.615    29,22      1\n"
+
+    assert parse_trips_annex(text) == []
+
+
+def test_pdf_to_text_rechaza_archivos_que_no_son_pdf(tmp_path):
+    from openmar.sources.inidep import pdf_to_text
+
+    fake = tmp_path / "x.pdf"
+    fake.write_bytes(b"<html>no soy un pdf</html>")
+
+    import pytest
+
+    with pytest.raises(RuntimeError, match="no es un PDF"):
+        pdf_to_text(fake)
+
+
 def test_anexo_ignora_texto_antes_del_titulo():
     assert parse_trips_annex("sin anexo 12/1/2025 1 2") == []
 

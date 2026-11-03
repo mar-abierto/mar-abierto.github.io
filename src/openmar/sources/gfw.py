@@ -15,6 +15,7 @@ BASE_URL = "https://gateway.api.globalfishingwatch.org/v3"
 IDENTITY_DATASET = "public-global-vessel-identity:latest"
 GAPS_DATASET = "public-global-gaps-events:latest"
 FISHING_DATASET = "public-global-fishing-events:latest"
+EVENTS_PAGE_SIZE = 500
 
 
 class GFWError(RuntimeError):
@@ -30,11 +31,15 @@ class Gap:
     start: datetime
     end: datetime
     hours: float
-    start_km_from_shore: float
-    end_km_from_shore: float
-    lat: float
-    lon: float
+    start_km_from_shore: float | None
+    end_km_from_shore: float | None
+    lat: float | None
+    lon: float | None
     intentional: bool
+
+
+def _optional_float(value) -> float | None:
+    return None if value is None else float(value)
 
 
 def _parse_time(value: str) -> datetime:
@@ -55,10 +60,10 @@ def parse_gap_event(raw: dict) -> Gap:
         start=_parse_time(raw["start"]),
         end=_parse_time(raw["end"]),
         hours=float(gap.get("durationHours", 0)),
-        start_km_from_shore=float(distances.get("startDistanceFromShoreKm", 0)),
-        end_km_from_shore=float(distances.get("endDistanceFromShoreKm", 0)),
-        lat=float(position.get("lat", 0)),
-        lon=float(position.get("lon", 0)),
+        start_km_from_shore=_optional_float(distances.get("startDistanceFromShoreKm")),
+        end_km_from_shore=_optional_float(distances.get("endDistanceFromShoreKm")),
+        lat=_optional_float(position.get("lat")),
+        lon=_optional_float(position.get("lon")),
         intentional=bool(gap.get("intentionalDisabling", False)),
     )
 
@@ -122,18 +127,21 @@ class GFWClient:
         for i in range(0, len(ids), self._batch_size):
             batch = ids[i : i + self._batch_size]
             offset = 0
-            while True:
+            for _ in range(self._max_pages):
                 params = {
                     "datasets[0]": dataset,
                     "start-date": start_date,
                     "end-date": end_date,
-                    "limit": 500,
+                    "limit": EVENTS_PAGE_SIZE,
                     "offset": offset,
                 }
                 params.update({f"vessels[{j}]": vid for j, vid in enumerate(batch)})
                 page = self._get("/events", params)
                 events.extend(page.get("entries", []))
-                offset = page.get("nextOffset")
-                if not offset:
+                next_offset = page.get("nextOffset")
+                # Se sigue sólo si hay próxima página y el offset avanza: un offset
+                # trabado (o en 0) no puede hacer girar el ciclo para siempre.
+                if next_offset is None or next_offset <= offset:
                     break
+                offset = next_offset
         return events

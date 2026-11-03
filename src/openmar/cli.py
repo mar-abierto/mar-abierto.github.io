@@ -9,6 +9,7 @@
 import argparse
 import json
 import sys
+from datetime import date
 from pathlib import Path
 
 import requests
@@ -30,7 +31,8 @@ def download_gfw(raw_dir: Path, start: str, end: str) -> None:
     client = GFWClient(load_token())
     vessels = client.search_vessels(SQUID_FLEET_QUERY)
     save_raw(raw_dir / "gfw" / "buques.json", json.dumps(vessels), source=f"{BASE_URL}/vessels/search", query=SQUID_FLEET_QUERY)
-    active = [vid for vid, last in map(_vessel_id, vessels) if vid and last[:10] >= start]
+    # Un buque sin fecha de última transmisión se conserva: mejor de más que perderlo.
+    active = [vid for vid, last in map(_vessel_id, vessels) if vid and (not last or last[:10] >= start)]
     gaps = client.get_events(GAPS_DATASET, active, start, end)
     save_raw(raw_dir / RAW_FILES["gaps"], json.dumps(gaps), source=f"{BASE_URL}/events", dataset=GAPS_DATASET, period=f"{start}/{end}")
     print(f"GFW: {len(vessels)} buques, {len(active)} activos desde {start}, {len(gaps)} apagones.")
@@ -54,14 +56,21 @@ def download_rfp(raw_dir: Path) -> None:
     print("Registro de Flota Pesquera: descargado. Fuente: CPA y Sin Azul No Hay Verde.")
 
 
+def _iso_date(text: str) -> str:
+    try:
+        return date.fromisoformat(text).isoformat()
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(f"fecha inválida: {text} (formato AAAA-MM-DD)") from exc
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="openmar", description="Observatorio pesquero del Mar Argentino")
     parser.add_argument("--datos", type=Path, default=Path("data"), help="carpeta de datos (default: data)")
     sub = parser.add_subparsers(dest="comando", required=True)
     descargar = sub.add_parser("descargar", help="baja los datos crudos de una fuente")
     descargar.add_argument("fuente", choices=["gfw", "inidep", "rfp"])
-    descargar.add_argument("--desde", default="2025-01-01")
-    descargar.add_argument("--hasta", default="2025-12-31")
+    descargar.add_argument("--desde", type=_iso_date, default="2025-01-01")
+    descargar.add_argument("--hasta", type=_iso_date, default="2025-12-31")
     sub.add_parser("cruzar", help="cruza las fuentes y genera los CSV")
     return parser
 
@@ -81,7 +90,7 @@ def main(argv: list[str] | None = None) -> int:
             stats = build_outputs(raw_dir, out_dir)
             print(", ".join(f"{k}: {v}" for k, v in stats.items()))
             print(f"Resultados en {out_dir}")
-    except (FileNotFoundError, RuntimeError, GFWError, requests.RequestException) as exc:
+    except (FileNotFoundError, RuntimeError, GFWError, requests.RequestException, KeyError, ValueError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
     return 0

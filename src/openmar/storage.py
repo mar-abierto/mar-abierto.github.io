@@ -17,7 +17,9 @@ def save_raw(path: Path, content: str | bytes, source: str, **details: str) -> P
     else:
         path.write_text(content, encoding="utf-8")
     meta = {"source": source, "downloaded": datetime.now(timezone.utc).isoformat(), **details}
-    path.with_name(f"{path.name}.meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2))
+    path.with_name(f"{path.name}.meta.json").write_text(
+        json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
     return path
 
 
@@ -29,7 +31,7 @@ def load_token(env_file: Path = Path(".env")) -> str:
     env_file = Path(env_file)
     if env_file.exists():
         for line in env_file.read_text().splitlines():
-            key, sep, value = line.partition("=")
-            if sep and key.strip() == TOKEN_VAR and value.strip():
-                return value.strip()
+            key, sep, value = line.removeprefix("export ").partition("=")
+            if sep and key.strip() == TOKEN_VAR and value.strip().strip("\"'"):
+                return value.strip().strip("\"'")
     raise RuntimeError(f"Falta {TOKEN_VAR}: definilo en el entorno o en {env_file} (ver .env.example).")
