@@ -185,3 +185,24 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px); }
     opacity: 1; transform: none; transition: none;
   }
 }
+
+/* ---------- Afuera y adentro ---------- */
+.hero__lede--small { font-size: 16px; color: var(--ink-3); }
+.zones { margin: 0; }
+.zones__band { display: grid; grid-template-columns: 1.4fr auto 1fr; min-height: 210px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.zones__in, .zones__out { display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 22px; }
+.zones__in { background: linear-gradient(90deg, rgba(95, 180, 217, 0.04), rgba(95, 180, 217, 0.14)); }
+.zones__out { background: repeating-linear-gradient(135deg, rgba(251, 191, 36, 0.05) 0 10px, transparent 10px 20px); }
+.zones b { font: 700 22px/1.1 var(--font-display); color: var(--ink); }
+.zones span { color: var(--ink-2); font-size: 14px; }
+.zones__line { position: relative; width: 2px; background: var(--amarillo); box-shadow: 0 0 12px var(--amarillo); }
+.zones__line span { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); padding: 2px 8px; border-radius: 99px; background: var(--sea-1); color: var(--amarillo); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.zones__tag { align-self: flex-start; margin-top: 6px; padding: 3px 10px; border-radius: 99px; font-size: 13px !important; font-weight: 600; }
+.zones__tag--can { background: rgba(95, 180, 217, 0.18); color: var(--zee) !important; }
+.zones__tag--cant { background: rgba(251, 191, 36, 0.16); color: var(--amarillo) !important; }
+.zones__cap { margin-top: 12px; color: var(--ink-2); font-size: 15px; font-style: italic; }
+@media (max-width: 520px) {
+  .zones__band { grid-template-columns: 1fr; }
+  .zones__line { width: auto; height: 2px; }
+  .zones__line span { top: 50%; transform: translate(-50%, -50%); }
+}

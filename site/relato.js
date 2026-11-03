@@ -12,6 +12,8 @@
       ...summary,
       derivado: {
         pct_sin_observador: season.mareas ? (100 * season.mareas_sin_observador) / season.mareas : 0,
+        // "Uno de cada N viajes llevó observador", redondeado.
+        uno_de_cada: season.mareas_con_observador ? season.mareas / season.mareas_con_observador : 0,
         apagones_fuera: (summary.apagones_por_estado.fuera_de_marea || 0) + (summary.apagones_por_estado.sin_mareas_del_buque || 0),
       },
     };
@@ -48,13 +50,13 @@
   function drawWaffle(season) {
     const lit = spread(season.mareas, season.mareas_con_observador);
     cells($("#waffle-mareas"), season.mareas, (i) => (lit.has(i) ? "cell cell--obs" : "cell"));
-    label("#waffle-mareas", `${num(season.mareas)} mareas en la temporada; ${num(season.mareas_con_observador)} con observador a bordo.`);
+    label("#waffle-mareas", `${num(season.mareas)} viajes en la temporada; ${num(season.mareas_con_observador)} con observador a bordo.`);
   }
 
   function drawFleet(history) {
     const observed = history.buques - history.buques_nunca_con_observador;
     cells($("#dots-buques"), history.buques, (i) => (i < observed ? "dot dot--obs" : "dot dot--never"));
-    label("#dots-buques", `${num(history.buques)} buques entre 2021 y 2024; ${num(history.buques_nunca_con_observador)} nunca llevaron observador.`);
+    label("#dots-buques", `${num(history.buques)} barcos entre 2021 y 2024; ${num(history.buques_nunca_con_observador)} nunca llevaron observador.`);
   }
 
   function drawGaps(byStatus) {
@@ -69,8 +71,8 @@
     const outside = (byStatus.fuera_de_marea || 0) + (byStatus.sin_mareas_del_buque || 0);
     label(
       "#strip-apagones",
-      `${num(classes.length)} apagones de AIS: ${num(byStatus.en_marea_sin_observador)} en mareas sin observador, ` +
-        `${num(byStatus.en_marea_con_observador)} con observador y ${num(outside)} fuera de las fechas de marea.`,
+      `${num(classes.length)} cortes de señal: ${num(byStatus.en_marea_sin_observador)} en viajes sin observador, ` +
+        `${num(byStatus.en_marea_con_observador)} con observador y ${num(outside)} fuera de las fechas de viaje.`,
     );
   }
 
@@ -78,36 +80,18 @@
     $("#series-anual").innerHTML = seriesHTML(series);
   }
 
-  function drawRates(rates) {
-    const max = Math.max(rates.sin_observador, rates.con_observador, 0.01);
-    const bar = (label, value, cls) => `
-      <div class="bar">
-        <span class="bar__label">${label}</span>
-        <span class="bar__track"><span class="bar__fill bar__fill--${cls}" style="--w:${(100 * value) / max}%"></span></span>
-        <span class="bar__value">${num(value, 2)}</span>
-      </div>`;
-    $("#bars-tasa").innerHTML = `
-      <p class="bars__title">Apagones por marea</p>
-      ${bar("Sin observador", rates.sin_observador, "sin")}
-      ${bar("Con observador", rates.con_observador, "con")}`;
-    label(
-      "#bars-tasa",
-      `Apagones por marea: ${num(rates.sin_observador, 2)} en mareas sin observador y ${num(rates.con_observador, 2)} en mareas con observador.`,
-    );
-  }
-
   function card(v) {
     // El detalle suma el total: sin observador, con observador y fuera de marea.
     const parts = [`${num(v.en_marea_sin_observador)} sin observador`];
     if (Number(v.en_marea_con_observador)) parts.push(`${num(v.en_marea_con_observador)} con observador`);
-    if (Number(v.fuera_de_marea)) parts.push(`${num(v.fuera_de_marea)} fuera de marea`);
+    if (Number(v.fuera_de_marea)) parts.push(`${num(v.fuera_de_marea)} fuera de viaje`);
     const history =
       v.viajes_2021_2024 === "" ? "Sin datos de 2021–2024" : `Observador en ${num(v.viajes_con_observador_2021_2024)} de ${plural(v.viajes_2021_2024, "viaje", "viajes")}, 2021–2024`;
     return `<li class="card">
       <a href="${fichaURL(v.buque)}">
         <span class="card__name">${esc(v.buque)}</span>
         <span class="card__owner">${esc(v.armador || "Sin armador en el registro")}</span>
-        <span class="card__big">${plural(v.apagones, "apagón", "apagones")}</span>
+        <span class="card__big">${plural(v.apagones, "corte de señal", "cortes de señal")}</span>
         <span class="card__detail">${esc(parts.join(" · "))}</span>
         <span class="card__history">${esc(history)}</span>
       </a>
@@ -150,7 +134,6 @@
     drawFleet(summary.relato.historico_2021_2024);
     drawGaps(summary.apagones_por_estado);
     drawSeries(summary.relato.cobertura_por_anio);
-    drawRates(summary.relato.apagones_por_marea);
     renderStatic(summary);
     document.documentElement.classList.add("is-ready");
     revealOnScroll();

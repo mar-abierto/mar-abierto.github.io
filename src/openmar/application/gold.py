@@ -191,6 +191,10 @@ def _story(vessels: list[dict], gaps: list[dict], silver_dir: Path) -> dict:
         "historico_2021_2024": history,
         "cobertura_por_anio": coverage_by_year(yearly, trips, season_year=SEASON_YEAR),
         "horas_sin_ais": round(sum(g["horas"] for g in gaps), 1),
+        "cerca_milla_200": {
+            "apagones": sum(bool(g["franja_milla_200"]) for g in gaps),
+            "buques": len({vessel_key(g["buque"]) for g in gaps if g["franja_milla_200"]}),
+        },
         "apagones_por_marea": {
             "sin_observador": _per_trip(by_status[STATUS_WITHOUT_OBSERVER], season["mareas_sin_observador"]),
             "con_observador": _per_trip(by_status[STATUS_WITH_OBSERVER], season["mareas_con_observador"]),
