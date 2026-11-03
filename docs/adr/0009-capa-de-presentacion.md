@@ -51,3 +51,11 @@ Ninguna cifra de la portada se escribe a mano: salen del bloque `relato` de
 la lista de límites compartidas viven en `site/comun.js`; los colores y fuentes, en
 `site/tokens.css`. Sin librerías nuevas: los gráficos son HTML y CSS.
 
+## Actualización (3 de noviembre de 2026): tablero
+
+Tercera página, `tablero.html`: indicadores principales, cobertura de observadores
+por año, apagones según la marea, puertos de escala y una tabla por armador que se
+ordena por cualquier columna. Los datos salen del bloque `tablero` de
+`resumen.json` (`domain/dashboard.py`). Ninguna columna usa el origen del capital
+(ADR 0010).
+

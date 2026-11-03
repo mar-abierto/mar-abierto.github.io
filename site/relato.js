@@ -2,17 +2,9 @@
 (() => {
   "use strict";
 
-  const { esc, num, plural, loadJSON, limitItems } = window.openMar;
+  const { esc, num, plural, loadJSON, limitItems, fillNumbers, seriesHTML } = window.openMar;
   const $ = (selector) => document.querySelector(selector);
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  const get = (data, path) => path.split(".").reduce((value, key) => (value == null ? value : value[key]), data);
-
-  const FORMATS = {
-    pct: (v) => `${num(v, 1)} %`,
-    pct0: (v) => `${num(v)} %`,
-    int: (v) => num(Math.round(Number(v))),
-  };
 
   function withDerived(summary) {
     const season = summary.relato.temporada;
@@ -23,19 +15,6 @@
         apagones_fuera: (summary.apagones_por_estado.fuera_de_marea || 0) + (summary.apagones_por_estado.sin_mareas_del_buque || 0),
       },
     };
-  }
-
-  function fillNumbers(data) {
-    document.querySelectorAll("[data-n]").forEach((el) => {
-      const value = get(data, el.dataset.n);
-      if (value == null) {
-        el.textContent = "s/d";
-        el.title = "Dato no disponible";
-        return;
-      }
-      const format = FORMATS[el.dataset.fmt] || ((v) => num(v, 1));
-      el.textContent = format(value);
-    });
   }
 
   // Elige k posiciones de n con un sorteo fijo (siempre el mismo dibujo).
@@ -96,17 +75,7 @@
   }
 
   function drawSeries(series) {
-    // Escala real: la barra entera es el 100 % de los viajes de ese año.
-    $("#series-anual").innerHTML = series
-      .map(
-        (y) => `<li class="series__year">
-          <span class="series__track"><span class="series__fill" style="--h:${y.pct_con_observador}%"></span></span>
-          <span class="series__pct">${num(y.pct_con_observador, 1)} %</span>
-          <span class="series__label">${esc(y.anio)}</span>
-          <span class="sr-only">: ${num(y.con_observador)} de ${num(y.viajes)} viajes con observador</span>
-        </li>`,
-      )
-      .join("");
+    $("#series-anual").innerHTML = seriesHTML(series);
   }
 
   function drawRates(rates) {

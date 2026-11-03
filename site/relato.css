@@ -30,6 +30,7 @@ a { color: inherit; }
 .top__nav { margin-left: auto; display: flex; gap: 20px; font-size: 14px; }
 .top__nav a { color: var(--ink-2); text-decoration: none; }
 .top__nav a:hover { color: var(--ink); }
+.top__nav a[aria-current="page"] { color: var(--ink); text-decoration: underline; text-decoration-color: var(--zee); text-underline-offset: 6px; }
 
 /* ---------- Portada ---------- */
 main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px); }

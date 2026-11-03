@@ -1,5 +1,6 @@
 /* Tokens compartidos por la portada y el mapa. */
 :root {
+  color-scheme: dark;
   --sea-0: #04080f;
   --sea-1: #07101c;
   --sea-2: #0c1828;

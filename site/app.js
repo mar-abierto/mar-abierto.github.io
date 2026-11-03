@@ -49,6 +49,9 @@
     const sanctions = p.sanciones_registradas
       ? `Disp. ${esc(p.sanciones_registradas)}${p.fechas_sanciones ? ` (${esc(p.fechas_sanciones)})` : ""}`
       : "ninguna en el registro";
+    const ports = Number(p.escalas)
+      ? `${num(p.escalas)}, sobre todo en ${esc(p.puerto_principal)}${Number(p.escalas_exterior) ? `; ${num(p.escalas_exterior)} afuera: ${esc(p.puertos_exterior)}` : "; ninguna afuera"}`
+      : "sin escalas detectadas";
     const position =
       p.posicion_segun === "apagones" ? "mediana de sus apagones" : `zona habitual de pesca (${num(p.eventos_de_pesca)} eventos)`;
     return `
@@ -63,6 +66,7 @@
           <dt>Mareas 2025</dt><dd>${num(p.mareas_temporada)} (${num(p.mareas_con_observador)} con observador)</dd>
           <dt>Captura 2025</dt><dd>${num(p.captura_t)} t</dd>
           <dt>Viajes con observador 2021–24</dt><dd>${observed2124}</dd>
+          <dt>Escalas en puerto 2025</dt><dd>${ports}</dd>
           <dt>Sanciones</dt><dd>${sanctions}</dd>
           <dt>Posición</dt><dd>${position}</dd>
         </dl>
