@@ -7,7 +7,7 @@ nunca como señal (ADR 0010).
 
 from collections import Counter
 
-from openmar.domain.matching import LOCAL_TZ
+from openmar.domain.matching import LOCAL_TZ, STATUS_WITH_OBSERVER, STATUS_WITHOUT_OBSERVER
 from openmar.domain.model import PortVisit, Trip, YearlyCoverage
 from openmar.domain.names import vessel_key
 from openmar.domain.port_visits import counts, is_abroad
@@ -58,13 +58,23 @@ def visit_rows(visits: list[PortVisit]) -> list[dict]:
     ]
 
 
+def gaps_in_trips(row: dict) -> int:
+    """Apagones que cayeron dentro de una marea (con o sin observador)."""
+    return row[STATUS_WITHOUT_OBSERVER] + row[STATUS_WITH_OBSERVER]
+
+
 def comparison(row: dict, fleet: dict) -> dict:
-    """El buque contra el total de la flota en la misma temporada."""
+    """El buque contra el total de la flota en la misma temporada.
+
+    Apagones por marea cuenta sólo los que ocurrieron durante una marea: los de
+    fuera de marea no tienen denominador.
+    """
     return {
         "pct_con_observador": _ratio(row["mareas_con_observador"], row["mareas_temporada"], 100, 1),
         "pct_con_observador_flota": _ratio(fleet["mareas_con_observador"], fleet["mareas"], 100, 1),
-        "apagones_por_marea": _ratio(row["apagones"], row["mareas_temporada"]),
-        "apagones_por_marea_flota": _ratio(fleet["apagones"], fleet["mareas"]),
+        "apagones_en_marea": gaps_in_trips(row),
+        "apagones_por_marea": _ratio(gaps_in_trips(row), row["mareas_temporada"]),
+        "apagones_por_marea_flota": _ratio(fleet["apagones_en_marea"], fleet["mareas"]),
     }
 
 

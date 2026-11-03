@@ -43,6 +43,7 @@
 .tl-gap { width: 4px; height: 26px; border-radius: 2px; background: var(--gap); box-shadow: 0 0 8px rgba(251, 146, 60, 0.7); }
 .tl-gap--con { background: var(--zee); box-shadow: none; }
 .tl-port { width: 11px; height: 11px; border-radius: 50%; background: var(--verde); border: 2px solid var(--sea-1); }
+.tl-port__tag { position: absolute; bottom: 100%; left: 50%; transform: translate(-50%, -2px); color: var(--amarillo); font-size: 10px; font-weight: 600; letter-spacing: 0.04em; }
 .tl-port--abroad { width: 15px; height: 15px; background: var(--amarillo); box-shadow: 0 0 10px var(--amarillo); z-index: 1; }
 .tl-track > .tl-empty { position: static; transform: none; padding: 6px 10px; color: var(--ink-3); font-size: 13px; }
 .tl-axis { position: relative; height: 18px; margin-left: 106px; }

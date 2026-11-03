@@ -57,24 +57,30 @@ def test_escalas_cuentan_solo_las_confiables_en_orden_y_marcan_el_exterior():
 
 
 def test_comparacion_con_la_flota():
-    row = {"mareas_temporada": 4, "mareas_con_observador": 1, "apagones": 6}
-    fleet = {"mareas": 100, "mareas_con_observador": 5, "apagones": 50}
+    # 6 apagones en mareas y 2 fuera de marea: los de afuera no entran en "por marea".
+    row = {"mareas_temporada": 4, "mareas_con_observador": 1, "apagones": 8,
+           STATUS_WITHOUT_OBSERVER: 5, STATUS_WITH_OBSERVER: 1}
+    fleet = {"mareas": 100, "mareas_con_observador": 5, "apagones_en_marea": 50}
 
     assert comparison(row, fleet) == {
         "pct_con_observador": 25.0, "pct_con_observador_flota": 5.0,
-        "apagones_por_marea": 1.5, "apagones_por_marea_flota": 0.5,
+        "apagones_en_marea": 6, "apagones_por_marea": 1.5, "apagones_por_marea_flota": 0.5,
     }
 
 
 def test_comparacion_sin_mareas_no_divide_por_cero():
-    result = comparison({"mareas_temporada": 0, "mareas_con_observador": 0, "apagones": 2}, {"mareas": 0, "mareas_con_observador": 0, "apagones": 0})
+    result = comparison(
+        {"mareas_temporada": 0, "mareas_con_observador": 0, "apagones": 2, STATUS_WITHOUT_OBSERVER: 0, STATUS_WITH_OBSERVER: 0},
+        {"mareas": 0, "mareas_con_observador": 0, "apagones_en_marea": 0},
+    )
 
     assert result["pct_con_observador"] is None
     assert result["apagones_por_marea"] is None
 
 
 def test_ficha_junta_todo_y_filtra_por_buque():
-    row = {"buque": "A", "armador": "X S.A.", "mareas_temporada": 2, "mareas_con_observador": 1, "apagones": 1}
+    row = {"buque": "A", "armador": "X S.A.", "mareas_temporada": 2, "mareas_con_observador": 1, "apagones": 1,
+           STATUS_WITHOUT_OBSERVER: 1, STATUS_WITH_OBSERVER: 0}
     yearly = [YearlyCoverage("A", 2021, 1, 3), YearlyCoverage("B", 2021, 0, 9)]
 
     result = profile(
@@ -84,7 +90,7 @@ def test_ficha_junta_todo_y_filtra_por_buque():
         yearly=yearly,
         visits=[port(datetime(2025, 2, 1, tzinfo=timezone.utc)), port(datetime(2025, 2, 1, tzinfo=timezone.utc), vessel="B")],
         season_year=2025,
-        fleet={"mareas": 10, "mareas_con_observador": 1, "apagones": 5},
+        fleet={"mareas": 10, "mareas_con_observador": 1, "apagones_en_marea": 5},
     )
 
     assert result["id"] == "A"
@@ -100,12 +106,13 @@ def test_ficha_junta_todo_y_filtra_por_buque():
 
 
 def test_ficha_une_grafias_del_buque_entre_fuentes():
-    row = {"buque": "TAE BAEK 75", "mareas_temporada": 0, "mareas_con_observador": 0, "apagones": 0}
+    row = {"buque": "TAE BAEK 75", "mareas_temporada": 0, "mareas_con_observador": 0, "apagones": 0,
+           STATUS_WITHOUT_OBSERVER: 0, STATUS_WITH_OBSERVER: 0}
 
     result = profile(
         row, trips=[], gaps=[], yearly=[YearlyCoverage("Nº 75 TAE BAEK", 2022, 0, 2)],
         visits=[port(datetime(2025, 2, 1, tzinfo=timezone.utc), vessel="75 TAE BAEK")],
-        season_year=2025, fleet={"mareas": 1, "mareas_con_observador": 0, "apagones": 0},
+        season_year=2025, fleet={"mareas": 1, "mareas_con_observador": 0, "apagones_en_marea": 0},
     )
 
     assert result["observador_por_anio"][0]["viajes"] == 2

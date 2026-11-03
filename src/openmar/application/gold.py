@@ -229,7 +229,8 @@ def _profiles(vessels: list[dict], gaps: list[dict], silver_dir: Path, summary: 
     yearly = read_yearly_coverage(silver_dir / SILVER["coverage_by_year"])
     visits = _season_visits(silver_dir)
     season = summary["relato"]["temporada"]
-    fleet = {"mareas": season["mareas"], "mareas_con_observador": season["mareas_con_observador"], "apagones": len(gaps)}
+    in_trips = sum(g["estado"] in (STATUS_WITHOUT_OBSERVER, STATUS_WITH_OBSERVER) for g in gaps)
+    fleet = {"mareas": season["mareas"], "mareas_con_observador": season["mareas_con_observador"], "apagones_en_marea": in_trips}
     profiles = [profile(v, trips, gaps, yearly, visits, SEASON_YEAR, fleet) for v in vessels]
     return {
         "generado": summary["generado"],

@@ -34,6 +34,14 @@
     </article>`;
   }
 
+  function portsMeta(p) {
+    const unknown = Number(p.escalas_pais_desconocido);
+    if (Number(p.escalas_exterior)) return `<b class="hl-warn">${num(p.escalas_exterior)} fuera del país</b>: ${esc(p.puertos_exterior)}`;
+    if (!Number(p.escalas)) return "Sin escalas detectadas";
+    if (unknown) return `Ninguna en el exterior identificada; ${plural(unknown, "escala", "escalas")} sin país · sobre todo en ${esc(p.puerto_principal)}`;
+    return `Ninguna fuera del país · sobre todo en ${esc(p.puerto_principal)}`;
+  }
+
   function renderKpis(f) {
     const p = f.datos;
     const c = f.comparacion;
@@ -49,13 +57,15 @@
       kpi(
         noTrips ? num(p.apagones) : num(c.apagones_por_marea, 2),
         noTrips ? "apagones de AIS en la temporada" : "apagones de AIS por marea",
-        `${plural(p.apagones, "apagón", "apagones")} en total · flota: ${num(c.apagones_por_marea_flota, 2)} por marea`,
+        noTrips
+          ? "Sin mareas informadas para comparar"
+          : `${plural(c.apagones_en_marea, "apagón", "apagones")} durante sus mareas${Number(p.fuera_de_marea) ? ` y ${num(p.fuera_de_marea)} fuera de ellas` : ""} · flota: ${num(c.apagones_por_marea_flota, 2)} por marea`,
         "kpi__value--gap",
       ),
       kpi(
         `${num(p.escalas)}`,
         "llegadas a puerto detectadas",
-        abroad ? `<b class="hl-warn">${`${num(abroad)} fuera del país`}</b>: ${esc(p.puertos_exterior)}` : Number(p.escalas) ? `Ninguna fuera del país · sobre todo en ${esc(p.puerto_principal)}` : "Sin escalas detectadas",
+        portsMeta(p),
         "kpi__value--port",
       ),
       kpi(`${num(p.captura_t)}<small> t</small>`, "de captura declarada en la temporada", "INIDEP, Anexo 1"),
@@ -96,17 +106,18 @@
       .filter((e) => inYear(e.llegada))
       .map((e) => {
         const label = `Llegada a ${e.puerto}${e.exterior ? ` (${e.pais})` : ""} el ${shortDate(e.llegada)}`;
-        return `<li class="tl-port${e.exterior ? " tl-port--abroad" : ""}" style="--x:${x(e.llegada)}%" title="${esc(label)}"><span class="sr-only">${esc(label)}</span></li>`;
+        const tag = e.exterior ? `<span class="tl-port__tag" aria-hidden="true">${esc(e.pais)}</span>` : "";
+        return `<li class="tl-port${e.exterior ? " tl-port--abroad" : ""}" style="--x:${x(e.llegada)}%" title="${esc(label)}">${tag}<span class="sr-only">${esc(label)}</span></li>`;
       })
       .join("");
 
-    const lane = (name, items, empty) =>
-      `<div class="tl-lane"><span class="tl-lane__name">${name}</span><ol class="tl-track">${items || `<li class="tl-empty">${empty}</li>`}</ol></div>`;
+    const lane = (id, name, items, empty) =>
+      `<div class="tl-lane"><span class="tl-lane__name" id="tl-${id}">${name}</span><ol class="tl-track" aria-labelledby="tl-${id}">${items || `<li class="tl-empty">${empty}</li>`}</ol></div>`;
 
     $("#timeline").innerHTML = `
-      ${lane("Mareas", trips, "Sin mareas en el informe")}
-      ${lane("Apagones", gaps, "Ninguno")}
-      ${lane("Puertos", ports, "Sin escalas detectadas")}
+      ${lane("mareas", "Mareas", trips, "Sin mareas en el informe")}
+      ${lane("apagones", "Apagones", gaps, "Ninguno")}
+      ${lane("puertos", "Puertos", ports, "Sin escalas detectadas")}
       <div class="tl-axis" aria-hidden="true">${months}</div>`;
 
     $("#tl-legend").innerHTML = [
@@ -243,7 +254,8 @@
     const [summary, fichas] = await Promise.all([loadJSON("data/resumen.json"), loadJSON("data/fichas.json")]);
     fillNumbers(summary);
     const wanted = new URLSearchParams(window.location.search).get("b");
-    const ficha = wanted && (fichas.buques[wanted] || Object.values(fichas.buques).find((f) => f.datos.buque === wanted));
+    const byKey = wanted && Object.hasOwn(fichas.buques, wanted) ? fichas.buques[wanted] : null;
+    const ficha = wanted && (byKey || Object.values(fichas.buques).find((f) => f.datos.buque === wanted));
     if (ficha) {
       renderVessel(ficha, summary);
       document.querySelector('.top__nav a[href="buque.html"]').removeAttribute("aria-current");
