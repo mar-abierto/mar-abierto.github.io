@@ -12,8 +12,8 @@ EEZ_URL = (
     f"&request=GetFeature&typeName=MarineRegions:eez&cql_filter=mrgid={EEZ_MRGID}"
     "&outputFormat=application/json"
 )
-# Tolerancia de simplificación en grados (~1 km): suficiente para un mapa nacional.
-SIMPLIFY_DEGREES = 0.01
+# Tolerancia de simplificación en grados (~3 km): suficiente para un mapa nacional.
+SIMPLIFY_DEGREES = 0.03
 COORD_DECIMALS = 4
 
 

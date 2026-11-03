@@ -209,7 +209,8 @@
     map.addLayer({
       id: "pesca-calor", type: "heatmap", source: "pesca", layout: { visibility: "none" },
       paint: {
-        "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 3, 6, 8, 18],
+        "heatmap-weight": ["interpolate", ["linear"], ["get", "eventos"], 1, 0.15, 40, 1],
+        "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 3, 8, 8, 30],
         "heatmap-intensity": ["interpolate", ["linear"], ["zoom"], 3, 0.6, 8, 1.4],
         "heatmap-opacity": 0.7,
         "heatmap-color": [

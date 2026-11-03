@@ -23,7 +23,10 @@ from openmar.domain.matching import (
 )
 from openmar.domain.model import RegistryRecord
 from openmar.domain.names import vessel_key
-from openmar.domain.positions import vessel_position
+from openmar.domain.positions import fishing_grid, vessel_position
+
+# Celdas de la capa de actividad de pesca: ~25 km, liviana para el navegador.
+FISHING_GRID_DEGREES = 0.25
 
 EMPTY_COUNTS = {
     "apagones": 0,
@@ -137,7 +140,7 @@ def _map_layers(vessels: list[dict], gaps: list[dict], silver_dir: Path, map_dir
     fishing = read_fishing(silver_dir / SILVER["fishing"])
     geo.write_geojson(
         map_dir / "pesca.geojson",
-        geo.collection([geo.point(f.lon, f.lat, {"buque": f.vessel_name}) for f in fishing]),
+        geo.collection([geo.point(lon, lat, {"eventos": n}) for lat, lon, n in fishing_grid(fishing, size=FISHING_GRID_DEGREES)]),
     )
     shutil.copyfile(silver_dir / SILVER["eez"], map_dir / "zee.geojson")
 

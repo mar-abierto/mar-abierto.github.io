@@ -39,3 +39,13 @@ def test_sin_datos_no_hay_posicion():
     from openmar.domain.positions import vessel_position
 
     assert vessel_position([], []) is None
+
+
+def test_grilla_de_pesca_agrupa_eventos_por_celda():
+    from openmar.domain.positions import fishing_grid
+
+    events = [event(-45.01, -60.02), event(-45.04, -60.06), event(-46.5, -61.5)]
+
+    cells = fishing_grid(events, size=0.1)
+
+    assert sorted(cells, key=lambda c: c[2]) == [(-46.45, -61.45, 1), (-45.05, -60.05, 2)]
