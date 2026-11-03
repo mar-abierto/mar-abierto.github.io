@@ -101,7 +101,11 @@ button, input { font: inherit; color: inherit; }
 }
 .search input::placeholder { color: var(--ink-3); }
 .search input:focus-visible { border-color: var(--zee); outline: 2px solid var(--zee); outline-offset: 1px; }
-.vessels { list-style: none; margin: 10px 0 0; padding: 0; }
+.vessels {
+  list-style: none; margin: 10px 0 0; padding: 0 4px 0 0;
+  max-height: min(340px, 42dvh); overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent;
+}
 .vessel {
   display: grid; grid-template-columns: 10px 1fr auto; align-items: center; gap: 12px;
   width: 100%; padding: 9px 8px; border: 0; border-radius: 10px; background: none; text-align: left; cursor: pointer;
@@ -119,7 +123,7 @@ button, input { font: inherit; color: inherit; }
 .missing summary { cursor: pointer; padding: 8px 0; font-weight: 500; }
 .missing ul { margin: 8px 0 0; padding-left: 18px; color: var(--ink-3); font-size: 12.5px; }
 
-.rules { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; color: var(--ink-2); font-size: 13px; }
+.rules { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 10px; color: var(--ink-2); font-size: 13px; }
 .rules li { display: grid; grid-template-columns: 10px 1fr; gap: 10px; align-items: baseline; }
 .rules strong { color: var(--ink); font-weight: 600; }
 .sources { margin: 0; padding-left: 18px; color: var(--ink-3); font-size: 12.5px; display: grid; gap: 4px; }
