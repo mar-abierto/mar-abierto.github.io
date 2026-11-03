@@ -148,6 +148,16 @@ def test_gold_arma_semaforo_ficha_y_capas_del_mapa(bronze, tmp_path):
     assert tablero["calidad_escalas"]["de_otros_anios"] == 1
     assert tablero["puertos_exterior"] == [{"puerto": "MONTEVIDEO", "pais": "URY", "escalas": 1, "buques": 1}]
     assert tablero["por_armador"][0]["armador"] == "ILLEX FISHING S.A."
+    fichas = json.loads((tmp_path / "gold" / "mapa" / "fichas.json").read_text())
+    assert set(fichas["buques"]) == {"TAE BAEK 75", "NANINA", "SIN APAGONES"}
+    ficha = fichas["buques"]["TAE BAEK 75"]
+    assert ficha["datos"]["armador"] == "ILLEX FISHING S.A."
+    assert [m["apagones"] for m in ficha["mareas"]] == [3]
+    assert len(ficha["apagones_detalle"]) == 3
+    assert [e["exterior"] for e in ficha["escalas_detalle"]] == [True, False]
+    assert ficha["observador_por_anio"][0] == {"anio": 2021, "viajes": 4, "con_observador": 0, "pct_con_observador": 0.0}
+    assert ficha["comparacion"]["pct_con_observador_flota"] == 33.3
+    assert fichas["temporada"] == summary["temporada"]
     zee = json.loads((tmp_path / "gold" / "mapa" / "zee.geojson").read_text())
     assert zee["features"][0]["properties"]["nombre"] == "Argentinian Exclusive Economic Zone"
 
@@ -159,7 +169,7 @@ def test_publicar_copia_las_capas_al_sitio(bronze, tmp_path):
     copied = publish_site(tmp_path / "gold", tmp_path / "site" / "data")
 
     assert sorted(p.name for p in copied) == [
-        "apagones.geojson", "buques.geojson", "pesca.geojson", "resumen.json", "zee.geojson",
+        "apagones.geojson", "buques.geojson", "fichas.json", "pesca.geojson", "resumen.json", "zee.geojson",
     ]
 
 

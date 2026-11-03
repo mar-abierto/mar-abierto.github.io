@@ -91,7 +91,10 @@ De lo general a lo particular:
    evolución en el tiempo. Para periodistas, legisladores y el CFP.
 3. **Mapa.** El que ya existe, como herramienta para explorar.
 4. **Ficha por buque.** Una página por barco con todo cruzado. Es lo que se
-   linkea desde una nota periodística.
+   linkea desde una nota periodística. **Hecha:** `buque.html?b=<buque>`, con
+   índice de los buques en `buque.html`. Muestra el año del buque en una línea
+   (mareas, apagones y escalas), el buque contra la flota, el histórico de
+   observadores, el registro y el detalle de cada marea, apagón y escala.
 
 ## Empresas y dueños: de dónde sale el dato
 

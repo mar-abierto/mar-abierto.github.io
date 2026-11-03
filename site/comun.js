@@ -8,6 +8,35 @@
     Number(value || 0).toLocaleString("es-AR", { maximumFractionDigits: digits, minimumFractionDigits: 0 });
   const plural = (n, one, many) => `${num(n)} ${Number(n) === 1 ? one : many}`;
 
+  const LABELS = { rojo: "Señales repetidas", amarillo: "Señales aisladas", verde: "Sin señales" };
+  const GAP_STATUS = {
+    en_marea_sin_observador: "en marea sin observador",
+    en_marea_con_observador: "en marea con observador a bordo",
+    fuera_de_marea: "fuera de las fechas de marea",
+    sin_mareas_del_buque: "sin mareas informadas",
+  };
+
+  // Resumen en una frase de los apagones de un buque (fila del gold).
+  function gapSummary(p, minHours) {
+    if (!Number(p.apagones)) {
+      return "Sin apagones de AIS registrados por Global Fishing Watch en la temporada.";
+    }
+    const parts = [
+      [p.en_marea_sin_observador, "en mareas sin observador"],
+      [p.en_marea_con_observador, "con observador a bordo"],
+      [p.fuera_de_marea, "fuera de las fechas de marea"],
+    ]
+      .filter(([n]) => Number(n) > 0)
+      .map(([n, text]) => `${num(n)} ${text}`);
+    let text = `${plural(p.apagones, "apagón", "apagones")} de AIS de ${num(minHours)} h o más (${num(p.horas_sin_ais)} h sin señal en total): ${parts.join(", ")}.`;
+    if (Number(p.franja_milla_200) > 0) {
+      text += ` ${plural(p.franja_milla_200, "empieza o termina", "empiezan o terminan")} cerca de la milla 200.`;
+    }
+    return text;
+  }
+
+  const fichaURL = (name) => `buque.html?b=${encodeURIComponent(name)}`;
+
   const get = (data, path) => path.split(".").reduce((value, key) => (value == null ? value : value[key]), data);
 
   const FORMATS = {
@@ -70,5 +99,7 @@
     ];
   }
 
-  window.openMar = Object.freeze({ esc, num, plural, loadJSON, limitItems, fillNumbers, seriesHTML });
+  window.openMar = Object.freeze({
+    esc, num, plural, get, loadJSON, limitItems, fillNumbers, seriesHTML, LABELS, GAP_STATUS, gapSummary, fichaURL,
+  });
 })();

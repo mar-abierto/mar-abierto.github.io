@@ -37,6 +37,7 @@ from openmar.domain.names import vessel_key
 from openmar.domain.port_visits import arrivals_in_year, port_summary, visit_quality
 from openmar.domain.positions import fishing_grid, vessel_position
 from openmar.domain.story import coverage_by_year, history_figures, season_figures
+from openmar.domain.vessel_profile import profile
 
 SEASON_YEAR = 2025
 
@@ -222,6 +223,21 @@ def _dashboard(vessels: list[dict], silver_dir: Path) -> dict:
     }
 
 
+def _profiles(vessels: list[dict], gaps: list[dict], silver_dir: Path, summary: dict) -> dict:
+    """Una ficha por buque, con la flota de la temporada como referencia."""
+    trips = read_trips(silver_dir / SILVER["trips"])
+    yearly = read_yearly_coverage(silver_dir / SILVER["coverage_by_year"])
+    visits = _season_visits(silver_dir)
+    season = summary["relato"]["temporada"]
+    fleet = {"mareas": season["mareas"], "mareas_con_observador": season["mareas_con_observador"], "apagones": len(gaps)}
+    profiles = [profile(v, trips, gaps, yearly, visits, SEASON_YEAR, fleet) for v in vessels]
+    return {
+        "generado": summary["generado"],
+        "temporada": summary["temporada"],
+        "buques": {p["id"]: p for p in profiles},
+    }
+
+
 def _summary(vessels: list[dict], gaps: list[dict], silver_dir: Path) -> dict:
     by_color = {c: sum(v["semaforo"] == c for v in vessels) for c in (signals.GREEN, signals.YELLOW, signals.RED)}
     return {
@@ -260,6 +276,8 @@ def build_gold(silver_dir: Path, gold_dir: Path) -> dict:
     _map_layers(vessels, gaps, silver_dir, map_dir)
     summary = _summary(vessels, gaps, silver_dir)
     (map_dir / "resumen.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+    profiles = _profiles(vessels, gaps, silver_dir, summary)
+    (map_dir / "fichas.json").write_text(json.dumps(profiles, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     return summary
 
 

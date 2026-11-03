@@ -4,13 +4,6 @@
 
   const COLORS = { rojo: "#fb5a6e", amarillo: "#fbbf24", verde: "#34d399" };
   const ORDER = { rojo: 0, amarillo: 1, verde: 2 };
-  const LABELS = { rojo: "Señales repetidas", amarillo: "Señales aisladas", verde: "Sin señales" };
-  const GAP_STATUS = {
-    en_marea_sin_observador: "en marea sin observador",
-    en_marea_con_observador: "en marea con observador a bordo",
-    fuera_de_marea: "fuera de las fechas de marea",
-    sin_mareas_del_buque: "sin mareas informadas",
-  };
   const BOUNDS = [[-68.5, -55.5], [-52.5, -36.5]];
   const FONT = ["Noto Sans Regular"];
 
@@ -20,28 +13,11 @@
   let vessels = [];
   let hoverPopup = null;
   let pinnedPopup = null;
+  let minGapHours = null;
 
-  const { esc, num, plural, limitItems, loadJSON } = window.openMar;
+  const { esc, num, plural, limitItems, loadJSON, LABELS, GAP_STATUS, gapSummary, fichaURL } = window.openMar;
 
   // ---------- Textos ----------
-
-  function vesselSummary(p) {
-    if (!Number(p.apagones)) {
-      return "Sin apagones de AIS registrados por Global Fishing Watch en la temporada.";
-    }
-    const parts = [
-      [p.en_marea_sin_observador, "en mareas sin observador"],
-      [p.en_marea_con_observador, "con observador a bordo"],
-      [p.fuera_de_marea, "fuera de las fechas de marea"],
-    ]
-      .filter(([n]) => Number(n) > 0)
-      .map(([n, text]) => `${num(n)} ${text}`);
-    let text = `${plural(p.apagones, "apagón", "apagones")} de AIS de 12 h o más (${num(p.horas_sin_ais)} h sin señal en total): ${parts.join(", ")}.`;
-    if (Number(p.franja_milla_200) > 0) {
-      text += ` ${plural(p.franja_milla_200, "empieza o termina", "empiezan o terminan")} cerca de la milla 200.`;
-    }
-    return text;
-  }
 
   function vesselCard(p) {
     const observed2124 =
@@ -60,8 +36,9 @@
           <span class="card__status"><span class="dot dot--${esc(p.semaforo)}"></span>${esc(LABELS[p.semaforo])}</span>
           <h3 class="card__name">${esc(p.buque)}</h3>
           <div class="card__owner">${p.armador ? esc(p.armador) : "Sin armador en el registro"}${p.matricula ? ` · Matrícula ${esc(p.matricula)}` : ""}</div>
+          <a class="card__more" href="${fichaURL(p.buque)}">Ver la ficha completa →</a>
         </header>
-        <p class="card__summary">${esc(vesselSummary(p))}</p>
+        <p class="card__summary">${esc(gapSummary(p, minGapHours))}</p>
         <dl class="card__grid">
           <dt>Mareas 2025</dt><dd>${num(p.mareas_temporada)} (${num(p.mareas_con_observador)} con observador)</dd>
           <dt>Captura 2025</dt><dd>${num(p.captura_t)} t</dd>
@@ -127,7 +104,7 @@
     const missing = summary.sin_posicion || [];
     $("#missing-count").textContent = `(${num(missing.length)})`;
     $("#missing").innerHTML = missing
-      .map((v) => `<li><span class="dot dot--${esc(v.semaforo)}"></span> ${esc(v.buque)} · ${esc(v.armador || "sin armador en el registro")}</li>`)
+      .map((v) => `<li><span class="dot dot--${esc(v.semaforo)}"></span> <a href="${fichaURL(v.buque)}">${esc(v.buque)}</a> · ${esc(v.armador || "sin armador en el registro")}</li>`)
       .join("");
     $("#sources").innerHTML = (summary.fuentes || [])
       .filter((s) => /^https:\/\//.test(s.url || ""))
@@ -348,6 +325,7 @@
         Number(b.properties.apagones) - Number(a.properties.apagones) ||
         a.properties.buque.localeCompare(b.properties.buque),
     );
+    minGapHours = summary.reglas?.horas_minimas_apagon;
     renderCounts(summary);
     renderStatic(summary);
     if (window.matchMedia("(max-width: 760px)").matches) setPanelCollapsed(true);

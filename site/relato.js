@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  const { esc, num, plural, loadJSON, limitItems, fillNumbers, seriesHTML } = window.openMar;
+  const { esc, num, plural, loadJSON, limitItems, fillNumbers, seriesHTML, fichaURL } = window.openMar;
   const $ = (selector) => document.querySelector(selector);
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -104,7 +104,7 @@
     const history =
       v.viajes_2021_2024 === "" ? "Sin datos de 2021–2024" : `Observador en ${num(v.viajes_con_observador_2021_2024)} de ${plural(v.viajes_2021_2024, "viaje", "viajes")}, 2021–2024`;
     return `<li class="card">
-      <a href="mapa.html?buque=${encodeURIComponent(v.buque)}">
+      <a href="${fichaURL(v.buque)}">
         <span class="card__name">${esc(v.buque)}</span>
         <span class="card__owner">${esc(v.armador || "Sin armador en el registro")}</span>
         <span class="card__big">${plural(v.apagones, "apagón", "apagones")}</span>

@@ -148,6 +148,9 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px); }
   background: var(--zee); color: var(--sea-0); transition: transform 200ms var(--ease), box-shadow 200ms var(--ease);
 }
 .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(95, 180, 217, 0.3); }
+.btn--ghost { background: transparent; color: var(--ink); border: 1px solid var(--line-strong); }
+.btn--ghost:hover { box-shadow: none; border-color: var(--zee); }
+.btn:focus-visible { outline: 2px solid var(--zee); outline-offset: 3px; }
 
 /* ---------- Lo que no sabemos y fuentes ---------- */
 .limits { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }

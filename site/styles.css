@@ -134,6 +134,8 @@ button, input { font: inherit; color: inherit; }
 .card__grid dt { color: var(--ink-3); }
 .card__grid dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
 .card__foot { padding: 10px 16px 12px; color: var(--ink-3); font-size: 11px; border-top: 1px solid var(--line); }
+.card__more { display: inline-block; margin-top: 8px; color: var(--zee); font-size: 13px; font-weight: 600; text-decoration: none; }
+.card__more:hover, .card__more:focus-visible { text-decoration: underline; }
 .card--gap { width: 240px; }
 
 .maplibregl-ctrl-attrib { background: rgba(4, 8, 15, 0.7) !important; color: var(--ink-3); font-size: 10.5px; }
