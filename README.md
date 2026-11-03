@@ -2,55 +2,99 @@
 
 **El Mar Argentino, a la vista de todos.**
 
-Observatorio pesquero independiente: una ficha pública por cada barco que pesca en
-el Mar Argentino, con quién es su dueño, qué permisos tiene, por dónde anduvo y si
-cumple las reglas.
+Herramienta abierta para cruzar, barco por barco, datos públicos sobre la flota
+pesquera argentina: qué hace cada buque en el mar (recorridos y apagones de AIS),
+con quién a bordo (observadores del INIDEP) y quién es su armador (registro de la
+flota). Cada resultado guarda de qué fuente salió.
 
-Arrancado el 2 de noviembre de 2026.
+Pensada para periodistas de datos, investigadores, organizaciones y cualquiera que
+quiera mirar el mar con datos.
 
----
+## Qué hace hoy
 
-## El problema en tres líneas
+Para la flota potera (calamar) de 2025:
 
-- Detectar barcos ya está resuelto: Prefectura usa su sistema Guardacostas y
-  Skylight, y Global Fishing Watch publica datos satelitales gratis.
-- Lo que nadie mira es **nuestra propia flota**. En 2025 sólo 9 de 354 mareas de
-  poteros llevaron observador a bordo, y 53 de los 84 poteros argentinos serían de
-  capital chino.
-- Los datos para controlarlo existen, pero están desparramados en PDFs, registros y
-  mapas que nadie cruza barco por barco.
+1. Baja de Global Fishing Watch los poteros con bandera argentina y sus apagones de AIS.
+2. Baja del INIDEP el detalle de cada marea y la cobertura de observadores.
+3. Baja del Registro de Flota Pesquera el armador, la matrícula y las sanciones.
+4. Ubica cada apagón en la marea en la que ocurrió y dice si había observador a bordo.
 
-El detalle, con fuentes, está en [`docs/contexto.md`](docs/contexto.md).
+El resultado son tres archivos CSV: un resumen por buque, el detalle de cada
+apagón y todas las mareas. Los hallazgos de la primera corrida están en
+[`docs/hallazgos-2025.md`](docs/hallazgos-2025.md).
 
-## Qué hace
+## Instalación
 
-1. **Ficha por barco**: dueño, permisos, mareas, observadores, recorridos, multas.
-2. **Alertas**: AIS apagado cerca de la milla 200, zonas vedadas, mareas sin
-   observador, cambios de dueño o de bandera.
-3. **Lectura automática** del Boletín Oficial y las actas del Consejo Federal
-   Pesquero.
-4. **Mapa e informes públicos**, cada dato con su fuente.
+Requiere Python 3.12+, [uv](https://docs.astral.sh/uv/) y `pdftotext` (poppler).
 
-## Dónde está cada cosa
+```bash
+sudo apt install poppler-utils      # en Debian/Ubuntu
+git clone <url-del-repositorio> openMar && cd openMar
+uv sync
+```
 
-| Archivo | Qué es |
-|---|---|
-| [`docs/contexto.md`](docs/contexto.md) | El problema, quién ya trabaja en esto y el hueco que cubre openMar. |
-| [`docs/arquitectura.md`](docs/arquitectura.md) | Fuentes de datos, modelo, flujo y stack. |
-| [`docs/etapa-0-demo.md`](docs/etapa-0-demo.md) | El demo: los 84 poteros argentinos. Es lo próximo a construir. |
-| `data/` | Datos descargados y procesados. No se versionan (ver [`data/README.md`](data/README.md)). |
+Pedí un token gratuito de Global Fishing Watch para uso no comercial en
+<https://globalfishingwatch.org/our-apis/tokens> y guardalo en un archivo `.env`
+(ver `.env.example`):
+
+```
+GFW_API_TOKEN=tu-token
+```
+
+El `.env` está en `.gitignore`. No lo compartas ni lo pegues en issues.
+
+## Uso
+
+```bash
+uv run openmar descargar inidep
+uv run openmar descargar rfp
+uv run openmar descargar gfw --desde 2025-01-01 --hasta 2025-12-31
+uv run openmar cruzar
+```
+
+Los datos crudos quedan en `data/raw/` (cada archivo con un `.meta.json` que dice
+de dónde salió y cuándo) y los resultados en `data/processed/`.
+
+## Fuentes y cómo citarlas
+
+| Fuente | Qué aporta | Cita |
+|---|---|---|
+| [Global Fishing Watch](https://globalfishingwatch.org) | Identidad de buques y apagones de AIS | Según sus [términos de uso](https://globalfishingwatch.org/our-apis/documentation#terms-of-use) |
+| [INIDEP, repositorio Mar Abierto](https://marabierto.inidep.edu.ar) | Mareas por buque y cobertura de observadores | Citar el informe técnico correspondiente |
+| [Registro de Flota Pesquera](https://registroflotapesquera.org) | Armador, matrícula, permisos y sanciones | Círculo de Políticas Ambientales y Sin Azul No Hay Verde |
+
+openMar **no redistribuye** datos de terceros: el repositorio trae el código que
+los descarga de la fuente original, y cada usuario los baja por su cuenta.
+
+## Cómo leer los resultados
+
+- **Un apagón de AIS no es una infracción.** Los buques argentinos también reportan
+  por VMS a las autoridades, y ese dato no es público. Un apagón es una señal para
+  investigar.
+- El conjunto público de apagones de GFW sólo incluye cortes de 12 horas o más,
+  que GFW marca como posible apagado intencional.
+- La "franja de la milla 200" se aproxima con la distancia a la costa (300 a 450 km).
+  El cálculo exacto contra la línea de la ZEE está pendiente.
+- Los informes del INIDEP incluyen nombres de observadores: openMar no los extrae.
 
 ## Estado
 
-- [x] Investigación inicial y contexto
-- [ ] Etapa 0: demo con los 84 poteros
-- [ ] Validar con especialistas (Milko Schvartzman, Círculo de Políticas Ambientales)
-- [ ] Propuesta a Enrique Piñeyro
+- [x] Recolectores de GFW, INIDEP y Registro de Flota Pesquera
+- [x] Cruce de apagones con mareas y observadores
+- [ ] Apagones contra la línea real de la ZEE
+- [ ] Ficha por buque y mapa
+- [ ] Extracción de las actas del Consejo Federal Pesquero
+- [ ] Más pesquerías además del calamar
 
-## Principios
+## Documentación
 
-- **Cada dato con su fuente.** Si no se puede citar, no se publica.
-- **Sumar, no competir.** Prefectura, Global Fishing Watch, Oceana y los
-  investigadores ya hacen su parte; openMar es la pieza que los conecta.
-- **Abierto.** Licencia propuesta: AGPL-3.0 para el código y CC BY 4.0 para los
-  datos. A confirmar antes de publicar.
+| Archivo | Qué es |
+|---|---|
+| [`docs/contexto.md`](docs/contexto.md) | El problema y quién ya trabaja en esto |
+| [`docs/arquitectura.md`](docs/arquitectura.md) | Fuentes, modelo y flujo |
+| [`docs/hallazgos-2025.md`](docs/hallazgos-2025.md) | Resultados de la primera corrida |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Cómo sumarse |
+
+## Licencia
+
+Código: [MIT](LICENSE). Resultados publicados por el proyecto: CC BY 4.0.

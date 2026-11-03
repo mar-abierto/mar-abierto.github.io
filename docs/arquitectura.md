@@ -42,10 +42,24 @@ nombre. Reconocer que dos registros escritos distinto hablan del mismo barco
    200, entradas a zonas vedadas, cambios de dueño o bandera.
 5. **Publicación**: fichas por barco, mapa e informes, cada dato con su fuente.
 
-## Stack propuesto
+## Stack
 
-- **Backend**: Java 21 + Quarkus.
-- **Base**: PostgreSQL + PostGIS (zonas, líneas de 200 millas, recorridos).
-- **Extracción de PDF**: modelo de lenguaje con salida estructurada; cada valor
-  extraído guarda la página y el fragmento de origen para poder auditarlo.
-- **Front**: a definir después del demo.
+- **Lenguaje**: Python 3.12, gestionado con uv. Es lo que usa la comunidad de
+  datos abiertos y periodismo de datos.
+- **PDF**: `pdftotext -layout` (poppler) para conservar las columnas de las tablas.
+- **Salidas**: CSV en `data/processed/`.
+- **Próximo**: PostGIS o GeoPandas para el cálculo contra la línea de la ZEE;
+  extracción con modelo de lenguaje para las actas del CFP, guardando la página y
+  el fragmento de origen de cada valor.
+
+## Código
+
+| Módulo | Qué hace |
+|---|---|
+| `openmar/normalize.py` | Lleva los nombres de buques a una forma comparable entre fuentes |
+| `openmar/sources/gfw.py` | Cliente de la API de Global Fishing Watch |
+| `openmar/sources/inidep.py` | Lectores de los informes del INIDEP |
+| `openmar/sources/rfp.py` | Lector del Registro de Flota Pesquera |
+| `openmar/cross.py` | Cruce de apagones con mareas |
+| `openmar/pipeline.py` | Arma los CSV de salida |
+| `openmar/cli.py` | Comandos `openmar descargar` y `openmar cruzar` |

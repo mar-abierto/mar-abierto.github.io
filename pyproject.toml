@@ -1,0 +1,28 @@
+[project]
+name = "openmar"
+version = "0.1.0"
+description = "Observatorio pesquero independiente del Mar Argentino: cruza datos públicos barco por barco."
+authors = [
+    { name = "Esteban Roveda", email = "esteban.roveda.io@gmail.com" }
+]
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = [
+    "requests>=2.34.2",
+]
+
+[project.scripts]
+openmar = "openmar.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[build-system]
+requires = ["uv_build>=0.11.9,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+    "pytest-cov>=7.1.0",
+]
