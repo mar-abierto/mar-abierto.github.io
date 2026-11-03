@@ -1,0 +1,34 @@
+"""Cifras del relato: lo que la portada cuenta, calculado desde los datos."""
+
+from openmar.domain.model import Coverage, Trip
+
+
+def _pct(part: int, total: int) -> float:
+    return round(100 * part / total, 1) if total else 0.0
+
+
+def season_figures(trips: list[Trip]) -> dict:
+    """Mareas de la temporada con y sin observador, buques y captura."""
+    observed = sum(t.observer for t in trips)
+    return {
+        "mareas": len(trips),
+        "mareas_con_observador": observed,
+        "mareas_sin_observador": len(trips) - observed,
+        "pct_con_observador": _pct(observed, len(trips)),
+        "buques": len({t.vessel for t in trips}),
+        "buques_con_algun_observador": len({t.vessel for t in trips if t.observer}),
+        "captura_t": round(sum(t.catch_kg for t in trips) / 1000, 1),
+    }
+
+
+def history_figures(coverage: list[Coverage]) -> dict:
+    """Viajes con observador en el período histórico del INIDEP."""
+    trips = sum(c.trips for c in coverage)
+    observed = sum(c.with_observer for c in coverage)
+    return {
+        "buques": len(coverage),
+        "viajes": trips,
+        "viajes_con_observador": observed,
+        "pct_con_observador": _pct(observed, trips),
+        "buques_nunca_con_observador": sum(c.with_observer == 0 for c in coverage),
+    }

@@ -36,3 +36,18 @@ posición sobre la soberanía. Las etiquetas del mapa base se muestran en castel
 - Actualizar el mapa es regenerar los GeoJSON y volver a desplegar.
 - Si más adelante hace falta interactividad pesada o datos en vivo, se puede
   migrar a un framework sin cambiar la capa gold.
+
+## Actualización (3 de noviembre de 2026): portada infográfica
+
+El sitio pasa a tener dos páginas, según `docs/propuesta-de-valor.md`:
+
+- `index.html`: portada que cuenta la historia en seis capítulos (mareas con
+  observador, histórico 2021–2024, apagones, la lectura honesta de los apagones,
+  buques con señales repetidas y lo que no sabemos).
+- `mapa.html`: el mapa. Acepta `?buque=NOMBRE` para abrir la ficha de un buque.
+
+Ninguna cifra de la portada se escribe a mano: salen del bloque `relato` de
+`resumen.json`, que calcula `openmar gold` (`domain/story.py`). Las funciones y
+la lista de límites compartidas viven en `site/comun.js`; los colores y fuentes, en
+`site/tokens.css`. Sin librerías nuevas: los gráficos son HTML y CSS.
+

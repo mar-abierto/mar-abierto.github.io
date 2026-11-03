@@ -1,0 +1,20 @@
+/* Tokens compartidos por la portada y el mapa. */
+:root {
+  --sea-0: #04080f;
+  --sea-1: #07101c;
+  --sea-2: #0c1828;
+  --line: rgba(148, 178, 214, 0.14);
+  --line-strong: rgba(148, 178, 214, 0.28);
+  --ink: #e8eef6;
+  --ink-2: #a8b6c8;
+  --ink-3: #6f7f94;
+  --rojo: #fb5a6e;
+  --amarillo: #fbbf24;
+  --verde: #34d399;
+  --gap: #fb923c;
+  --zee: #5fb4d9;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --panel-w: 380px;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}

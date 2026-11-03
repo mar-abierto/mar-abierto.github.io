@@ -24,6 +24,7 @@ from openmar.domain.matching import (
 from openmar.domain.model import RegistryRecord
 from openmar.domain.names import vessel_key
 from openmar.domain.positions import fishing_grid, vessel_position
+from openmar.domain.story import history_figures, season_figures
 
 # Celdas de la capa de actividad de pesca: ~25 km, liviana para el navegador.
 FISHING_GRID_DEGREES = 0.25
@@ -145,7 +146,33 @@ def _map_layers(vessels: list[dict], gaps: list[dict], silver_dir: Path, map_dir
     shutil.copyfile(silver_dir / SILVER["eez"], map_dir / "zee.geojson")
 
 
-def _summary(vessels: list[dict], gaps: list[dict]) -> dict:
+def _per_trip(gaps: int, trips: int) -> float:
+    return round(gaps / trips, 2) if trips else 0.0
+
+
+def _story(vessels: list[dict], gaps: list[dict], silver_dir: Path) -> dict:
+    """Cifras de la portada: mareas, observadores y apagones, con su contexto."""
+    season = season_figures(read_trips(silver_dir / SILVER["trips"]))
+    history = history_figures(read_coverage(silver_dir / SILVER["coverage"]))
+    by_status = {s: sum(g["estado"] == s for g in gaps) for s in (STATUS_WITHOUT_OBSERVER, STATUS_WITH_OBSERVER)}
+    red = sorted((v for v in vessels if v["semaforo"] == signals.RED), key=lambda v: -v["apagones"])
+    return {
+        "temporada": season,
+        "historico_2021_2024": history,
+        "horas_sin_ais": round(sum(g["horas"] for g in gaps), 1),
+        "apagones_por_marea": {
+            "sin_observador": _per_trip(by_status[STATUS_WITHOUT_OBSERVER], season["mareas_sin_observador"]),
+            "con_observador": _per_trip(by_status[STATUS_WITH_OBSERVER], season["mareas_con_observador"]),
+        },
+        "senales_repetidas": [
+            {k: v[k] for k in ("buque", "armador", "apagones", STATUS_WITHOUT_OBSERVER, STATUS_NO_TRIP,
+                                "viajes_2021_2024", "viajes_con_observador_2021_2024")}
+            for v in red
+        ],
+    }
+
+
+def _summary(vessels: list[dict], gaps: list[dict], silver_dir: Path) -> dict:
     by_color = {c: sum(v["semaforo"] == c for v in vessels) for c in (signals.GREEN, signals.YELLOW, signals.RED)}
     return {
         "generado": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -166,6 +193,7 @@ def _summary(vessels: list[dict], gaps: list[dict]) -> dict:
             "franja_milla_200_km": list(NEAR_200NM_KM),
             "tolerancia_dias_marea": 3,
         },
+        "relato": _story(vessels, gaps, silver_dir),
         "fuentes": SOURCES,
     }
 
@@ -178,7 +206,7 @@ def build_gold(silver_dir: Path, gold_dir: Path) -> dict:
     write_rows(gold_dir / "apagones-detalle.csv", gaps)
     map_dir = gold_dir / "mapa"
     _map_layers(vessels, gaps, silver_dir, map_dir)
-    summary = _summary(vessels, gaps)
+    summary = _summary(vessels, gaps, silver_dir)
     (map_dir / "resumen.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     return summary
 

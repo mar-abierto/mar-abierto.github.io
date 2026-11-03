@@ -4,109 +4,116 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>openMar · El Mar Argentino, a la vista de todos</title>
-  <meta name="description" content="Mapa abierto de la flota potera argentina: apagones de AIS, mareas con y sin observador y armadores, barco por barco, con la fuente de cada dato.">
+  <meta name="description" content="En 2025, la flota potera argentina hizo 354 mareas. Casi ninguna llevó un observador del Estado a bordo. Los datos, cruzados y con su fuente.">
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#04080f">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2304080f'/%3E%3Ccircle cx='11' cy='19' r='4' fill='%2334d399'/%3E%3Ccircle cx='19' cy='12' r='3' fill='%23fbbf24'/%3E%3Ccircle cx='22' cy='21' r='3' fill='%23fb5a6e'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link href="vendor/maplibre-gl@4.7.1/maplibre-gl.css" rel="stylesheet">
-  <link href="styles.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="tokens.css" rel="stylesheet">
+  <link href="relato.css" rel="stylesheet">
 </head>
 <body>
-  <main class="app">
-    <aside class="panel" id="panel" aria-label="Capas y buques">
-      <button class="panel__handle" id="panel-toggle" aria-expanded="true" aria-controls="panel-body">
-        <span class="panel__handle-bar" aria-hidden="true"></span>
-        <span class="sr-only">Mostrar u ocultar el panel</span>
-      </button>
+  <header class="top">
+    <a class="top__brand" href="./">open<span>Mar</span></a>
+    <p class="top__draft">Borrador · en revisión</p>
+    <nav class="top__nav" aria-label="Secciones">
+      <a href="mapa.html">Mapa</a>
+      <a href="#fuentes">Fuentes</a>
+    </nav>
+  </header>
 
-      <header class="brand">
-        <p class="brand__draft">Borrador · en revisión</p>
-        <h1 class="brand__title">open<span>Mar</span></h1>
-        <p class="brand__lede">La flota potera argentina en la temporada de calamar 2025, barco por barco. Cada luz es un buque en su zona habitual de pesca.</p>
-      </header>
+  <main id="relato" aria-busy="true">
+    <section class="hero">
+      <p class="kicker">Calamar · temporada 2025</p>
+      <h1 class="hero__title">
+        <span data-n="relato.temporada.buques">78</span> barcos con bandera argentina pescaron calamar en 2025.
+        <em>En <span data-n="relato.temporada.mareas_sin_observador">331</span> de sus <span data-n="relato.temporada.mareas">354</span> mareas no había nadie del Estado a bordo.</em>
+      </h1>
+      <p class="hero__lede">openMar cruza datos públicos que nadie junta: las mareas del INIDEP, las señales de posición de Global Fishing Watch y el registro de la flota. No acusa a nadie. Muestra dónde mirar.</p>
+      <p class="hero__scroll" aria-hidden="true">Bajá para ver los datos ↓</p>
+    </section>
 
-      <div class="panel__body" id="panel-body">
-        <section class="block" aria-labelledby="semaforo-title">
-          <h2 class="block__title" id="semaforo-title">Señales para revisar</h2>
-          <div class="lights" role="group" aria-label="Filtrar por color">
-            <button class="light light--rojo is-on" data-color="rojo" aria-pressed="true">
-              <span class="light__dot" aria-hidden="true"></span>
-              <span class="light__count" data-count="rojo">–</span>
-              <span class="light__label">Repetidas</span>
-            </button>
-            <button class="light light--amarillo is-on" data-color="amarillo" aria-pressed="true">
-              <span class="light__dot" aria-hidden="true"></span>
-              <span class="light__count" data-count="amarillo">–</span>
-              <span class="light__label">Aisladas</span>
-            </button>
-            <button class="light light--verde is-on" data-color="verde" aria-pressed="true">
-              <span class="light__dot" aria-hidden="true"></span>
-              <span class="light__count" data-count="verde">–</span>
-              <span class="light__label">Sin señales</span>
-            </button>
-          </div>
-          <ul class="rules">
-            <li><span class="dot dot--rojo" aria-hidden="true"></span><span><strong>Señales repetidas:</strong> 3 o más apagones en mareas sin observador del INIDEP, o fuera de las fechas de marea.</span></li>
-            <li><span class="dot dot--amarillo" aria-hidden="true"></span><span><strong>Señales aisladas:</strong> 1 o 2 apagones así, o apagones sólo con observador a bordo.</span></li>
-            <li><span class="dot dot--verde" aria-hidden="true"></span><span><strong>Sin señales:</strong> sin apagones registrados por GFW. No significa "cumple": un buque que casi no transmite tampoco tiene apagones.</span></li>
-          </ul>
-          <p class="note">Un apagón de AIS es un corte de 12 horas o más en la señal de posición. <strong>No es una infracción</strong>: los buques también reportan por VMS, que no es público. El color indica dónde mirar primero.</p>
-        </section>
-
-        <section class="block" aria-labelledby="capas-title">
-          <h2 class="block__title" id="capas-title">Capas</h2>
-          <ul class="layers">
-            <li><label class="switch"><input type="checkbox" data-layer="buques" checked><span class="switch__ui" aria-hidden="true"></span>Buques y nombres</label></li>
-            <li><label class="switch"><input type="checkbox" data-layer="apagones" checked><span class="switch__ui" aria-hidden="true"></span>Apagones de AIS <span class="swatch swatch--ring" aria-hidden="true"></span></label></li>
-            <li><label class="switch"><input type="checkbox" data-layer="pesca"><span class="switch__ui" aria-hidden="true"></span>Actividad de pesca <span class="swatch swatch--glow" aria-hidden="true"></span></label></li>
-            <li><label class="switch"><input type="checkbox" data-layer="zee" checked><span class="switch__ui" aria-hidden="true"></span>Límite de la ZEE (milla 200) <span class="swatch swatch--line" aria-hidden="true"></span></label></li>
-          </ul>
-        </section>
-
-        <section class="block block--list" aria-labelledby="buques-title">
-          <div class="block__head">
-            <h2 class="block__title" id="buques-title">Buques</h2>
-            <span class="block__meta" id="list-count" aria-live="polite"></span>
-          </div>
-          <label class="search">
-            <span class="sr-only">Buscar buque o armador</span>
-            <input type="search" id="search" placeholder="Buscar buque o armador" autocomplete="off">
-          </label>
-          <ol class="vessels" id="vessels"></ol>
-          <details class="missing">
-            <summary>Sin datos de AIS en 2025 <span id="missing-count"></span></summary>
-            <p class="note">Pescaron según el INIDEP, pero Global Fishing Watch no tiene su recorrido. No aparecen en el mapa.</p>
-            <ul id="missing"></ul>
-          </details>
-        </section>
-
-        <section class="block block--about" aria-labelledby="leer-title">
-          <h2 class="block__title" id="leer-title">Sobre los datos</h2>
-          <p class="note">La posición es la mediana de sus eventos de pesca de 2025, no dónde está hoy. La "franja de la milla 200" se aproxima con la distancia a la costa (300 a 450 km).</p>
-          <h3 class="block__subtitle">Fuentes</h3>
-          <ul class="sources" id="sources"></ul>
-          <p class="foot">Código abierto (MIT) · Resultados CC BY 4.0 · <span id="generated"></span></p>
-        </section>
+    <section class="chapter" aria-labelledby="c1">
+      <div class="chapter__text">
+        <p class="chapter__n">1</p>
+        <h2 id="c1">Una marea, un cuadrado</h2>
+        <p>Cada cuadrado es una marea de la temporada 2025: un viaje de pesca de semanas, de puerto a puerto. Los <strong class="hl-obs"><span data-n="relato.temporada.mareas_con_observador">23</span> encendidos</strong> llevaron un observador del INIDEP, el científico que registra a bordo qué se pesca y cómo.</p>
+        <p class="figure-big"><span data-n="relato.temporada.pct_con_observador" data-fmt="pct">6,5 %</span><small>de las mareas con observador</small></p>
+        <p class="source">Fuente: INIDEP, Informe Técnico Oficial 026/2025, Anexo 1. Mareas hasta el 5 de junio de 2025.</p>
       </div>
-    </aside>
+      <div class="waffle" id="waffle-mareas" role="img" aria-label="354 mareas, 23 con observador"></div>
+    </section>
 
-    <div class="map" id="map" role="region" aria-label="Mapa del Mar Argentino"></div>
-    <div class="map-status" id="map-status" role="status">Cargando el mar…</div>
+    <section class="chapter" aria-labelledby="c2">
+      <div class="chapter__text">
+        <p class="chapter__n">2</p>
+        <h2 id="c2">No es un año raro</h2>
+        <p>Entre 2021 y 2024 la flota potera hizo <span data-n="relato.historico_2021_2024.viajes">1.224</span> viajes. Sólo <span data-n="relato.historico_2021_2024.viajes_con_observador">62</span> llevaron observador.</p>
+        <p>De <span data-n="relato.historico_2021_2024.buques">83</span> buques, <strong class="hl-dim"><span data-n="relato.historico_2021_2024.buques_nunca_con_observador">62</span> no llevaron un observador ni una sola vez</strong> en cuatro años.</p>
+        <p class="source">Fuente: INIDEP, <em>Observadores del INIDEP a bordo, pesquería 2024</em>, Tabla 9. El texto del informe dice 61; su tabla, sumada fila por fila, da 62.</p>
+      </div>
+      <div class="dots" id="dots-buques" role="img" aria-label="83 buques, 62 nunca llevaron observador entre 2021 y 2024"></div>
+    </section>
 
-    <footer class="limits" id="limits" aria-labelledby="limits-title">
-      <button class="limits__toggle" id="limits-toggle" aria-expanded="false" aria-controls="limits-list">
-        <span class="limits__icon" aria-hidden="true">!</span>
-        <span id="limits-title"><strong>Lo que este mapa no muestra.</strong> <span id="limits-short">Datos faltantes y límites de las fuentes.</span></span>
-        <span class="limits__more">Ver detalle</span>
-      </button>
-      <ul class="limits__list" id="limits-list" hidden></ul>
-    </footer>
+    <section class="chapter" aria-labelledby="c3">
+      <div class="chapter__text">
+        <p class="chapter__n">3</p>
+        <h2 id="c3">Mientras tanto, la señal se apaga</h2>
+        <p>Los barcos transmiten su posición por AIS. En 2025 hubo <span data-n="apagones">76</span> cortes de 12 horas o más en la flota potera: unas <span data-n="relato.horas_sin_ais" data-fmt="int">3.000</span> horas sin saber dónde estaban.</p>
+        <ul class="legend">
+          <li><span class="sw sw--sin"></span><b data-n="apagones_por_estado.en_marea_sin_observador">52</b> en mareas sin observador</li>
+          <li><span class="sw sw--con"></span><b data-n="apagones_por_estado.en_marea_con_observador">18</b> en mareas con observador</li>
+          <li><span class="sw sw--fuera"></span><b data-n="apagones_por_estado.fuera_de_marea">6</b> fuera de las fechas de marea</li>
+        </ul>
+        <p class="source">Fuente: Global Fishing Watch, apagones de AIS (cortes de 12 h o más en zonas con buena recepción).</p>
+      </div>
+      <div class="strip" id="strip-apagones" role="img" aria-label="76 apagones de AIS según haya o no observador a bordo"></div>
+    </section>
+
+    <section class="chapter chapter--turn" aria-labelledby="c4">
+      <div class="chapter__text">
+        <p class="chapter__n">4</p>
+        <h2 id="c4">Pero ojo: apagar no es esconder</h2>
+        <p>Si los apagones fueran sólo para esconderse, habría menos cuando hay un observador mirando. No pasa: por cada marea <strong>con</strong> observador hubo más apagones que por cada marea sin él. Se concentran en pocos barcos y pueden ser fallas de equipo o de recepción.</p>
+        <p>Además, los buques reportan su posición por VMS a la autoridad, y ese dato no es público. <strong>Un apagón es una señal para revisar, no una infracción.</strong></p>
+        <p>Lo grave es otra cosa: <strong>en el <span data-n="derivado.pct_sin_observador" data-fmt="pct0">94 %</span> de las mareas no hay nadie independiente a bordo</strong>, así que nadie puede decir qué pasó en esas horas.</p>
+      </div>
+      <div class="bars" id="bars-tasa" role="img" aria-label="Apagones por marea con y sin observador"></div>
+    </section>
+
+    <section class="chapter chapter--list" aria-labelledby="c5">
+      <div class="chapter__text">
+        <p class="chapter__n">5</p>
+        <h2 id="c5">Dónde mirar primero</h2>
+        <p><span data-n="por_color.rojo">8</span> buques tienen <strong class="hl-red">señales repetidas</strong>: 3 o más apagones en mareas sin observador o fuera de las fechas de marea. La regla es pública y es la misma para todos, sin importar de quién sea el barco.</p>
+      </div>
+      <ol class="cards" id="cards-rojo"></ol>
+      <p class="cards__more"><a class="btn" href="mapa.html">Ver los <span data-n="buques_en_mapa">65</span> buques en el mapa →</a></p>
+    </section>
+
+    <section class="chapter chapter--limits" aria-labelledby="c6">
+      <div class="chapter__text">
+        <p class="chapter__n">6</p>
+        <h2 id="c6">Lo que no sabemos</h2>
+        <p>Preferimos decir lo que falta a completar con suposiciones.</p>
+      </div>
+      <ul class="limits" id="limits"></ul>
+    </section>
+
+    <section class="chapter chapter--sources" id="fuentes" aria-labelledby="c7">
+      <div class="chapter__text">
+        <h2 id="c7">Fuentes y método</h2>
+        <p>Todo sale de datos públicos, con el código abierto para reproducirlo. Cada cifra de esta página se calcula a partir de las fuentes; ninguna está escrita a mano.</p>
+      </div>
+      <ul class="sources" id="sources"></ul>
+      <p class="foot">Código abierto (MIT) · Resultados CC BY 4.0 · <span id="generated"></span></p>
+    </section>
   </main>
 
-  <script src="vendor/maplibre-gl@4.7.1/maplibre-gl.js"></script>
-  <script src="app.js"></script>
+  <noscript><p class="noscript">Esta página necesita JavaScript para dibujar los gráficos. Los datos están en <a href="data/resumen.json">resumen.json</a>.</p></noscript>
+  <script src="comun.js"></script>
+  <script src="relato.js"></script>
 </body>
 </html>

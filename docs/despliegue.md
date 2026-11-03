@@ -50,5 +50,5 @@ defecto.
       derivados.
 - [ ] Avisar al Círculo de Políticas Ambientales que el mapa muestra datos de su
       registro.
-- [ ] Quitar `noindex` de `site/index.html` y `X-Robots-Tag` de `site/vercel.json`.
-- [ ] Quitar el cartel "Borrador · en revisión".
+- [ ] Quitar `noindex` de `site/index.html` y `site/mapa.html`, y `X-Robots-Tag` de `site/vercel.json`.
+- [ ] Quitar el cartel "Borrador · en revisión" de la portada y del mapa.

@@ -114,6 +114,13 @@ def test_gold_arma_semaforo_ficha_y_capas_del_mapa(bronze, tmp_path):
     assert summary["buques_en_mapa"] == 2
     assert [v["buque"] for v in summary["sin_posicion"]] == ["SIN APAGONES"]
     assert summary["sin_armador"] == ["NANINA", "SIN APAGONES"]
+    relato = summary["relato"]
+    assert relato["temporada"]["mareas"] == 3
+    assert relato["temporada"]["mareas_con_observador"] == 1
+    assert relato["historico_2021_2024"]["buques_nunca_con_observador"] == 1
+    assert relato["horas_sin_ais"] == 52.0
+    assert relato["apagones_por_marea"] == {"sin_observador": 1.5, "con_observador": 1.0}
+    assert [v["buque"] for v in relato["senales_repetidas"]] == ["TAE BAEK 75"]
     zee = json.loads((tmp_path / "gold" / "mapa" / "zee.geojson").read_text())
     assert zee["features"][0]["properties"]["nombre"] == "Argentinian Exclusive Economic Zone"
 
