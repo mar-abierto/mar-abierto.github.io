@@ -1,6 +1,6 @@
 from datetime import date
 
-from openmar.sources.inidep import parse_observer_coverage, parse_trips_annex
+from openmar.adapters.inidep import parse_observer_coverage, parse_trips_annex
 
 ANEXO = """
 Texto previo con 12/1/2025 y números 1 2 3 que no es el anexo.
@@ -72,7 +72,7 @@ def test_anexo_descarta_filas_sin_buque_conocido():
 
 
 def test_pdf_to_text_rechaza_archivos_que_no_son_pdf(tmp_path):
-    from openmar.sources.inidep import pdf_to_text
+    from openmar.adapters.inidep import pdf_to_text
 
     fake = tmp_path / "x.pdf"
     fake.write_bytes(b"<html>no soy un pdf</html>")

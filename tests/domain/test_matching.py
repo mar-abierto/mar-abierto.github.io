@@ -1,6 +1,6 @@
 from datetime import date, datetime, timezone
 
-from openmar.cross import (
+from openmar.domain.matching import (
     STATUS_NO_TRIP,
     STATUS_UNMATCHED,
     STATUS_WITH_OBSERVER,
@@ -9,8 +9,8 @@ from openmar.cross import (
     match_gaps_to_trips,
     summarize_by_vessel,
 )
-from openmar.sources.gfw import Gap
-from openmar.sources.inidep import Trip
+from openmar.domain.model import AisGap as Gap
+from openmar.domain.model import Trip
 
 
 def gap(name, day, start_km=100, end_km=100):
@@ -145,3 +145,12 @@ def test_resumen_por_buque_cuenta_estados_y_franja():
         STATUS_UNMATCHED: 0,
     }
     assert summary["NANINA"][STATUS_WITH_OBSERVER] == 1
+
+
+def test_apagon_sin_nombre_se_identifica_por_mmsi():
+    unnamed = gap("", "2025-01-10")
+
+    [m] = match_gaps_to_trips([unnamed], TRIPS, names_by_mmsi={"701": "TAE BAEK 75"})
+
+    assert m.vessel == "TAE BAEK 75"
+    assert m.status == STATUS_WITHOUT_OBSERVER

@@ -6,10 +6,11 @@ Los datos de GFW se citan como fuente según sus términos de uso.
 """
 
 from collections.abc import Iterable
-from dataclasses import dataclass
 from datetime import datetime
 
 import requests
+
+from openmar.domain.model import AisGap, FishingEvent
 
 BASE_URL = "https://gateway.api.globalfishingwatch.org/v3"
 IDENTITY_DATASET = "public-global-vessel-identity:latest"
@@ -22,22 +23,6 @@ class GFWError(RuntimeError):
     """Error de la API de GFW. Nunca incluye el token."""
 
 
-@dataclass(frozen=True)
-class Gap:
-    event_id: str
-    vessel_id: str
-    vessel_name: str
-    mmsi: str
-    start: datetime
-    end: datetime
-    hours: float
-    start_km_from_shore: float | None
-    end_km_from_shore: float | None
-    lat: float | None
-    lon: float | None
-    intentional: bool
-
-
 def _optional_float(value) -> float | None:
     return None if value is None else float(value)
 
@@ -46,13 +31,13 @@ def _parse_time(value: str) -> datetime:
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
-def parse_gap_event(raw: dict) -> Gap:
+def parse_gap_event(raw: dict) -> AisGap:
     """Convierte un evento de apagón de AIS de la API en un `Gap`."""
     vessel = raw.get("vessel", {})
     distances = raw.get("distances", {})
     position = raw.get("position", {})
     gap = raw.get("gap", {})
-    return Gap(
+    return AisGap(
         event_id=raw["id"],
         vessel_id=vessel.get("id", ""),
         vessel_name=vessel.get("name") or "",
@@ -65,6 +50,20 @@ def parse_gap_event(raw: dict) -> Gap:
         lat=_optional_float(position.get("lat")),
         lon=_optional_float(position.get("lon")),
         intentional=bool(gap.get("intentionalDisabling", False)),
+    )
+
+
+def parse_fishing_event(raw: dict) -> FishingEvent:
+    """Convierte un evento de pesca de la API en un `FishingEvent`."""
+    vessel = raw.get("vessel", {})
+    position = raw.get("position", {})
+    return FishingEvent(
+        event_id=raw["id"],
+        vessel_name=vessel.get("name") or "",
+        mmsi=vessel.get("ssvid", ""),
+        start=_parse_time(raw["start"]),
+        lat=float(position["lat"]),
+        lon=float(position["lon"]),
     )
 
 

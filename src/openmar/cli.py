@@ -1,59 +1,48 @@
-"""Línea de comandos de openMar.
+"""Línea de comandos de openMar: el adaptador de entrada (ADR 0005).
 
-    openmar descargar gfw --desde 2025-01-01 --hasta 2025-12-31
-    openmar descargar inidep
-    openmar descargar rfp
-    openmar cruzar
+    openmar descargar todo --desde 2025-01-01 --hasta 2025-12-31
+    openmar silver
+    openmar gold
+    openmar publicar
 """
 
 import argparse
-import json
+import subprocess
 import sys
 from datetime import date
 from pathlib import Path
 
 import requests
 
-from openmar.pipeline import RAW_FILES, build_outputs
-from openmar.sources import inidep, rfp
-from openmar.sources.gfw import BASE_URL, GAPS_DATASET, GFWClient, GFWError
-from openmar.storage import load_token, save_raw
+from openmar.adapters.filesystem import LocalRawStore, load_token
+from openmar.adapters.gfw import GFWClient, GFWError
+from openmar.application import download
+from openmar.application.gold import build_gold, publish_site
+from openmar.application.silver import build_silver
 
-SQUID_FLEET_QUERY = "flag='ARG' AND geartypes='SQUID_JIGGER'"
-
-
-def _vessel_id(entry: dict) -> tuple[str, str]:
-    info = (entry.get("selfReportedInfo") or [{}])[0]
-    return info.get("id", ""), info.get("transmissionDateTo") or ""
-
-
-def download_gfw(raw_dir: Path, start: str, end: str) -> None:
-    client = GFWClient(load_token())
-    vessels = client.search_vessels(SQUID_FLEET_QUERY)
-    save_raw(raw_dir / "gfw" / "buques.json", json.dumps(vessels), source=f"{BASE_URL}/vessels/search", query=SQUID_FLEET_QUERY)
-    # Un buque sin fecha de última transmisión se conserva: mejor de más que perderlo.
-    active = [vid for vid, last in map(_vessel_id, vessels) if vid and (not last or last[:10] >= start)]
-    gaps = client.get_events(GAPS_DATASET, active, start, end)
-    save_raw(raw_dir / RAW_FILES["gaps"], json.dumps(gaps), source=f"{BASE_URL}/events", dataset=GAPS_DATASET, period=f"{start}/{end}")
-    print(f"GFW: {len(vessels)} buques, {len(active)} activos desde {start}, {len(gaps)} apagones.")
+SOURCES = ("gfw", "inidep", "rfp", "zee")
+MAX_DOWNLOAD_BYTES = 50 * 1024 * 1024
+KNOWN_ERRORS = (
+    FileNotFoundError,
+    RuntimeError,
+    GFWError,
+    requests.RequestException,
+    subprocess.SubprocessError,
+    KeyError,
+    ValueError,
+)
 
 
-def _fetch(url: str) -> requests.Response:
-    response = requests.get(url, timeout=120)
-    response.raise_for_status()
-    return response
-
-
-def download_inidep(raw_dir: Path) -> None:
-    for name, url in inidep.REPORTS.items():
-        pdf = save_raw(raw_dir / "inidep" / f"{name}.pdf", _fetch(url).content, source=url)
-        pdf.with_suffix(".txt").write_text(inidep.pdf_to_text(pdf), encoding="utf-8")
-        print(f"INIDEP: {name}")
-
-
-def download_rfp(raw_dir: Path) -> None:
-    save_raw(raw_dir / RAW_FILES["registry"], _fetch(rfp.URL).text, source=rfp.URL)
-    print("Registro de Flota Pesquera: descargado. Fuente: CPA y Sin Azul No Hay Verde.")
+def fetch(url: str) -> bytes:
+    """Descarga con tiempo límite y tope de tamaño."""
+    with requests.get(url, timeout=120, stream=True, headers={"User-Agent": "openMar"}) as response:
+        response.raise_for_status()
+        content = bytearray()
+        for chunk in response.iter_content(chunk_size=65536):
+            content.extend(chunk)
+            if len(content) > MAX_DOWNLOAD_BYTES:
+                raise RuntimeError(f"La descarga de {url} supera {MAX_DOWNLOAD_BYTES // 2**20} MB.")
+    return bytes(content)
 
 
 def _iso_date(text: str) -> str:
@@ -67,30 +56,47 @@ def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="openmar", description="Observatorio pesquero del Mar Argentino")
     parser.add_argument("--datos", type=Path, default=Path("data"), help="carpeta de datos (default: data)")
     sub = parser.add_subparsers(dest="comando", required=True)
-    descargar = sub.add_parser("descargar", help="baja los datos crudos de una fuente")
-    descargar.add_argument("fuente", choices=["gfw", "inidep", "rfp"])
+    descargar = sub.add_parser("descargar", help="baja datos crudos a data/bronze")
+    descargar.add_argument("fuente", choices=[*SOURCES, "todo"])
     descargar.add_argument("--desde", type=_iso_date, default="2025-01-01")
     descargar.add_argument("--hasta", type=_iso_date, default="2025-12-31")
-    sub.add_parser("cruzar", help="cruza las fuentes y genera los CSV")
+    sub.add_parser("silver", help="limpia y unifica: data/bronze → data/silver")
+    sub.add_parser("gold", help="cruza y arma el mapa: data/silver → data/gold")
+    publicar = sub.add_parser("publicar", help="copia el mapa de data/gold al sitio")
+    publicar.add_argument("--sitio", type=Path, default=Path("site/data"))
     return parser
+
+
+def _download(store: LocalRawStore, source: str, start: str, end: str) -> dict:
+    if source == "gfw":
+        return download.download_gfw(store, GFWClient(load_token()), start, end)
+    if source == "inidep":
+        return download.download_inidep(store, fetch)
+    if source == "rfp":
+        return download.download_registry(store, fetch)
+    return download.download_eez(store, fetch)
+
+
+def _print(title: str, stats: dict) -> None:
+    print(f"{title}: " + ", ".join(f"{k}: {v}" for k, v in stats.items() if not isinstance(v, (dict, list))))
 
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
-    raw_dir, out_dir = args.datos / "raw", args.datos / "processed"
+    bronze, silver, gold = args.datos / "bronze", args.datos / "silver", args.datos / "gold"
     try:
         if args.comando == "descargar":
-            if args.fuente == "gfw":
-                download_gfw(raw_dir, args.desde, args.hasta)
-            elif args.fuente == "inidep":
-                download_inidep(raw_dir)
-            else:
-                download_rfp(raw_dir)
+            store = LocalRawStore(bronze)
+            for source in SOURCES if args.fuente == "todo" else (args.fuente,):
+                _print(source, _download(store, source, args.desde, args.hasta))
+        elif args.comando == "silver":
+            _print("silver", build_silver(LocalRawStore(bronze), silver))
+        elif args.comando == "gold":
+            _print("gold", build_gold(silver, gold))
         else:
-            stats = build_outputs(raw_dir, out_dir)
-            print(", ".join(f"{k}: {v}" for k, v in stats.items()))
-            print(f"Resultados en {out_dir}")
-    except (FileNotFoundError, RuntimeError, GFWError, requests.RequestException, KeyError, ValueError) as exc:
+            copied = publish_site(gold, args.sitio)
+            print(f"publicados {len(copied)} archivos en {args.sitio}")
+    except KNOWN_ERRORS as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
     return 0

@@ -1,6 +1,8 @@
-# Datos: no se versionan
-data/raw/
-data/processed/
+# Datos: no se versionan (ADR 0004). Sólo la documentación de la carpeta.
+data/*
+!data/README.md
+# Datos del mapa: se generan con `openmar publicar`
+site/data/
 
 # Secretos
 .env

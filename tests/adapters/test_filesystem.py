@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from openmar.storage import load_token, save_raw
+from openmar.adapters.filesystem import LocalRawStore, load_token, save_raw
 
 
 def test_save_raw_guarda_el_archivo_y_su_procedencia(tmp_path):
@@ -48,3 +48,17 @@ def test_token_ausente_da_error_claro(monkeypatch, tmp_path):
 
     with pytest.raises(RuntimeError, match="GFW_API_TOKEN"):
         load_token(tmp_path / ".env")
+
+
+def test_local_raw_store_guarda_y_lee_relativo_a_su_carpeta(tmp_path):
+    store = LocalRawStore(tmp_path / "bronze")
+
+    store.save("rfp/pagina.html", "<table/>", source="https://ejemplo.org")
+
+    assert store.read_text("rfp/pagina.html") == "<table/>"
+    assert store.path("rfp/pagina.html") == tmp_path / "bronze" / "rfp" / "pagina.html"
+
+
+def test_local_raw_store_avisa_si_falta_el_archivo(tmp_path):
+    with pytest.raises(FileNotFoundError, match="openmar descargar"):
+        LocalRawStore(tmp_path).read_text("nada.json")

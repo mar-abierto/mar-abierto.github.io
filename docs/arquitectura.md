@@ -54,12 +54,21 @@ nombre. Reconocer que dos registros escritos distinto hablan del mismo barco
 
 ## Código
 
-| Módulo | Qué hace |
-|---|---|
-| `openmar/normalize.py` | Lleva los nombres de buques a una forma comparable entre fuentes |
-| `openmar/sources/gfw.py` | Cliente de la API de Global Fishing Watch |
-| `openmar/sources/inidep.py` | Lectores de los informes del INIDEP |
-| `openmar/sources/rfp.py` | Lector del Registro de Flota Pesquera |
-| `openmar/cross.py` | Cruce de apagones con mareas |
-| `openmar/pipeline.py` | Arma los CSV de salida |
-| `openmar/cli.py` | Comandos `openmar descargar` y `openmar cruzar` |
+Arquitectura hexagonal ([ADR 0005](adr/0005-arquitectura-hexagonal.md)): las
+dependencias apuntan hacia adentro.
+
+| Capa | Módulo | Qué hace |
+|---|---|---|
+| Dominio | `domain/model.py` | `Trip`, `Coverage`, `AisGap`, `FishingEvent`, `RegistryRecord` |
+| Dominio | `domain/names.py` | Nombre para mostrar y clave para cruzar fuentes |
+| Dominio | `domain/matching.py` | Cruce de apagones con mareas (fechas locales, ADR 0007) |
+| Dominio | `domain/signals.py` | Semáforo de señales (ADR 0008) |
+| Dominio | `domain/positions.py` | Zona habitual de pesca de cada buque |
+| Puertos | `ports.py` | `RawStore`: guardar y leer la capa bronze |
+| Adaptadores | `adapters/gfw.py`, `inidep.py`, `rfp.py`, `geo.py` | Una pieza por fuente |
+| Adaptadores | `adapters/filesystem.py`, `tabular.py` | Disco y CSV |
+| Aplicación | `application/download.py` | Fuentes → bronze |
+| Aplicación | `application/silver.py` | Bronze → silver |
+| Aplicación | `application/gold.py` | Silver → gold y mapa |
+| Entrada | `cli.py` | `openmar descargar`, `silver`, `gold`, `publicar` |
+| Presentación | `site/` | Mapa estático (ADR 0009) |

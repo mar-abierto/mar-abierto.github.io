@@ -19,8 +19,9 @@ Para la flota potera (calamar) de 2025:
 3. Baja del Registro de Flota Pesquera el armador, la matrícula y las sanciones.
 4. Ubica cada apagón en la marea en la que ocurrió y dice si había observador a bordo.
 
-El resultado son tres archivos CSV: un resumen por buque, el detalle de cada
-apagón y todas las mareas. Los hallazgos de la primera corrida están en
+El resultado es un resumen por buque con un semáforo de señales
+([ADR 0008](docs/adr/0008-senales-no-acusaciones.md)), el detalle de cada apagón y
+un mapa. Los hallazgos de la primera corrida están en
 [`docs/hallazgos-2025.md`](docs/hallazgos-2025.md).
 
 ## Instalación
@@ -46,14 +47,22 @@ El `.env` está en `.gitignore`. No lo compartas ni lo pegues en issues.
 ## Uso
 
 ```bash
-uv run openmar descargar inidep
-uv run openmar descargar rfp
-uv run openmar descargar gfw --desde 2025-01-01 --hasta 2025-12-31
-uv run openmar cruzar
+uv run openmar descargar todo --desde 2025-01-01 --hasta 2025-12-31
+uv run openmar silver      # limpia y unifica
+uv run openmar gold        # cruza y arma el mapa
+uv run openmar publicar    # copia el mapa a site/data
 ```
 
-Los datos crudos quedan en `data/raw/` (cada archivo con un `.meta.json` que dice
-de dónde salió y cuándo) y los resultados en `data/processed/`.
+Los datos se organizan en tres capas ([ADR 0006](docs/adr/0006-capas-de-datos.md)):
+
+| Capa | Qué tiene |
+|---|---|
+| `data/bronze/` | Lo que llegó de cada fuente, sin tocar, con un `.meta.json` de origen y fecha |
+| `data/silver/` | Una tabla limpia por concepto: buques, mareas, apagones, pesca, registro |
+| `data/gold/` | Cruces listos para usar y las capas del mapa |
+
+Para ver el mapa en tu máquina: `python3 -m http.server -d site` y abrí
+<http://localhost:8000>.
 
 ## Fuentes y cómo citarlas
 
@@ -82,7 +91,8 @@ los descarga de la fuente original, y cada usuario los baja por su cuenta.
 - [x] Recolectores de GFW, INIDEP y Registro de Flota Pesquera
 - [x] Cruce de apagones con mareas y observadores
 - [ ] Apagones contra la línea real de la ZEE
-- [ ] Ficha por buque y mapa
+- [x] Mapa con semáforo por buque
+- [ ] Ficha por buque
 - [ ] Extracción de las actas del Consejo Federal Pesquero
 - [ ] Más pesquerías además del calamar
 
@@ -90,6 +100,7 @@ los descarga de la fuente original, y cada usuario los baja por su cuenta.
 
 | Archivo | Qué es |
 |---|---|
+| [`docs/adr/`](docs/adr/) | Decisiones de arquitectura, con su porqué |
 | [`docs/contexto.md`](docs/contexto.md) | El problema y quién ya trabaja en esto |
 | [`docs/arquitectura.md`](docs/arquitectura.md) | Fuentes, modelo y flujo |
 | [`docs/hallazgos-2025.md`](docs/hallazgos-2025.md) | Resultados de la primera corrida |

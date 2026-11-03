@@ -8,11 +8,11 @@ Los informes incluyen nombres de observadores. Estos lectores no los extraen.
 
 import re
 import subprocess
-from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
 
-from openmar.normalize import normalize_vessel_name
+from openmar.domain.model import Coverage, Trip
+from openmar.domain.names import normalize_vessel_name
 
 # Informes usados por el demo de la flota potera.
 REPORTS = {
@@ -29,27 +29,6 @@ _FILA_MAREA = re.compile(
     r"(?P<captura>[\d.]+)\s+(?P<rend>[\d,]+)"
 )
 _FILA_COBERTURA = re.compile(r"^\s(?P<buque>[A-Z][A-Z0-9 ]+?)\s{2,}(?P<numeros>[\d\s.]+)$")
-
-
-@dataclass(frozen=True)
-class Trip:
-    vessel: str
-    trip: int
-    observer: bool
-    start: date
-    end: date
-    days: int
-    catch_kg: int
-    rate_t_per_day: float
-
-
-@dataclass(frozen=True)
-class Coverage:
-    vessel: str
-    trips: int
-    with_observer: int
-    without_observer: int
-    pct_with_observer: float
 
 
 def _parse_date(text: str) -> date:

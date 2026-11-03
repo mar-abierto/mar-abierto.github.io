@@ -1,4 +1,4 @@
-from openmar.sources.rfp import parse_registry_html
+from openmar.adapters.rfp import parse_registry_html
 
 HTML = """
 <html><body><table>

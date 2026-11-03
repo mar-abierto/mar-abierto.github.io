@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 import pytest
 
-from openmar.sources.gfw import GFWClient, GFWError, parse_gap_event
+from openmar.adapters.gfw import GFWClient, GFWError, parse_gap_event
 
 
 class FakeResponse:
