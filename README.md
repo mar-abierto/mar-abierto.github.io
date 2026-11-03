@@ -10,6 +10,8 @@ flota). Cada resultado guarda de qué fuente salió.
 Pensada para periodistas de datos, investigadores, organizaciones y cualquiera que
 quiera mirar el mar con datos.
 
+![Mapa de openMar: la flota potera argentina con su semáforo de señales](docs/img/mapa.png)
+
 ## Qué hace hoy
 
 Para la flota potera (calamar) de 2025:
@@ -104,6 +106,7 @@ los descarga de la fuente original, y cada usuario los baja por su cuenta.
 | [`docs/contexto.md`](docs/contexto.md) | El problema y quién ya trabaja en esto |
 | [`docs/arquitectura.md`](docs/arquitectura.md) | Fuentes, modelo y flujo |
 | [`docs/hallazgos-2025.md`](docs/hallazgos-2025.md) | Resultados de la primera corrida |
+| [`docs/despliegue.md`](docs/despliegue.md) | Cómo ver y publicar el mapa |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Cómo sumarse |
 
 ## Licencia
