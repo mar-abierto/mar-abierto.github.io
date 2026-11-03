@@ -46,10 +46,33 @@ Argentina no publica los datos VMS de su flota. Perú lo hace desde 2018 y Chile
 también, a través de Global Fishing Watch
 ([Oceana](https://usa.oceana.org/press-releases/chile-publish-vessel-tracking-data-through-global-fishing-watch/)).
 
+## Registro de Flota Pesquera (lanzado el 2 de noviembre de 2026)
+
+El Círculo de Políticas Ambientales y Sin Azul No Hay Verde publicaron
+[registroflotapesquera.org](https://registroflotapesquera.org): 520 buques con
+matrícula, arte de pesca, armador (titular del permiso), permiso, autorización,
+sanciones y CITC, armado con pedidos de acceso a la información pública
+([El Sureño](https://www.surenio.com.ar/publican-la-base-de-datos-de-barcos-que-operan-en-el-mar-argentino/)).
+Ellos mismos aclaran que autorizaciones y sanciones están incompletas.
+
+**No incluye:** recorridos AIS, mareas, observadores ni dueños reales (socios de
+las empresas armadoras).
+
+En Diputados hay un proyecto de Maximiliano Ferraro (junio de 2026) para que el
+Registro de la Pesca sea público, digital y abierto, incluida la composición
+societaria ([Revista Puerto](https://revistapuerto.com.ar/2026/06/proyecto-de-ley-para-hacer-publicos-todos-los-datos-de-la-pesca-argentina/)).
+
+**Consecuencia para openMar:** la parte de "registro" ya la cubre la sociedad
+civil. openMar no la duplica: la usa como fuente y le suma la capa de
+**comportamiento** (AIS, mareas, observadores, cruces). El CPA pasa de "validar
+con ellos" a socio natural.
+
 ## El hueco
 
-Nadie cruza, barco por barco, recorridos + permisos + dueños + observadores +
-sanciones, ni lo publica de forma sostenida. Eso es openMar.
+Nadie cruza, barco por barco, el registro (armador, permisos, sanciones) con lo que
+el barco hace en el mar (recorridos, apagones, mareas, observadores), ni lo publica
+de forma sostenida. Tampoco nadie publica los dueños reales detrás de las empresas
+armadoras. Eso es openMar.
 
 ## Riesgos
 
