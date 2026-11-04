@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>openMar · Mapa de la flota potera</title>
-  <meta name="description" content="Mapa abierto de la flota potera argentina: apagones de AIS, mareas con y sin observador y armadores, barco por barco, con la fuente de cada dato.">
+  <title>openMar · Mapa de la flota calamarera</title>
+  <meta name="description" content="Mapa abierto de la flota calamarera argentina: cortes de señal, viajes con y sin observador y empresas titulares, barco por barco, con la fuente de cada dato.">
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#ffffff">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2315191f'/%3E%3Crect x='7' y='7' width='8' height='8' fill='%231d5fa6'/%3E%3Crect x='17' y='7' width='8' height='8' fill='%23ffffff' opacity='.35'/%3E%3Crect x='7' y='17' width='8' height='8' fill='%23ffffff' opacity='.35'/%3E%3Crect x='17' y='17' width='8' height='8' fill='%23ffffff' opacity='.35'/%3E%3C/svg%3E">
@@ -22,14 +22,14 @@
     <a class="top__brand" href="./">open<span>Mar</span></a>
     <p class="top__draft">Borrador · en revisión</p>
     <nav class="top__nav" aria-label="Secciones">
-      <a href="./">Relato</a>
-      <a href="tablero.html">Tablero</a>
-      <a href="buque.html">Buques</a>
+      <a href="./">La historia</a>
+      <a href="tablero.html">Empresas</a>
+      <a href="buque.html">Barcos</a>
       <a href="mapa.html" aria-current="page">Mapa</a>
     </nav>
   </header>
   <main class="app">
-    <aside class="panel" id="panel" aria-label="Capas y buques">
+    <aside class="panel" id="panel" aria-label="Capas y barcos">
       <button class="panel__handle" id="panel-toggle" aria-expanded="true" aria-controls="panel-body">
         <span class="panel__handle-bar" aria-hidden="true"></span>
         <span class="sr-only">Mostrar u ocultar el panel</span>
@@ -37,7 +37,7 @@
 
       <header class="brand">
         <h1 class="brand__title">Mapa de la flota</h1>
-        <p class="brand__lede">La flota potera argentina en la temporada de calamar 2025, barco por barco. Cada luz es un buque en su zona habitual de pesca.</p>
+        <p class="brand__lede">Los barcos argentinos que pescan calamar, en la temporada 2025, uno por uno. Cada punto es un barco en su zona habitual de pesca.</p>
       </header>
 
       <div class="panel__body" id="panel-body">
@@ -61,43 +61,43 @@
             </button>
           </div>
           <ul class="rules">
-            <li><span class="dot dot--rojo" aria-hidden="true"></span><span><strong>Señales repetidas:</strong> 3 o más apagones en mareas sin observador del INIDEP, o fuera de las fechas de marea.</span></li>
-            <li><span class="dot dot--amarillo" aria-hidden="true"></span><span><strong>Señales aisladas:</strong> 1 o 2 apagones así, o apagones sólo con observador a bordo.</span></li>
-            <li><span class="dot dot--verde" aria-hidden="true"></span><span><strong>Sin señales:</strong> sin apagones registrados por GFW. No significa "cumple": un buque que casi no transmite tampoco tiene apagones.</span></li>
+            <li><span class="dot dot--rojo" aria-hidden="true"></span><span><strong>Señales repetidas:</strong> <span data-n="reglas.umbral_senales_repetidas">3</span> o más cortes de señal en viajes sin observador, o fuera de las fechas de viaje.</span></li>
+            <li><span class="dot dot--amarillo" aria-hidden="true"></span><span><strong>Señales aisladas:</strong> 1 o 2 cortes así, o cortes sólo con observador a bordo.</span></li>
+            <li><span class="dot dot--verde" aria-hidden="true"></span><span><strong>Sin señales:</strong> Global Fishing Watch no registró cortes de señal. Eso no quiere decir que el barco cumpla: uno que casi no transmite tampoco tiene cortes.</span></li>
           </ul>
-          <p class="note">Un apagón de AIS es un corte de 12 horas o más en la señal de posición. <strong>No es una infracción</strong>: los buques también reportan por VMS, que no es público. El color indica dónde mirar primero.</p>
+          <p class="note">Un corte de señal es un lapso de <span data-n="reglas.horas_minimas_apagon">12</span> horas o más sin la señal abierta de posición, la que cualquiera puede seguir en internet. <strong>Un corte no prueba una infracción</strong>: los barcos también mandan su posición al Estado por una señal privada, que no se publica. El color indica dónde mirar primero.</p>
         </section>
 
         <section class="block" aria-labelledby="capas-title">
           <h2 class="block__title" id="capas-title">Capas</h2>
           <ul class="layers">
-            <li><label class="switch"><input type="checkbox" data-layer="buques" checked><span class="switch__ui" aria-hidden="true"></span>Buques y nombres</label></li>
-            <li><label class="switch"><input type="checkbox" data-layer="apagones" checked><span class="switch__ui" aria-hidden="true"></span>Apagones de AIS <span class="swatch swatch--ring" aria-hidden="true"></span></label></li>
+            <li><label class="switch"><input type="checkbox" data-layer="buques" checked><span class="switch__ui" aria-hidden="true"></span>Barcos y nombres</label></li>
+            <li><label class="switch"><input type="checkbox" data-layer="apagones" checked><span class="switch__ui" aria-hidden="true"></span>Cortes de señal <span class="swatch swatch--ring" aria-hidden="true"></span></label></li>
             <li><label class="switch"><input type="checkbox" data-layer="pesca"><span class="switch__ui" aria-hidden="true"></span>Actividad de pesca <span class="swatch swatch--glow" aria-hidden="true"></span></label></li>
-            <li><label class="switch"><input type="checkbox" data-layer="zee" checked><span class="switch__ui" aria-hidden="true"></span>Límite de la ZEE (milla 200) <span class="swatch swatch--line" aria-hidden="true"></span></label></li>
+            <li><label class="switch"><input type="checkbox" data-layer="zee" checked><span class="switch__ui" aria-hidden="true"></span>Límite de las 200 millas <span class="swatch swatch--line" aria-hidden="true"></span></label></li>
           </ul>
         </section>
 
         <section class="block block--list" aria-labelledby="buques-title">
           <div class="block__head">
-            <h2 class="block__title" id="buques-title">Buques</h2>
+            <h2 class="block__title" id="buques-title">Barcos</h2>
             <span class="block__meta" id="list-count" aria-live="polite"></span>
           </div>
           <label class="search">
-            <span class="sr-only">Buscar buque o armador</span>
-            <input type="search" id="search" placeholder="Buscar buque o armador" autocomplete="off">
+            <span class="sr-only">Buscar barco o empresa</span>
+            <input type="search" id="search" placeholder="Buscar barco o empresa" autocomplete="off">
           </label>
           <ol class="vessels" id="vessels"></ol>
           <details class="missing">
-            <summary>Sin datos de AIS en 2025 <span id="missing-count"></span></summary>
-            <p class="note">Pescaron según el INIDEP, pero Global Fishing Watch no tiene su recorrido. No aparecen en el mapa.</p>
+            <summary>Sin recorrido en 2025 <span id="missing-count"></span></summary>
+            <p class="note">Pescaron según el instituto de investigación pesquera del Estado (INIDEP), pero Global Fishing Watch no tiene su recorrido, así que no aparecen en el mapa.</p>
             <ul id="missing"></ul>
           </details>
         </section>
 
         <section class="block block--about" aria-labelledby="leer-title">
           <h2 class="block__title" id="leer-title">Sobre los datos</h2>
-          <p class="note">La posición es la mediana de sus eventos de pesca de 2025, no dónde está hoy. La "franja de la milla 200" se aproxima con la distancia a la costa (300 a 450 km).</p>
+          <p class="note">La posición es el punto típico donde pescó cada barco en 2025 (la mediana de sus eventos de pesca), no dónde está hoy. La "franja de la milla 200" se aproxima con la distancia a la costa (300 a 450 km).</p>
           <h3 class="block__subtitle">Fuentes</h3>
           <ul class="sources" id="sources"></ul>
           <p class="foot">Código abierto (MIT) · Resultados CC BY 4.0 · <span id="generated"></span></p>

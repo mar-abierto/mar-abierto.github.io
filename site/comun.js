@@ -10,25 +10,25 @@
 
   const LABELS = { rojo: "Señales repetidas", amarillo: "Señales aisladas", verde: "Sin señales" };
   const GAP_STATUS = {
-    en_marea_sin_observador: "en marea sin observador",
-    en_marea_con_observador: "en marea con observador a bordo",
-    fuera_de_marea: "fuera de las fechas de marea",
-    sin_mareas_del_buque: "sin mareas informadas",
+    en_marea_sin_observador: "durante un viaje sin observador",
+    en_marea_con_observador: "durante un viaje con observador a bordo",
+    fuera_de_marea: "fuera de las fechas de viaje",
+    sin_mareas_del_buque: "en un barco sin viajes informados",
   };
 
   // Resumen en una frase de los apagones de un buque (fila del gold).
   function gapSummary(p, minHours) {
     if (!Number(p.apagones)) {
-      return "Sin apagones de AIS registrados por Global Fishing Watch en la temporada.";
+      return "Global Fishing Watch no registró cortes de señal en la temporada.";
     }
     const parts = [
-      [p.en_marea_sin_observador, "en mareas sin observador"],
+      [p.en_marea_sin_observador, "en viajes sin observador"],
       [p.en_marea_con_observador, "con observador a bordo"],
-      [p.fuera_de_marea, "fuera de las fechas de marea"],
+      [p.fuera_de_marea, "fuera de las fechas de viaje"],
     ]
       .filter(([n]) => Number(n) > 0)
       .map(([n, text]) => `${num(n)} ${text}`);
-    let text = `${plural(p.apagones, "apagón", "apagones")} de AIS de ${num(minHours)} h o más (${num(p.horas_sin_ais)} h sin señal en total): ${parts.join(", ")}.`;
+    let text = `${plural(p.apagones, "corte de señal", "cortes de señal")} de ${num(minHours)} horas o más (${num(p.horas_sin_ais)} horas sin señal en total): ${parts.join(", ")}.`;
     if (Number(p.franja_milla_200) > 0) {
       text += ` ${plural(p.franja_milla_200, "empieza o termina", "empiezan o terminan")} cerca de la milla 200.`;
     }
@@ -87,16 +87,16 @@
     const missing = summary.sin_posicion || [];
     const noOwner = summary.sin_armador || [];
     return [
-      `<strong>${plural(missing.length, "buque pescó", "buques pescaron")}</strong> según el INIDEP pero no tienen recorrido en Global Fishing Watch: no aparecen en el mapa (la lista está en el panel del mapa).`,
-      `<strong>${plural(noOwner.length, "buque no figura", "buques no figuran")}</strong> en el Registro de Flota Pesquera${noOwner.length ? `: ${noOwner.map(esc).join(", ")}` : ""}.`,
-      "<strong>Dueños reales:</strong> el armador es la empresa titular del permiso. Quiénes son sus socios no está publicado.",
-      "<strong>Escalas en puerto:</strong> las detecta Global Fishing Watch por AIS, sólo en buques que lo tienen encendido. Una escala no es necesariamente una descarga (puede ser reparación, abastecimiento o cambio de tripulación), y los transbordos en el mar no se cuentan.",
-      "<strong>VMS:</strong> las posiciones que los buques reportan a las autoridades no son públicas. Este mapa sólo usa AIS.",
-      `<strong>Apagones:</strong> sólo cortes de ${num(summary.reglas?.horas_minimas_apagon)} horas o más en zonas con buena recepción satelital (criterio de Global Fishing Watch). Los cortes más cortos no aparecen.`,
-      `<strong>Mareas y observadores:</strong> vienen del informe técnico 026/2025 del INIDEP, con datos hasta el 5 de junio de 2025. Las mareas posteriores no están. La prensa citó 9 mareas con observador; este informe marca ${num(summary.relato?.temporada?.mareas_con_observador)}. La diferencia está sin resolver hasta que se publique el informe final.`,
-      "<strong>Posición:</strong> es la mediana de los eventos de pesca de 2025, no dónde está hoy el buque. La franja de la milla 200 es aproximada (300 a 450 km de la costa).",
-      "<strong>Alcance:</strong> sólo poteros con bandera argentina en la temporada de calamar 2025. La flota extranjera de la milla 201 no está incluida.",
-      "<strong>Islas Malvinas:</strong> el límite de la ZEE es el que publica Marine Regions, que deja fuera el área en disputa alrededor de las islas. No es una posición de openMar sobre la soberanía: la Argentina reclama esas aguas.",
+      `<strong>${plural(missing.length, "barco pescó", "barcos pescaron")}</strong> según los datos oficiales de viajes, pero no tienen recorrido en Global Fishing Watch: no aparecen en el mapa (la lista está en el panel del mapa).`,
+      `<strong>${plural(noOwner.length, "barco no figura", "barcos no figuran")}</strong> en el Registro de Flota Pesquera${noOwner.length ? `: ${noOwner.map(esc).join(", ")}` : ""}.`,
+      "<strong>Dueños reales:</strong> el registro dice qué empresa es titular del permiso de pesca (el armador). Quiénes son sus socios no está publicado.",
+      "<strong>Escalas en puerto:</strong> las detecta Global Fishing Watch con la señal abierta de posición, sólo en barcos que la tienen encendida. Una escala no es necesariamente una descarga (puede ser reparación, abastecimiento o cambio de tripulación), y los transbordos en el mar no se cuentan.",
+      "<strong>Señal privada:</strong> las posiciones que los barcos le mandan al Estado por su señal privada no son públicas. openMar sólo usa la señal abierta, la que cualquiera puede seguir en internet.",
+      `<strong>Cortes de señal:</strong> sólo cuentan los de ${num(summary.reglas?.horas_minimas_apagon)} horas o más en zonas con buena recepción satelital (criterio de Global Fishing Watch). Los cortes más cortos no aparecen.`,
+      `<strong>Viajes y observadores:</strong> vienen del informe técnico 026/2025 del INIDEP, con datos hasta el 5 de junio de 2025. Los viajes posteriores no están. La prensa citó 9 viajes con observador; este informe marca ${num(summary.relato?.temporada?.mareas_con_observador)}. La diferencia está sin resolver hasta que se publique el informe final.`,
+      "<strong>Posición:</strong> es el punto típico donde pescó cada barco en 2025 (la mediana de sus eventos de pesca), no dónde está hoy. La franja de la milla 200 es aproximada (300 a 450 km de la costa).",
+      "<strong>Alcance:</strong> sólo barcos calamareros con bandera argentina en la temporada de calamar 2025. La flota extranjera de la milla 201 no está incluida.",
+      "<strong>Islas Malvinas:</strong> el límite de las 200 millas es el que publica Marine Regions, que deja fuera el área en disputa alrededor de las islas. Usarlo no implica una posición de openMar sobre la soberanía: la Argentina reclama esas aguas.",
     ];
   }
 

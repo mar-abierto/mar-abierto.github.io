@@ -6,10 +6,10 @@
   const $ = (selector) => document.querySelector(selector);
 
   const GAP_PARTS = [
-    { key: "en_marea_sin_observador", label: "en mareas sin observador", cls: "sin" },
-    { key: "en_marea_con_observador", label: "en mareas con observador", cls: "con" },
-    { key: "fuera_de_marea", label: "fuera de las fechas de marea", cls: "fuera" },
-    { key: "sin_mareas_del_buque", label: "sin mareas informadas del buque", cls: "fuera" },
+    { key: "en_marea_sin_observador", label: "en viajes sin observador", cls: "sin" },
+    { key: "en_marea_con_observador", label: "en viajes con observador", cls: "con" },
+    { key: "fuera_de_marea", label: "fuera de las fechas de viaje", cls: "fuera" },
+    { key: "sin_mareas_del_buque", label: "en barcos sin viajes informados", cls: "fuera" },
   ];
 
   const COLUMNS = {
@@ -53,7 +53,7 @@
         return `<li class="port${abroad ? " port--abroad" : ""}">
           <span class="port__name">${esc(p.puerto)}${abroad ? ` <em>(${esc(p.pais)})</em>` : ""}</span>
           <span class="port__track"><span class="port__fill" style="--w:${Number((100 * p.escalas) / max)}%"></span></span>
-          <span class="port__value">${num(p.escalas)}<small> · ${num(p.buques)} ${p.buques === 1 ? "buque" : "buques"}</small></span>
+          <span class="port__value">${num(p.escalas)}<small> · ${num(p.buques)} ${p.buques === 1 ? "barco" : "barcos"}</small></span>
         </li>`;
       })
       .join("");

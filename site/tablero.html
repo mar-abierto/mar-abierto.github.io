@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>openMar · Tablero de la flota potera</title>
-  <meta name="description" content="Indicadores de la flota potera argentina, empresa por empresa: observadores a bordo, apagones de AIS y puertos de escala. Las mismas reglas para todas.">
+  <title>openMar · La flota calamarera, empresa por empresa</title>
+  <meta name="description" content="Indicadores de la flota calamarera argentina, empresa por empresa: observadores a bordo, cortes de señal y puertos donde paran los barcos. Las mismas reglas para todas.">
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#ffffff">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2315191f'/%3E%3Crect x='7' y='7' width='8' height='8' fill='%231d5fa6'/%3E%3Crect x='17' y='7' width='8' height='8' fill='%23ffffff' opacity='.35'/%3E%3Crect x='7' y='17' width='8' height='8' fill='%23ffffff' opacity='.35'/%3E%3Crect x='17' y='17' width='8' height='8' fill='%23ffffff' opacity='.35'/%3E%3C/svg%3E">
@@ -22,16 +22,16 @@
     <a class="top__brand" href="./">open<span>Mar</span></a>
     <p class="top__draft">Borrador · en revisión</p>
     <nav class="top__nav" aria-label="Secciones">
-      <a href="./">Relato</a>
-      <a href="tablero.html" aria-current="page">Tablero</a>
-      <a href="buque.html">Buques</a>
+      <a href="./">La historia</a>
+      <a href="tablero.html" aria-current="page">Empresas</a>
+      <a href="buque.html">Barcos</a>
       <a href="mapa.html">Mapa</a>
     </nav>
   </header>
 
   <main id="tablero" class="board" aria-busy="true">
     <header class="board__head">
-      <p class="kicker">Tablero · <span data-n="temporada">temporada</span></p>
+      <p class="kicker">Empresas · <span data-n="temporada">temporada</span></p>
       <h1 class="board__title">Las preguntas que el Estado no responde, en números</h1>
       <p class="board__lede">Los mismos indicadores para todas las empresas, sin importar el origen de su capital. Cada número se calcula desde fuentes públicas; abajo de cada uno está cómo.</p>
     </header>
@@ -39,48 +39,48 @@
     <section class="kpis" aria-label="Indicadores principales">
       <article class="kpi">
         <p class="kpi__value kpi__value--obs"><span data-n="relato.temporada.pct_con_observador" data-fmt="pct">–</span></p>
-        <p class="kpi__label">de las mareas de la temporada con observador del INIDEP</p>
-        <p class="kpi__meta"><span data-n="relato.temporada.mareas_con_observador">–</span> de <span data-n="relato.temporada.mareas">–</span> mareas</p>
+        <p class="kpi__label">de los viajes de pesca de la temporada llevaron observador a bordo</p>
+        <p class="kpi__meta"><span data-n="relato.temporada.mareas_con_observador">–</span> de <span data-n="relato.temporada.mareas">–</span> viajes</p>
       </article>
       <article class="kpi">
         <p class="kpi__value"><span data-n="relato.historico_2021_2024.buques_nunca_con_observador">–</span><small> de <span data-n="relato.historico_2021_2024.buques">–</span></small></p>
-        <p class="kpi__label">buques nunca llevaron observador entre 2021 y 2024</p>
-        <p class="kpi__meta">INIDEP, Tabla 9</p>
+        <p class="kpi__label">barcos nunca llevaron observador entre 2021 y 2024</p>
+        <p class="kpi__meta">Fuente: INIDEP, informe de observadores 2024</p>
       </article>
       <article class="kpi">
         <p class="kpi__value kpi__value--gap"><span data-n="apagones_por_estado.en_marea_sin_observador">–</span></p>
-        <p class="kpi__label">apagones de AIS en mareas sin observador</p>
-        <p class="kpi__meta">de <span data-n="apagones">–</span> apagones en total</p>
+        <p class="kpi__label">cortes de señal en viajes sin observador</p>
+        <p class="kpi__meta">de <span data-n="apagones">–</span> cortes en total</p>
       </article>
       <article class="kpi">
         <p class="kpi__value kpi__value--port"><span data-n="tablero.escalas_exterior">–</span><small> de <span data-n="tablero.escalas">–</span></small></p>
         <p class="kpi__label">llegadas a puerto fuera de la Argentina detectadas en <span data-n="temporada">–</span></p>
-        <p class="kpi__meta">Buques con alguna escala afuera: <span data-n="tablero.buques_con_escalas_exterior">–</span></p>
+        <p class="kpi__meta">Barcos con alguna escala afuera: <span data-n="tablero.buques_con_escalas_exterior">–</span></p>
       </article>
     </section>
 
     <section class="panel-grid">
       <article class="card-ind">
         <h2>¿Hay alguien del Estado a bordo?</h2>
-        <p class="card-ind__q">Viajes con observador del INIDEP, año por año. La barra entera es el 100 % de los viajes.</p>
+        <p class="card-ind__q">Viajes con observador del instituto de investigación pesquera del Estado (INIDEP), año por año. La barra entera es el 100 % de los viajes.</p>
         <ol class="series__bars" id="series-anual" aria-label="Porcentaje de viajes con observador por año"></ol>
-        <p class="how"><strong>Cómo se calcula:</strong> viajes con observador sobre viajes totales. 2021–2024: Tabla 9 del informe de observadores 2024. 2025: Anexo 1 del ITO 026/2025, mareas hasta el 5 de junio.</p>
+        <p class="how"><strong>Cómo se calcula:</strong> viajes con observador sobre viajes totales. 2021–2024: Tabla 9 del informe de observadores 2024 del INIDEP. 2025: Anexo 1 del ITO 026/2025, viajes hasta el 5 de junio.</p>
       </article>
 
       <article class="card-ind">
         <h2>¿Qué pasa con la señal?</h2>
-        <p class="card-ind__q">Apagones de AIS de <span data-n="reglas.horas_minimas_apagon">–</span> horas o más, según la marea en la que ocurrieron.</p>
+        <p class="card-ind__q">Cortes de <span data-n="reglas.horas_minimas_apagon">–</span> horas o más en la señal abierta de posición, la que cualquiera puede seguir en internet, según en qué viaje ocurrieron.</p>
         <div class="stack" id="stack-apagones"></div>
         <ul class="stack__legend" id="stack-legend"></ul>
-        <p class="how"><strong>Cómo se calcula:</strong> cada apagón de Global Fishing Watch se ubica en la marea del buque según la fecha en hora argentina, con <span data-n="reglas.tolerancia_dias_marea">–</span> días de tolerancia. Un apagón no es una infracción.</p>
+        <p class="how"><strong>Cómo se calcula:</strong> cada corte que registra Global Fishing Watch se ubica en un viaje del barco según la fecha en hora argentina, con <span data-n="reglas.tolerancia_dias_marea">–</span> días de tolerancia. Un corte de señal, por sí solo, no prueba ninguna infracción.</p>
       </article>
 
       <article class="card-ind card-ind--wide">
         <h2>¿Dónde paran los barcos?</h2>
-        <p class="card-ind__q">Escalas en puerto de los buques de la temporada. Responde a una pregunta concreta: si el trabajo en tierra queda en el país.</p>
+        <p class="card-ind__q">Escalas en puerto de los barcos de la temporada. Sirve para responder una pregunta concreta: si el trabajo en tierra queda en el país.</p>
         <ol class="ports" id="ports"></ol>
-        <p class="how"><strong>Cómo se calcula:</strong> <span data-n="tablero.periodo_escalas">–</span>, de confianza alta en Global Fishing Watch (entrada y salida del puerto detectadas por AIS). Se cuentan <span data-n="tablero.calidad_escalas.contadas">–</span>. Quedaron afuera <span data-n="tablero.calidad_escalas.de_otros_anios">–</span> estadías que empezaron antes del año y <span data-n="tablero.calidad_escalas.baja_confianza">–</span> de baja confianza. En <span data-n="tablero.calidad_escalas.nombre_completado">–</span> escalas el nombre del puerto se completó con el de otras escalas del mismo puerto.</p>
-        <p class="how how--warn"><strong>Lo que este dato no dice:</strong> sólo ve buques con el AIS encendido. Una escala no es necesariamente una descarga, y los transbordos en el mar no aparecen. Que no se detecten escalas afuera no prueba que no haya descargas en el exterior.</p>
+        <p class="how"><strong>Cómo se calcula:</strong> <span data-n="tablero.periodo_escalas">–</span>, de confianza alta en Global Fishing Watch (entrada y salida del puerto detectadas con la señal abierta). Se cuentan <span data-n="tablero.calidad_escalas.contadas">–</span>. Quedaron afuera <span data-n="tablero.calidad_escalas.de_otros_anios">–</span> estadías que empezaron antes del año y <span data-n="tablero.calidad_escalas.baja_confianza">–</span> de baja confianza. En <span data-n="tablero.calidad_escalas.nombre_completado">–</span> escalas el nombre del puerto se completó con el de otras escalas del mismo puerto.</p>
+        <p class="how how--warn"><strong>Lo que este dato no dice:</strong> sólo ve barcos con la señal abierta encendida. Una escala no es necesariamente una descarga, y los transbordos en el mar no aparecen. Que no se detecten escalas afuera no prueba que no haya descargas en el exterior.</p>
       </article>
     </section>
 
@@ -88,7 +88,7 @@
       <div class="owners__head">
         <div>
           <h2 id="owners-title">Empresa por empresa</h2>
-          <p class="card-ind__q">Armador: la empresa titular del permiso según el Registro de Flota Pesquera. No necesariamente es el dueño final.</p>
+          <p class="card-ind__q">Cada fila es un armador, la empresa titular del permiso de pesca según el Registro de Flota Pesquera, que no necesariamente es el dueño final.</p>
         </div>
         <label class="search">
           <span class="sr-only">Buscar empresa</span>
@@ -97,15 +97,15 @@
       </div>
       <div class="table-wrap" tabindex="0" role="region" aria-labelledby="owners-title">
         <table class="table" id="owners-table">
-          <caption class="sr-only">Indicadores por armador. Los encabezados ordenan la tabla.</caption>
+          <caption class="sr-only">Indicadores por empresa. Los encabezados ordenan la tabla.</caption>
           <thead>
             <tr>
-              <th scope="col" data-key="armador" data-type="text">Armador</th>
-              <th scope="col" data-key="buques">Buques</th>
-              <th scope="col" data-key="mareas" aria-sort="descending">Mareas</th>
+              <th scope="col" data-key="armador" data-type="text">Empresa</th>
+              <th scope="col" data-key="buques">Barcos</th>
+              <th scope="col" data-key="mareas" aria-sort="descending">Viajes</th>
               <th scope="col" data-key="pct_con_observador">% con observador</th>
-              <th scope="col" data-key="apagones_sin_observador">Apagones sin observador</th>
-              <th scope="col" data-key="buques_senales_repetidas">Buques con señales repetidas</th>
+              <th scope="col" data-key="apagones_sin_observador">Cortes de señal sin observador</th>
+              <th scope="col" data-key="buques_senales_repetidas">Barcos con señales repetidas</th>
               <th scope="col" data-key="escalas_exterior">Escalas en el exterior</th>
               <th scope="col" data-key="captura_t">Captura (t)</th>
             </tr>

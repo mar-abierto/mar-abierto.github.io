@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>openMar · Ficha de buque</title>
-  <meta name="description" content="Ficha de un buque de la flota potera argentina: mareas, observadores a bordo, apagones de AIS y escalas en puerto, cruzados desde fuentes públicas.">
+  <title>openMar · Ficha de barco</title>
+  <meta name="description" content="Ficha de un barco de la flota calamarera argentina: viajes de pesca, observadores a bordo, cortes de señal y escalas en puerto, cruzados desde fuentes públicas.">
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#ffffff">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2315191f'/%3E%3Crect x='7' y='7' width='8' height='8' fill='%231d5fa6'/%3E%3Crect x='17' y='7' width='8' height='8' fill='%23ffffff' opacity='.35'/%3E%3Crect x='7' y='17' width='8' height='8' fill='%23ffffff' opacity='.35'/%3E%3Crect x='17' y='17' width='8' height='8' fill='%23ffffff' opacity='.35'/%3E%3C/svg%3E">
@@ -23,9 +23,9 @@
     <a class="top__brand" href="./">open<span>Mar</span></a>
     <p class="top__draft">Borrador · en revisión</p>
     <nav class="top__nav" aria-label="Secciones">
-      <a href="./">Relato</a>
-      <a href="tablero.html">Tablero</a>
-      <a href="buque.html" aria-current="page">Buques</a>
+      <a href="./">La historia</a>
+      <a href="tablero.html">Empresas</a>
+      <a href="buque.html" aria-current="page">Barcos</a>
       <a href="mapa.html">Mapa</a>
     </nav>
   </header>
@@ -34,50 +34,50 @@
     <!-- Ficha de un buque: se completa desde data/fichas.json -->
     <article id="vessel" hidden>
       <header class="vhead">
-        <p class="kicker">Ficha de buque · <span data-n="temporada">–</span></p>
+        <p class="kicker">Ficha de barco · <span data-n="temporada">–</span></p>
         <h1 class="vhead__name" id="v-name"></h1>
         <p class="vhead__meta" id="v-meta"></p>
         <p class="vhead__status" id="v-status"></p>
         <p class="vhead__summary" id="v-summary"></p>
-        <p class="vhead__links"><a class="btn" id="v-map" href="mapa.html">Ver en el mapa →</a> <a class="btn btn--ghost" href="buque.html">Todos los buques</a></p>
+        <p class="vhead__links"><a class="btn" id="v-map" href="mapa.html">Ver en el mapa →</a> <a class="btn btn--ghost" href="buque.html">Todos los barcos</a></p>
       </header>
 
-      <section class="kpis" aria-label="El buque contra la flota" id="v-kpis"></section>
+      <section class="kpis" aria-label="El barco comparado con la flota" id="v-kpis"></section>
 
       <section class="card-ind card-ind--wide timeline-card" aria-labelledby="tl-title">
         <h2 id="tl-title">Su año, en una línea</h2>
-        <p class="card-ind__q">Mareas informadas por el INIDEP, apagones de AIS y llegadas a puerto detectadas por Global Fishing Watch, sobre el mismo calendario.</p>
+        <p class="card-ind__q">Viajes de pesca informados por el instituto de investigación pesquera del Estado (INIDEP), cortes de la señal abierta de posición (la que cualquiera puede seguir en internet) y llegadas a puerto detectadas por Global Fishing Watch, sobre el mismo calendario.</p>
         <div class="timeline" id="timeline" role="group" aria-labelledby="tl-title"></div>
         <ul class="tl-legend" id="tl-legend"></ul>
-        <p class="how"><strong>Cómo se lee:</strong> cada barra es una marea, del día de salida al de regreso. Las mareas llegan hasta el corte del informe del INIDEP; las escalas y los apagones cubren todo el año.</p>
+        <p class="how"><strong>Cómo se lee:</strong> cada barra es un viaje, del día de salida al de regreso. Los viajes llegan hasta la fecha del último informe del INIDEP; las escalas y los cortes de señal cubren todo el año.</p>
       </section>
 
       <section class="panel-grid">
         <article class="card-ind">
           <h2>¿Llevó observador?</h2>
-          <p class="card-ind__q">Viajes con observador del INIDEP, año por año. La barra entera es el 100 % de los viajes del buque.</p>
+          <p class="card-ind__q">Viajes con observador a bordo, año por año. La barra entera es el 100 % de los viajes del barco.</p>
           <ol class="series__bars" id="v-series" aria-label="Porcentaje de viajes con observador por año"></ol>
-          <p class="how"><strong>Cómo se calcula:</strong> 2021–2024, Tabla 9 del informe de observadores 2024. Temporada, Anexo 1 del ITO 026/2025.</p>
+          <p class="how"><strong>Cómo se calcula:</strong> 2021–2024, Tabla 9 del informe de observadores 2024 del INIDEP. Temporada, Anexo 1 del ITO 026/2025.</p>
         </article>
 
         <article class="card-ind">
           <h2>Registro</h2>
-          <p class="card-ind__q">Lo que dice el Registro de Flota Pesquera. El armador es la empresa titular del permiso, no necesariamente el dueño final.</p>
+          <p class="card-ind__q">Lo que dice el Registro de Flota Pesquera. El armador es la empresa titular del permiso de pesca, que no necesariamente es el dueño final.</p>
           <dl class="facts" id="v-registry"></dl>
           <p class="how"><strong>Fuente:</strong> Registro de Flota Pesquera (CPA y Sin Azul No Hay Verde). El origen del capital no es una señal en openMar: las reglas son las mismas para todas las empresas.</p>
         </article>
       </section>
 
       <section class="card-ind card-ind--wide" aria-labelledby="trips-title">
-        <h2 id="trips-title">Mareas de la temporada</h2>
+        <h2 id="trips-title">Viajes de la temporada</h2>
         <div class="table-wrap" tabindex="0" role="region" aria-labelledby="trips-title">
           <table class="table table--plain" id="v-trips"></table>
         </div>
       </section>
 
       <section class="card-ind card-ind--wide" aria-labelledby="gaps-title">
-        <h2 id="gaps-title">Apagones de AIS</h2>
-        <p class="card-ind__q">Cortes de <span data-n="reglas.horas_minimas_apagon">–</span> horas o más en la señal de posición. Un apagón no es una infracción: puede ser una falla, mala recepción o un apagado a propósito.</p>
+        <h2 id="gaps-title">Cortes de señal</h2>
+        <p class="card-ind__q">Veces en que la señal abierta de posición se cortó por <span data-n="reglas.horas_minimas_apagon">–</span> horas o más. Un corte, por sí solo, no prueba una infracción: puede ser una falla, mala recepción o un apagado a propósito.</p>
         <div class="table-wrap" tabindex="0" role="region" aria-labelledby="gaps-title">
           <table class="table table--plain" id="v-gaps"></table>
         </div>
@@ -85,7 +85,7 @@
 
       <section class="card-ind card-ind--wide" aria-labelledby="ports-title">
         <h2 id="ports-title">Llegadas a puerto</h2>
-        <p class="card-ind__q">Escalas de confianza alta detectadas por AIS. Una escala no es necesariamente una descarga.</p>
+        <p class="card-ind__q">Escalas de confianza alta detectadas con la señal abierta. Una escala no es necesariamente una descarga.</p>
         <div class="table-wrap" tabindex="0" role="region" aria-labelledby="ports-title">
           <table class="table table--plain" id="v-ports"></table>
         </div>
@@ -96,14 +96,14 @@
     <!-- Índice: sin buque elegido, o con uno que no existe -->
     <section id="directory" hidden aria-labelledby="dir-title">
       <header class="board__head">
-        <p class="kicker">Buques · <span data-n="temporada">–</span></p>
+        <p class="kicker">Barcos · <span data-n="temporada">–</span></p>
         <h1 class="board__title" id="dir-title">Una ficha por barco</h1>
-        <p class="board__lede">Todo lo que se sabe de cada buque de la flota potera, cruzado entre fuentes públicas. Para citar un barco en una nota, linkeá su ficha.</p>
+        <p class="board__lede">Todo lo que se sabe de cada barco de la flota calamarera, cruzado entre fuentes públicas. Para citar un barco en una nota, linkeá su ficha.</p>
         <p class="notice" id="dir-notice" hidden></p>
       </header>
       <label class="search">
-        <span class="sr-only">Buscar buque o empresa</span>
-        <input type="search" id="dir-search" placeholder="Buscar buque o empresa" autocomplete="off">
+        <span class="sr-only">Buscar barco o empresa</span>
+        <input type="search" id="dir-search" placeholder="Buscar barco o empresa" autocomplete="off">
       </label>
       <p class="how" id="dir-count" aria-live="polite"></p>
       <ul class="directory" id="dir-list"></ul>

@@ -19,9 +19,9 @@
   function statusText(p, rules) {
     const threshold = rules?.umbral_senales_repetidas;
     const why = {
-      rojo: `${num(threshold)} o más apagones de AIS sin observador a bordo.`,
-      amarillo: `Tuvo apagones de AIS, pero menos de ${num(threshold)} sin observador a bordo.`,
-      verde: "Sin apagones de AIS registrados en la temporada.",
+      rojo: `${num(threshold)} o más cortes de señal sin observador a bordo.`,
+      amarillo: `Tuvo cortes de señal, pero menos de ${num(threshold)} sin observador a bordo.`,
+      verde: "Sin cortes de señal registrados en la temporada.",
     }[p.semaforo];
     return `<span class="dot dot--${esc(p.semaforo)}"></span><b>${esc(LABELS[p.semaforo])}.</b> ${esc(why)} El color dice dónde mirar primero, no quién es culpable.`;
   }
@@ -50,16 +50,16 @@
     $("#v-kpis").innerHTML = [
       kpi(
         noTrips ? "s/d" : `${num(c.pct_con_observador, 1)} %`,
-        "de sus mareas de la temporada con observador",
-        noTrips ? "Sin mareas en el informe del INIDEP" : `${num(p.mareas_con_observador)} de ${plural(p.mareas_temporada, "marea", "mareas")} · flota: ${num(c.pct_con_observador_flota, 1)} %`,
+        "de sus viajes de la temporada llevaron observador",
+        noTrips ? "Sin viajes en el informe de observadores" : `${num(p.mareas_con_observador)} de ${plural(p.mareas_temporada, "viaje", "viajes")} · flota: ${num(c.pct_con_observador_flota, 1)} %`,
         "kpi__value--obs",
       ),
       kpi(
         noTrips ? num(p.apagones) : num(c.apagones_por_marea, 2),
-        noTrips ? "apagones de AIS en la temporada" : "apagones de AIS por marea",
+        noTrips ? "cortes de señal en la temporada" : "cortes de señal por viaje",
         noTrips
-          ? "Sin mareas informadas para comparar"
-          : `${plural(c.apagones_en_marea, "apagón", "apagones")} durante sus mareas${Number(p.fuera_de_marea) ? ` y ${num(p.fuera_de_marea)} fuera de ellas` : ""} · flota: ${num(c.apagones_por_marea_flota, 2)} por marea`,
+          ? "Sin viajes informados para comparar"
+          : `${plural(c.apagones_en_marea, "corte", "cortes")} durante sus viajes${Number(p.fuera_de_marea) ? ` y ${num(p.fuera_de_marea)} fuera de ellos` : ""} · flota: ${num(c.apagones_por_marea_flota, 2)} por viaje`,
         "kpi__value--gap",
       ),
       kpi(
@@ -68,7 +68,7 @@
         portsMeta(p),
         "kpi__value--port",
       ),
-      kpi(`${num(p.captura_t)}<small> t</small>`, "de captura declarada en la temporada", "INIDEP, Anexo 1"),
+      kpi(`${num(p.captura_t)}<small> t</small>`, "de captura declarada en la temporada", "Fuente: INIDEP, informe técnico 026/2025"),
     ].join("");
   }
 
@@ -89,7 +89,7 @@
       .map((t) => {
         const left = x(t.inicio);
         const width = Math.max(0.6, x(t.fin) - left + 100 / span);
-        const label = `Marea ${t.marea}: ${shortDate(t.inicio)} al ${shortDate(t.fin)}, ${t.observador ? "con" : "sin"} observador${t.apagones ? `, ${plural(t.apagones, "apagón", "apagones")}` : ""}`;
+        const label = `Viaje ${t.marea}: ${shortDate(t.inicio)} al ${shortDate(t.fin)}, ${t.observador ? "con" : "sin"} observador${t.apagones ? `, ${plural(t.apagones, "corte de señal", "cortes de señal")}` : ""}`;
         return `<li class="tl-trip${t.observador ? " tl-trip--obs" : ""}" style="--x:${left}%;--w:${width}%" title="${esc(label)}"><span class="sr-only">${esc(label)}</span></li>`;
       })
       .join("");
@@ -97,7 +97,7 @@
     const gaps = f.apagones_detalle
       .filter((g) => inYear(g.fecha_local))
       .map((g) => {
-        const label = `Apagón del ${shortDate(g.fecha_local)}: ${num(g.horas, 1)} h, ${GAP_STATUS[g.estado] || g.estado}`;
+        const label = `Corte de señal del ${shortDate(g.fecha_local)}: ${num(g.horas, 1)} h, ${GAP_STATUS[g.estado] || g.estado}`;
         return `<li class="tl-gap tl-gap--${g.estado === "en_marea_con_observador" ? "con" : "sin"}" style="--x:${x(g.fecha_local)}%" title="${esc(label)}"><span class="sr-only">${esc(label)}</span></li>`;
       })
       .join("");
@@ -115,15 +115,15 @@
       `<div class="tl-lane"><span class="tl-lane__name" id="tl-${id}">${name}</span><ol class="tl-track" aria-labelledby="tl-${id}">${items || `<li class="tl-empty">${empty}</li>`}</ol></div>`;
 
     $("#timeline").innerHTML = `
-      ${lane("mareas", "Mareas", trips, "Sin mareas en el informe")}
-      ${lane("apagones", "Apagones", gaps, "Ninguno")}
+      ${lane("mareas", "Viajes", trips, "Sin viajes en el informe")}
+      ${lane("apagones", "Cortes de señal", gaps, "Ninguno")}
       ${lane("puertos", "Puertos", ports, "Sin escalas detectadas")}
       <div class="tl-axis" aria-hidden="true">${months}</div>`;
 
     $("#tl-legend").innerHTML = [
-      ["tl-sw tl-sw--trip", "Marea sin observador"],
-      ["tl-sw tl-sw--obs", "Marea con observador"],
-      ["tl-sw tl-sw--gap", "Apagón de AIS"],
+      ["tl-sw tl-sw--trip", "Viaje sin observador"],
+      ["tl-sw tl-sw--obs", "Viaje con observador"],
+      ["tl-sw tl-sw--gap", "Corte de señal"],
       ["tl-sw tl-sw--port", "Llegada a puerto argentino"],
       ["tl-sw tl-sw--abroad", "Llegada a puerto del exterior"],
     ]
@@ -152,13 +152,13 @@
   function renderTables(f, rules) {
     table(
       $("#v-trips"),
-      ["Marea", "Salida", "Regreso", "#Días", "Observador", "#Captura (t)", "#Apagones"],
+      ["Viaje", "Salida", "Regreso", "#Días", "Observador", "#Captura (t)", "#Cortes de señal"],
       f.mareas.map((t) => [
         th(num(t.marea)), td(shortDate(t.inicio)), td(shortDate(t.fin)), tdn(num(t.dias)),
         td(t.observador ? '<span class="pill pill--obs">Sí</span>' : "No"),
         tdn(num(t.captura_t, 1)), tdn(t.apagones ? `<span class="pill pill--gap">${num(t.apagones)}</span>` : "0"),
       ]),
-      "El informe del INIDEP no registra mareas de este buque en la temporada.",
+      "El informe de observadores no registra viajes de este barco en la temporada.",
     );
 
     table(
@@ -166,11 +166,11 @@
       ["Fecha", "#Horas sin señal", "Cuándo", "#Distancia a la costa al cortarse", "Cerca de la milla 200"],
       f.apagones_detalle.map((g) => [
         th(shortDate(g.fecha_local)), tdn(num(g.horas, 1)),
-        td(`${esc(GAP_STATUS[g.estado] || g.estado)}${g.marea !== "" ? ` (marea ${esc(g.marea)})` : ""}`),
+        td(`${esc(GAP_STATUS[g.estado] || g.estado)}${g.marea !== "" ? ` (viaje ${esc(g.marea)})` : ""}`),
         tdn(g.km_costa_inicio == null ? "s/d" : `${num(g.km_costa_inicio)} km`),
         td(g.franja_milla_200 ? "Sí" : "No"),
       ]),
-      `Global Fishing Watch no registra apagones de ${num(rules?.horas_minimas_apagon)} horas o más de este buque.`,
+      `Global Fishing Watch no registra cortes de señal de ${num(rules?.horas_minimas_apagon)} horas o más de este barco.`,
     );
 
     table(
@@ -190,7 +190,7 @@
 
   function renderRegistry(p) {
     const rows = [
-      ["Armador", p.armador ? esc(p.armador) : "No figura en el registro"],
+      ["Empresa", p.armador ? esc(p.armador) : "No figura en el registro"],
       ["Matrícula", p.matricula ? esc(p.matricula) : "s/d"],
       ["Sanciones registradas", p.sanciones_registradas ? `Disp. ${esc(p.sanciones_registradas)}${p.fechas_sanciones ? ` <span class="muted">(${esc(p.fechas_sanciones)})</span>` : ""}` : "Ninguna en el registro"],
       ["Viajes 2021–2024", p.viajes_2021_2024 === "" ? "Sin datos" : `${num(p.viajes_2021_2024)}, ${num(p.viajes_con_observador_2021_2024)} con observador`],
@@ -231,19 +231,19 @@
       .map((f) => f.datos)
       .sort((a, b) => ORDER[a.semaforo] - ORDER[b.semaforo] || Number(b.apagones) - Number(a.apagones) || a.buque.localeCompare(b.buque));
     if (missing) {
-      $("#dir-notice").textContent = `No encontramos el buque "${missing}". Elegilo de la lista.`;
+      $("#dir-notice").textContent = `No encontramos el barco "${missing}". Elegilo de la lista.`;
       $("#dir-notice").hidden = false;
     }
     const item = (p) => `<li><a class="dir-item" href="${fichaURL(p.buque)}">
       <span class="dot dot--${esc(p.semaforo)}" title="${esc(LABELS[p.semaforo])}"></span>
       <span class="dir-item__name">${esc(p.buque)}</span>
       <span class="dir-item__owner">${esc(p.armador || "Sin armador en el registro")}</span>
-      <span class="dir-item__meta">${plural(p.mareas_temporada, "marea", "mareas")} · ${num(p.mareas_con_observador)} con observador · ${plural(p.apagones, "apagón", "apagones")}</span>
+      <span class="dir-item__meta">${plural(p.mareas_temporada, "viaje", "viajes")} · ${num(p.mareas_con_observador)} con observador · ${plural(p.apagones, "corte de señal", "cortes de señal")}</span>
     </a></li>`;
     const render = (query) => {
       const shown = all.filter((p) => !query || `${p.buque} ${p.armador}`.toLowerCase().includes(query));
       $("#dir-list").innerHTML = shown.map(item).join("");
-      $("#dir-count").textContent = `${plural(shown.length, "buque", "buques")}${query ? ` de ${num(all.length)}` : ""}. Primero los que tienen señales repetidas.`;
+      $("#dir-count").textContent = `${plural(shown.length, "barco", "barcos")}${query ? ` de ${num(all.length)}` : ""}. Primero los que tienen señales repetidas.`;
     };
     $("#dir-search").addEventListener("input", (e) => render(e.target.value.trim().toLowerCase()));
     render("");

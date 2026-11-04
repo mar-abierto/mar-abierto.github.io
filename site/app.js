@@ -15,7 +15,7 @@
   let pinnedPopup = null;
   let minGapHours = null;
 
-  const { esc, num, plural, limitItems, loadJSON, LABELS, GAP_STATUS, gapSummary, fichaURL } = window.openMar;
+  const { esc, num, plural, limitItems, loadJSON, fillNumbers, LABELS, GAP_STATUS, gapSummary, fichaURL } = window.openMar;
 
   // ---------- Textos ----------
 
@@ -29,7 +29,7 @@
       ? `${num(p.escalas)}, sobre todo en ${esc(p.puerto_principal)}${Number(p.escalas_exterior) ? `; ${num(p.escalas_exterior)} afuera: ${esc(p.puertos_exterior)}` : "; ninguna afuera"}`
       : "sin escalas detectadas";
     const position =
-      p.posicion_segun === "apagones" ? "mediana de sus apagones" : `zona habitual de pesca (${num(p.eventos_de_pesca)} eventos)`;
+      p.posicion_segun === "apagones" ? "punto típico de sus cortes de señal" : `zona habitual de pesca (${num(p.eventos_de_pesca)} eventos)`;
     return `
       <article class="card">
         <header class="card__head">
@@ -40,7 +40,7 @@
         </header>
         <p class="card__summary">${esc(gapSummary(p, minGapHours))}</p>
         <dl class="card__grid">
-          <dt>Mareas 2025</dt><dd>${num(p.mareas_temporada)} (${num(p.mareas_con_observador)} con observador)</dd>
+          <dt>Viajes 2025</dt><dd>${num(p.mareas_temporada)} (${num(p.mareas_con_observador)} con observador)</dd>
           <dt>Captura 2025</dt><dd>${num(p.captura_t)} t</dd>
           <dt>Viajes con observador 2021–24</dt><dd>${observed2124}</dd>
           <dt>Llegadas a puerto 2025</dt><dd>${ports}</dd>
@@ -55,14 +55,14 @@
     return `
       <article class="card card--gap">
         <header class="card__head">
-          <span class="card__status">Apagón de AIS</span>
-          <h3 class="card__name">${esc(p.buque || "Buque sin identificar")}</h3>
+          <span class="card__status">Corte de señal</span>
+          <h3 class="card__name">${esc(p.buque || "Barco sin identificar")}</h3>
           <div class="card__owner">${esc(p.fecha_local)} · ${num(p.horas, 1)} h sin señal</div>
         </header>
-        <p class="card__summary">Ocurrió ${esc(GAP_STATUS[p.estado] || p.estado)}${p.marea ? ` (marea ${esc(p.marea)})` : ""}.${
+        <p class="card__summary">Ocurrió ${esc(GAP_STATUS[p.estado] || p.estado)}${p.marea ? ` (viaje ${esc(p.marea)})` : ""}.${
           String(p.franja_milla_200) === "true" ? " Cerca de la milla 200." : ""
         }</p>
-        <footer class="card__foot">Fuente: Global Fishing Watch · cruce con mareas del INIDEP</footer>
+        <footer class="card__foot">Fuente: Global Fishing Watch · cruce con viajes del INIDEP</footer>
       </article>`;
   }
 
@@ -86,7 +86,7 @@
     list.innerHTML = visible
       .map((f) => {
         const p = f.properties;
-        const metric = Number(p.apagones) ? plural(p.apagones, "apagón", "apagones") : `${num(p.captura_t)} t`;
+        const metric = Number(p.apagones) ? plural(p.apagones, "corte", "cortes") : `${num(p.captura_t)} t`;
         return `<li><button class="vessel" data-name="${esc(p.buque)}">
           <span class="dot dot--${esc(p.semaforo)}" aria-hidden="true"></span>
           <span><span class="vessel__name">${esc(p.buque)}</span><span class="vessel__owner">${esc(p.armador || "Sin armador en el registro")}</span></span>
@@ -114,10 +114,10 @@
     $("#generated").textContent = generated ? `Datos generados el ${generated.toLocaleDateString("es-AR")}` : "";
     const items = limitItems(summary);
     $("#limits-list").innerHTML = items.map((item) => `<li>${item}</li>`).join("");
-    $("#limits-short").textContent = `${plural(missing.length, "buque", "buques")} sin recorrido, ${plural(
+    $("#limits-short").textContent = `${plural(missing.length, "barco", "barcos")} sin recorrido, ${plural(
       (summary.sin_armador || []).length,
-      "buque",
-      "buques",
+      "barco",
+      "barcos",
     )} sin armador en el registro y otros límites de las fuentes.`;
   }
 
@@ -326,6 +326,7 @@
         a.properties.buque.localeCompare(b.properties.buque),
     );
     minGapHours = summary.reglas?.horas_minimas_apagon;
+    fillNumbers(summary);
     renderCounts(summary);
     renderStatic(summary);
     if (window.matchMedia("(max-width: 760px)").matches) setPanelCollapsed(true);
