@@ -1,21 +1,28 @@
-/* Tokens compartidos por la portada y el mapa. */
+/* Tokens compartidos. Papel de diario: un azul para "hubo alguien a bordo", un óxido para los cortes de señal. */
 :root {
-  color-scheme: dark;
-  --sea-0: #04080f;
-  --sea-1: #07101c;
-  --sea-2: #0c1828;
-  --line: rgba(148, 178, 214, 0.14);
-  --line-strong: rgba(148, 178, 214, 0.28);
-  --ink: #e8eef6;
-  --ink-2: #a8b6c8;
-  --ink-3: #6f7f94;
-  --rojo: #fb5a6e;
-  --amarillo: #fbbf24;
-  --verde: #34d399;
-  --gap: #fb923c;
-  --zee: #5fb4d9;
-  --font-display: "Fraunces", Georgia, serif;
-  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  color-scheme: light;
+  --sea-0: #f6f7f8;
+  --sea-1: #ffffff;
+  --sea-2: #eceff2;
+  --line: rgba(20, 28, 40, 0.14);
+  --line-strong: rgba(20, 28, 40, 0.3);
+  --ink: #15191f;
+  --ink-2: #353d48;
+  --ink-3: #5a6370;
+  --zee: #1d5fa6;      /* con observador; acento informativo */
+  --gap: #b3470f;      /* cortes de señal */
+  --rojo: #b3470f;     /* señales repetidas: el mismo óxido, sin rojo alarma */
+  --amarillo: #8a5a00; /* escala en el exterior, avisos */
+  --verde: #8b95a1;    /* sin señales: gris, no "aprobado" */
+  --cell-off: #d9dde2;
+  --cell-line: #9aa3ae;
+  --zone-in: #e3edf7;
+  --zone-out: rgba(138, 90, 0, 0.12);
+  --top-bg: #ffffff;
+  --top-h: 53px;
+  --font-display: "Libre Franklin", "Helvetica Neue", Arial, sans-serif;
+  --font-read: "Source Serif 4", Georgia, serif;
+  --font-body: "Libre Franklin", "Helvetica Neue", Arial, sans-serif;
   --panel-w: 380px;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }

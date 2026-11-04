@@ -6,16 +6,28 @@
   <title>openMar · Mapa de la flota potera</title>
   <meta name="description" content="Mapa abierto de la flota potera argentina: apagones de AIS, mareas con y sin observador y armadores, barco por barco, con la fuente de cada dato.">
   <meta name="robots" content="noindex, nofollow">
-  <meta name="theme-color" content="#04080f">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2304080f'/%3E%3Ccircle cx='11' cy='19' r='4' fill='%2334d399'/%3E%3Ccircle cx='19' cy='12' r='3' fill='%23fbbf24'/%3E%3Ccircle cx='22' cy='21' r='3' fill='%23fb5a6e'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2315191f'/%3E%3Crect x='7' y='7' width='8' height='8' fill='%231d5fa6'/%3E%3Crect x='17' y='7' width='8' height='8' fill='%23ffffff' opacity='.35'/%3E%3Crect x='7' y='17' width='8' height='8' fill='%23ffffff' opacity='.35'/%3E%3Crect x='17' y='17' width='8' height='8' fill='%23ffffff' opacity='.35'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
   <link href="vendor/maplibre-gl@4.7.1/maplibre-gl.css" rel="stylesheet">
   <link href="tokens.css" rel="stylesheet">
+  <link href="cabecera.css" rel="stylesheet">
   <link href="styles.css" rel="stylesheet">
 </head>
-<body>
+<body class="is-map">
+  <a class="skip" href="#panel">Saltar al panel del mapa</a>
+  <header class="top">
+    <a class="top__brand" href="./">open<span>Mar</span></a>
+    <p class="top__draft">Borrador · en revisión</p>
+    <nav class="top__nav" aria-label="Secciones">
+      <a href="./">Relato</a>
+      <a href="tablero.html">Tablero</a>
+      <a href="buque.html">Buques</a>
+      <a href="mapa.html" aria-current="page">Mapa</a>
+    </nav>
+  </header>
   <main class="app">
     <aside class="panel" id="panel" aria-label="Capas y buques">
       <button class="panel__handle" id="panel-toggle" aria-expanded="true" aria-controls="panel-body">
@@ -24,9 +36,7 @@
       </button>
 
       <header class="brand">
-        <p class="brand__draft">Borrador · en revisión</p>
-        <h1 class="brand__title"><a href="./" class="brand__home" aria-label="openMar, volver al relato">open<span>Mar</span></a></h1>
-        <nav class="brand__nav" aria-label="Secciones"><a href="./">Relato</a><a href="tablero.html">Tablero</a><a href="buque.html">Buques</a><a href="mapa.html" aria-current="page">Mapa</a></nav>
+        <h1 class="brand__title">Mapa de la flota</h1>
         <p class="brand__lede">La flota potera argentina en la temporada de calamar 2025, barco por barco. Cada luz es un buque en su zona habitual de pesca.</p>
       </header>
 

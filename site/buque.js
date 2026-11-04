@@ -258,7 +258,7 @@
     const ficha = wanted && (byKey || Object.values(fichas.buques).find((f) => f.datos.buque === wanted));
     if (ficha) {
       renderVessel(ficha, summary);
-      document.querySelector('.top__nav a[href="buque.html"]').removeAttribute("aria-current");
+      document.querySelector('.top__nav a[href="buque.html"]').setAttribute("aria-current", "true"); // dentro de la sección, no la página índice
     } else {
       renderDirectory(fichas, wanted);
     }

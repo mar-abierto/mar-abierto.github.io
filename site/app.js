@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  const COLORS = { rojo: "#fb5a6e", amarillo: "#fbbf24", verde: "#34d399" };
+  const COLORS = { rojo: "#b3470f", amarillo: "#8a5a00", verde: "#8b95a1" };
   const ORDER = { rojo: 0, amarillo: 1, verde: 2 };
   const BOUNDS = [[-68.5, -55.5], [-52.5, -36.5]];
   const FONT = ["Noto Sans Regular"];
@@ -124,12 +124,12 @@
   // ---------- Mapa ----------
 
   // Mapa base abierto y sin clave (OpenFreeMap, datos de OpenStreetMap).
-  const BASE_STYLE = "https://tiles.openfreemap.org/styles/dark";
+  const BASE_STYLE = "https://tiles.openfreemap.org/styles/positron";
 
   function tuneBase(map) {
     const paint = [
-      ["background", "background-color", "#0d1624"],
-      ["water", "fill-color", "#04080f"],
+      ["background", "background-color", "#f6f7f8"],
+      ["water", "fill-color", "#dce5ed"],
     ];
     for (const [id, property, value] of paint) {
       if (map.getLayer(id)) map.setPaintProperty(id, property, value);
@@ -157,10 +157,10 @@
     map.addSource("apagones", { type: "geojson", data: data.apagones });
     map.addSource("buques", { type: "geojson", data: data.buques });
 
-    map.addLayer({ id: "zee-relleno", type: "fill", source: "zee", paint: { "fill-color": "#5fb4d9", "fill-opacity": 0.035 } });
+    map.addLayer({ id: "zee-relleno", type: "fill", source: "zee", paint: { "fill-color": "#1d5fa6", "fill-opacity": 0.04 } });
     map.addLayer({
       id: "zee-linea", type: "line", source: "zee",
-      paint: { "line-color": "#5fb4d9", "line-opacity": 0.55, "line-width": 1.2, "line-dasharray": [3, 3] },
+      paint: { "line-color": "#1d5fa6", "line-opacity": 0.7, "line-width": 1.2, "line-dasharray": [3, 3] },
     });
     map.addLayer({
       id: "pesca-calor", type: "heatmap", source: "pesca", layout: { visibility: "none" },
@@ -171,7 +171,7 @@
         "heatmap-opacity": 0.7,
         "heatmap-color": [
           "interpolate", ["linear"], ["heatmap-density"],
-          0, "rgba(0,0,0,0)", 0.2, "rgba(120,60,20,0.35)", 0.5, "rgba(255,140,60,0.55)", 0.8, "rgba(255,200,110,0.8)", 1, "#fff3cf",
+          0, "rgba(179,71,15,0)", 0.2, "rgba(179,71,15,0.15)", 0.5, "rgba(179,71,15,0.35)", 0.8, "rgba(179,71,15,0.6)", 1, "#8a3307",
         ],
       },
     });
@@ -179,10 +179,10 @@
       id: "apagones", type: "circle", source: "apagones",
       paint: {
         "circle-radius": ["interpolate", ["linear"], ["zoom"], 3, 3, 8, 7],
-        "circle-color": "rgba(251,146,60,0.08)",
-        "circle-stroke-color": "#fb923c",
-        "circle-stroke-width": 1.4,
-        "circle-stroke-opacity": 0.85,
+        "circle-color": "rgba(179,71,15,0.06)",
+        "circle-stroke-color": "#b3470f",
+        "circle-stroke-width": 1,
+        "circle-stroke-opacity": 0.5,
       },
     });
     map.addLayer({
@@ -190,23 +190,23 @@
       paint: {
         "circle-radius": ["interpolate", ["linear"], ["zoom"], 3, ["match", ["get", "semaforo"], "rojo", 16, "amarillo", 12, 8], 8, ["match", ["get", "semaforo"], "rojo", 34, "amarillo", 26, 18]],
         "circle-color": colorExpr,
-        "circle-opacity": ["match", ["get", "semaforo"], "verde", 0.18, 0.32],
-        "circle-blur": 1,
+        "circle-opacity": 0,
       },
     });
     map.addLayer({
       id: "buques", type: "circle", source: "buques",
       paint: {
-        "circle-radius": ["interpolate", ["linear"], ["zoom"], 3, ["match", ["get", "semaforo"], "verde", 3.5, 5], 8, ["match", ["get", "semaforo"], "verde", 6, 8]],
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 3, ["match", ["get", "semaforo"], "verde", 3.5, 6], 8, ["match", ["get", "semaforo"], "verde", 6, 10]],
         "circle-color": colorExpr,
-        "circle-stroke-color": "#04080f",
-        "circle-stroke-width": 1,
+        "circle-stroke-color": "#ffffff",
+        "circle-stroke-width": 1.5,
       },
     });
     map.addLayer({
       id: "buques-nombres", type: "symbol", source: "buques",
       layout: {
-        "text-field": ["get", "buque"],
+        // Con poco zoom sólo se nombran los barcos con señales; así no se pisan.
+        "text-field": ["step", ["zoom"], ["match", ["get", "semaforo"], "verde", "", ["get", "buque"]], 6, ["get", "buque"]],
         "text-font": FONT,
         "text-size": ["interpolate", ["linear"], ["zoom"], 3, 10, 8, 13],
         "text-offset": [0, 1.1],
@@ -216,8 +216,8 @@
         "symbol-sort-key": ["match", ["get", "semaforo"], "rojo", 0, "amarillo", 1, 2],
       },
       paint: {
-        "text-color": ["match", ["get", "semaforo"], "verde", "#9fb0c4", "#e8eef6"],
-        "text-halo-color": "#04080f",
+        "text-color": ["match", ["get", "semaforo"], "verde", "#5a6370", "#15191f"],
+        "text-halo-color": "#ffffff",
         "text-halo-width": 1.4,
       },
     });

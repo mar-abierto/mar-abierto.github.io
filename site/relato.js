@@ -19,24 +19,6 @@
     };
   }
 
-  // Elige k posiciones de n con un sorteo fijo (siempre el mismo dibujo).
-  // El orden de los cuadrados no representa nada: sólo importa cuántos se encienden.
-  function spread(n, k) {
-    let seed = 2025; // mulberry32: entero de 32 bits, sin pérdida de precisión
-    const random = () => {
-      seed = (seed + 0x6d2b79f5) | 0;
-      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-    const positions = Array.from({ length: n }, (_, i) => i);
-    for (let i = n - 1; i > 0; i--) {
-      const j = Math.floor(random() * (i + 1));
-      [positions[i], positions[j]] = [positions[j], positions[i]];
-    }
-    return new Set(positions.slice(0, k));
-  }
-
   function cells(container, n, classFor) {
     const html = [];
     for (let i = 0; i < n; i++) html.push(`<span class="${classFor(i)}" style="--i:${i}"></span>`);
@@ -48,7 +30,8 @@
   }
 
   function drawWaffle(season) {
-    const lit = spread(season.mareas, season.mareas_con_observador);
+    // Los viajes con observador van primero, así "uno de cada 15" se cuenta a ojo.
+    const lit = new Set(Array.from({ length: season.mareas_con_observador }, (_, i) => i));
     cells($("#waffle-mareas"), season.mareas, (i) => (lit.has(i) ? "cell cell--obs" : "cell"));
     label("#waffle-mareas", `${num(season.mareas)} viajes en la temporada; ${num(season.mareas_con_observador)} con observador a bordo.`);
   }

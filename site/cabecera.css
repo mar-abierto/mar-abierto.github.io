@@ -1,0 +1,18 @@
+/* openMar · encabezado común a todas las páginas. */
+.skip { position: absolute; left: 16px; top: -60px; z-index: 20; padding: 10px 16px; border-radius: 3px; background: var(--ink); color: var(--sea-1); font-weight: 600; }
+.skip:focus { top: 8px; }
+.top {
+  position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 16px;
+  height: var(--top-h); padding: 0 clamp(16px, 4vw, 48px);
+  background: var(--top-bg); border-bottom: 1px solid var(--line); font-family: var(--font-body);
+}
+.top__brand { color: var(--ink); font: 800 21px/1 var(--font-display); letter-spacing: -0.02em; text-decoration: none; }
+.top__brand span { font-weight: 400; }
+.top__draft { margin: 0; color: var(--ink-3); font-size: 13px; }
+.top__nav { margin-left: auto; display: flex; gap: 22px; font-size: 15px; }
+.top__nav a { padding: 6px 0; color: var(--ink-2); text-decoration: none; }
+.top__nav a:hover { color: var(--ink); }
+.top__nav a[aria-current] { color: var(--ink); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 8px; }
+.top a:focus-visible { outline: 2px solid var(--zee); outline-offset: 3px; border-radius: 2px; }
+@media (max-width: 860px) { .top__draft { display: none; } }
+@media (max-width: 420px) { .top { gap: 12px; } .top__nav { gap: 14px; font-size: 14px; } }
