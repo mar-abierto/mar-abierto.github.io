@@ -43,6 +43,7 @@
     pct: (v) => `${num(v, 1)} %`,
     pct0: (v) => `${num(v)} %`,
     int: (v) => num(Math.round(Number(v))),
+    dec2: (v) => num(v, 2),
   };
 
   function fillNumbers(data) {

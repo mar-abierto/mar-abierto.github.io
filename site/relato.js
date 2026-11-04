@@ -59,47 +59,53 @@
     label("#dots-buques", `${num(history.buques)} barcos entre 2021 y 2024; ${num(history.buques_nunca_con_observador)} nunca llevaron observador.`);
   }
 
-  function drawGaps(byStatus) {
-    const order = [
-      ["en_marea_sin_observador", "sin"],
-      ["en_marea_con_observador", "con"],
-      ["fuera_de_marea", "fuera"],
-      ["sin_mareas_del_buque", "fuera"],
-    ];
-    const classes = order.flatMap(([key, cls]) => Array(byStatus[key] || 0).fill(`gap gap--${cls}`));
-    cells($("#strip-apagones"), classes.length, (i) => classes[i]);
-    const outside = (byStatus.fuera_de_marea || 0) + (byStatus.sin_mareas_del_buque || 0);
-    label(
-      "#strip-apagones",
-      `${num(classes.length)} cortes de señal: ${num(byStatus.en_marea_sin_observador)} en viajes sin observador, ` +
-        `${num(byStatus.en_marea_con_observador)} con observador y ${num(outside)} fuera de las fechas de viaje.`,
-    );
-  }
-
   function drawSeries(series) {
     $("#series-anual").innerHTML = seriesHTML(series);
   }
 
+  function drawRates(rates) {
+    const max = Math.max(rates.sin_observador, rates.con_observador, 0.01);
+    const bar = (text, value, cls) => `
+      <div class="bar">
+        <span class="bar__label">${text}</span>
+        <span class="bar__track"><span class="bar__fill bar__fill--${cls}" style="--w:${(100 * value) / max}%"></span></span>
+        <span class="bar__value">${num(value, 2)}</span>
+      </div>`;
+    $("#bars-tasa").innerHTML = `
+      <p class="bars__title">Cortes de señal por viaje</p>
+      ${bar("Con observador", rates.con_observador, "con")}
+      ${bar("Sin observador", rates.sin_observador, "sin")}`;
+    label(
+      "#bars-tasa",
+      `Cortes de señal por viaje: ${num(rates.con_observador, 2)} en viajes con observador y ${num(rates.sin_observador, 2)} en viajes sin observador.`,
+    );
+  }
+
+  // Los cortes que cuenta la regla del semáforo: sin observador o fuera de las fechas de viaje.
+  const ruleCount = (v) => Number(v.en_marea_sin_observador || 0) + Number(v.fuera_de_marea || 0);
+
   function card(v) {
-    // El detalle suma el total: sin observador, con observador y fuera de marea.
-    const parts = [`${num(v.en_marea_sin_observador)} sin observador`];
-    if (Number(v.en_marea_con_observador)) parts.push(`${num(v.en_marea_con_observador)} con observador`);
-    if (Number(v.fuera_de_marea)) parts.push(`${num(v.fuera_de_marea)} fuera de viaje`);
+    const parts = [`${num(v.en_marea_sin_observador)} en viajes sin observador`];
+    if (Number(v.fuera_de_marea)) parts.push(`${num(v.fuera_de_marea)} fuera de las fechas de viaje`);
+    const withObserver = Number(v.en_marea_con_observador)
+      ? `Además, ${plural(v.en_marea_con_observador, "corte", "cortes")} con observador a bordo, que la regla no cuenta.`
+      : "";
     const history =
-      v.viajes_2021_2024 === "" ? "Sin datos de 2021–2024" : `Observador en ${num(v.viajes_con_observador_2021_2024)} de ${plural(v.viajes_2021_2024, "viaje", "viajes")}, 2021–2024`;
+      v.viajes_2021_2024 === "" ? "Sin datos de 2021–2024" : `Llevó observador en ${num(v.viajes_con_observador_2021_2024)} de ${plural(v.viajes_2021_2024, "viaje", "viajes")} entre 2021 y 2024`;
     return `<li class="card">
       <a href="${fichaURL(v.buque)}">
         <span class="card__name">${esc(v.buque)}</span>
         <span class="card__owner">${esc(v.armador || "Sin armador en el registro")}</span>
-        <span class="card__big">${plural(v.apagones, "corte de señal", "cortes de señal")}</span>
+        <span class="card__big">${plural(ruleCount(v), "corte", "cortes")}</span>
         <span class="card__detail">${esc(parts.join(" · "))}</span>
+        ${withObserver ? `<span class="card__detail">${esc(withObserver)}</span>` : ""}
         <span class="card__history">${esc(history)}</span>
       </a>
     </li>`;
   }
 
   function renderStatic(summary) {
-    $("#cards-rojo").innerHTML = summary.relato.senales_repetidas.map(card).join("");
+    $("#cards-rojo").innerHTML = [...summary.relato.senales_repetidas].sort((a, b) => ruleCount(b) - ruleCount(a)).map(card).join("");
     $("#limits").innerHTML = limitItems(summary).map((item) => `<li>${item}</li>`).join("");
     $("#sources").innerHTML = summary.fuentes
       .map((s) => `<li><a href="${esc(s.url)}" rel="noopener">${esc(s.nombre)}</a>: ${esc(s.aporta)}</li>`)
@@ -132,7 +138,7 @@
     fillNumbers(summary);
     drawWaffle(summary.relato.temporada);
     drawFleet(summary.relato.historico_2021_2024);
-    drawGaps(summary.apagones_por_estado);
+    drawRates(summary.relato.apagones_por_marea);
     drawSeries(summary.relato.cobertura_por_anio);
     renderStatic(summary);
     document.documentElement.classList.add("is-ready");
