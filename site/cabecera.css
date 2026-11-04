@@ -16,3 +16,4 @@
 .top a:focus-visible { outline: 2px solid var(--zee); outline-offset: 3px; border-radius: 2px; }
 @media (max-width: 860px) { .top__draft { display: none; } }
 @media (max-width: 420px) { .top { gap: 12px; } .top__nav { gap: 14px; font-size: 14px; } }
+@media (max-width: 370px) { .top { padding: 0 12px; } .top__nav { gap: 10px; font-size: 13.5px; } .top__brand { font-size: 19px; } }

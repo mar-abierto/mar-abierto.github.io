@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  const { esc, num, loadJSON, limitItems, fillNumbers, seriesHTML } = window.openMar;
+  const { esc, num, loadJSON, limitItems, fillNumbers } = window.openMar;
   const $ = (selector) => document.querySelector(selector);
 
   const GAP_PARTS = [
@@ -28,22 +28,6 @@
   const NO_OWNER = "Sin armador en el registro"; // fila que agrupa buques sin armador, no es una empresa
 
   const state = { owners: [], key: "mareas", dir: "descending", query: "" };
-
-  function drawStack(byStatus) {
-    const parts = GAP_PARTS.filter((p) => byStatus[p.key]);
-    const total = parts.reduce((sum, p) => sum + byStatus[p.key], 0) || 1;
-    $("#stack-apagones").innerHTML = parts
-      .map((p) => `<span class="stack__part stack__part--${p.cls}" style="--w:${Number((100 * byStatus[p.key]) / total)}%"></span>`)
-      .join("");
-    $("#stack-apagones").setAttribute("role", "img");
-    $("#stack-apagones").setAttribute(
-      "aria-label",
-      parts.map((p) => `${num(byStatus[p.key])} ${p.label}`).join(", "),
-    );
-    $("#stack-legend").innerHTML = parts
-      .map((p) => `<li><span class="sw sw--${p.cls}"></span><b>${num(byStatus[p.key])}</b> ${p.label}</li>`)
-      .join("");
-  }
 
   function drawPorts(ports) {
     const max = Math.max(...ports.map((p) => p.escalas), 1);
@@ -111,8 +95,6 @@
   async function main() {
     const summary = await loadJSON("data/resumen.json");
     fillNumbers(summary);
-    $("#series-anual").innerHTML = seriesHTML(summary.relato.cobertura_por_anio);
-    drawStack(summary.apagones_por_estado);
     drawPorts(summary.tablero.puertos);
     state.owners = summary.tablero.por_armador;
     bindTable();

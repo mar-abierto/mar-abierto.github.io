@@ -31,63 +31,14 @@
 
   <main id="tablero" class="board" aria-busy="true">
     <header class="board__head">
-      <p class="kicker">Empresas · <span data-n="temporada">temporada</span></p>
-      <h1 class="board__title">Las preguntas que el Estado no responde, en números</h1>
-      <p class="board__lede">Los mismos indicadores para todas las empresas, sin importar el origen de su capital. Cada número se calcula desde fuentes públicas; abajo de cada uno está cómo.</p>
+      <h1 class="board__title">Empresa por empresa</h1>
+      <p class="board__lede">Las mismas cuentas para todas las empresas que pescan calamar, sin importar de dónde venga su capital: cuántos viajes hicieron, cuántos llevaron observador, cuántos cortes de señal tuvieron y dónde pararon sus barcos. Las cifras de toda la flota están en <a href="./">la historia</a>.</p>
     </header>
-
-    <section class="kpis" aria-label="Indicadores principales">
-      <article class="kpi">
-        <p class="kpi__value kpi__value--obs"><span data-n="relato.temporada.pct_con_observador" data-fmt="pct">–</span></p>
-        <p class="kpi__label">de los viajes de pesca de la temporada llevaron observador a bordo</p>
-        <p class="kpi__meta"><span data-n="relato.temporada.mareas_con_observador">–</span> de <span data-n="relato.temporada.mareas">–</span> viajes</p>
-      </article>
-      <article class="kpi">
-        <p class="kpi__value"><span data-n="relato.historico_2021_2024.buques_nunca_con_observador">–</span><small> de <span data-n="relato.historico_2021_2024.buques">–</span></small></p>
-        <p class="kpi__label">barcos nunca llevaron observador entre 2021 y 2024</p>
-        <p class="kpi__meta">Fuente: INIDEP, informe de observadores 2024</p>
-      </article>
-      <article class="kpi">
-        <p class="kpi__value kpi__value--gap"><span data-n="apagones_por_estado.en_marea_sin_observador">–</span></p>
-        <p class="kpi__label">cortes de señal en viajes sin observador</p>
-        <p class="kpi__meta">de <span data-n="apagones">–</span> cortes en total</p>
-      </article>
-      <article class="kpi">
-        <p class="kpi__value kpi__value--port"><span data-n="tablero.escalas_exterior">–</span><small> de <span data-n="tablero.escalas">–</span></small></p>
-        <p class="kpi__label">llegadas a puerto fuera de la Argentina detectadas en <span data-n="temporada">–</span></p>
-        <p class="kpi__meta">Barcos con alguna escala afuera: <span data-n="tablero.buques_con_escalas_exterior">–</span></p>
-      </article>
-    </section>
-
-    <section class="panel-grid">
-      <article class="card-ind">
-        <h2>¿Hay alguien del Estado a bordo?</h2>
-        <p class="card-ind__q">Viajes con observador del instituto de investigación pesquera del Estado (INIDEP), año por año. La barra entera es el 100 % de los viajes.</p>
-        <ol class="series__bars" id="series-anual" aria-label="Porcentaje de viajes con observador por año"></ol>
-        <p class="how"><strong>Cómo se calcula:</strong> viajes con observador sobre viajes totales. 2021–2024: Tabla 9 del informe de observadores 2024 del INIDEP. 2025: Anexo 1 del ITO 026/2025, viajes hasta el 5 de junio.</p>
-      </article>
-
-      <article class="card-ind">
-        <h2>¿Qué pasa con la señal?</h2>
-        <p class="card-ind__q">Cortes de <span data-n="reglas.horas_minimas_apagon">–</span> horas o más en la señal abierta de posición, la que cualquiera puede seguir en internet, según en qué viaje ocurrieron.</p>
-        <div class="stack" id="stack-apagones"></div>
-        <ul class="stack__legend" id="stack-legend"></ul>
-        <p class="how"><strong>Cómo se calcula:</strong> cada corte que registra Global Fishing Watch se ubica en un viaje del barco según la fecha en hora argentina, con <span data-n="reglas.tolerancia_dias_marea">–</span> días de tolerancia. Un corte de señal, por sí solo, no prueba ninguna infracción.</p>
-      </article>
-
-      <article class="card-ind card-ind--wide">
-        <h2>¿Dónde paran los barcos?</h2>
-        <p class="card-ind__q">Escalas en puerto de los barcos de la temporada. Sirve para responder una pregunta concreta: si el trabajo en tierra queda en el país.</p>
-        <ol class="ports" id="ports"></ol>
-        <p class="how"><strong>Cómo se calcula:</strong> <span data-n="tablero.periodo_escalas">–</span>, de confianza alta en Global Fishing Watch (entrada y salida del puerto detectadas con la señal abierta). Se cuentan <span data-n="tablero.calidad_escalas.contadas">–</span>. Quedaron afuera <span data-n="tablero.calidad_escalas.de_otros_anios">–</span> estadías que empezaron antes del año y <span data-n="tablero.calidad_escalas.baja_confianza">–</span> de baja confianza. En <span data-n="tablero.calidad_escalas.nombre_completado">–</span> escalas el nombre del puerto se completó con el de otras escalas del mismo puerto.</p>
-        <p class="how how--warn"><strong>Lo que este dato no dice:</strong> sólo ve barcos con la señal abierta encendida. Una escala no es necesariamente una descarga, y los transbordos en el mar no aparecen. Que no se detecten escalas afuera no prueba que no haya descargas en el exterior.</p>
-      </article>
-    </section>
 
     <section class="owners" aria-labelledby="owners-title">
       <div class="owners__head">
         <div>
-          <h2 id="owners-title">Empresa por empresa</h2>
+          <h2 id="owners-title">Indicadores por empresa</h2>
           <p class="card-ind__q">Cada fila es un armador, la empresa titular del permiso de pesca según el Registro de Flota Pesquera, que no necesariamente es el dueño final.</p>
         </div>
         <label class="search">
@@ -114,6 +65,16 @@
         </table>
       </div>
       <p class="how" id="owners-count" aria-live="polite"></p>
+    </section>
+
+    <section class="ports-block">
+      <article class="card-ind">
+        <h2>¿Dónde paran los barcos?</h2>
+        <p class="card-ind__q">Escalas en puerto de los barcos de la temporada. Sirve para responder una pregunta concreta: si el trabajo en tierra queda en el país.</p>
+        <ol class="ports" id="ports"></ol>
+        <p class="how"><strong>Cómo se calcula:</strong> <span data-n="tablero.periodo_escalas">–</span>, de confianza alta en Global Fishing Watch (entrada y salida del puerto detectadas con la señal abierta). Se cuentan <span data-n="tablero.calidad_escalas.contadas">–</span>. Quedaron afuera <span data-n="tablero.calidad_escalas.de_otros_anios">–</span> estadías que empezaron antes del año y <span data-n="tablero.calidad_escalas.baja_confianza">–</span> de baja confianza. En <span data-n="tablero.calidad_escalas.nombre_completado">–</span> escalas el nombre del puerto se completó con el de otras escalas del mismo puerto.</p>
+        <p class="how how--warn"><strong>Lo que este dato no dice:</strong> sólo ve barcos con la señal abierta encendida. Una escala no es necesariamente una descarga, y los transbordos en el mar no aparecen. Que no se detecten escalas afuera no prueba que no haya descargas en el exterior.</p>
+      </article>
     </section>
 
     <section class="chapter chapter--limits" aria-labelledby="limits-title">

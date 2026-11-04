@@ -82,6 +82,8 @@ th[aria-sort="ascending"] .sort::after { content: "↑"; color: var(--zee); }
 .pill--rojo { background: rgba(179, 71, 15, 0.18); color: var(--rojo); }
 
 .is-board .chapter--limits { padding-top: 64px; }
+.ports-block { margin-top: 14px; }
+.board__lede a { color: var(--zee); text-underline-offset: 3px; }
 
 @media (max-width: 960px) {
   .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
