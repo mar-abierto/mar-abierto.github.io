@@ -83,6 +83,18 @@
     return response.json();
   }
 
+  // Los cortes que cuenta la regla del semáforo: sin observador o fuera de las fechas de viaje.
+  // Es la cifra de cada barco en todas las páginas; los cortes con observador van aparte.
+  const ruleGaps = (p) => Number(p.en_marea_sin_observador || 0) + Number(p.fuera_de_marea || 0);
+
+  function cutsLabel(p) {
+    const counted = ruleGaps(p);
+    const withObserver = Number(p.en_marea_con_observador || 0);
+    if (!counted && !withObserver) return Number(p.apagones) ? plural(p.apagones, "corte de señal", "cortes de señal") : "sin cortes de señal";
+    const main = plural(counted, "corte de señal", "cortes de señal");
+    return withObserver ? `${main}, y ${num(withObserver)} más en viajes con observador` : main;
+  }
+
   function limitItems(summary) {
     const missing = summary.sin_posicion || [];
     const noOwner = summary.sin_armador || [];
@@ -101,6 +113,6 @@
   }
 
   window.openMar = Object.freeze({
-    esc, num, plural, get, loadJSON, limitItems, fillNumbers, seriesHTML, LABELS, GAP_STATUS, gapSummary, fichaURL,
+    esc, num, plural, get, loadJSON, limitItems, ruleGaps, cutsLabel, fillNumbers, seriesHTML, LABELS, GAP_STATUS, gapSummary, fichaURL,
   });
 })();

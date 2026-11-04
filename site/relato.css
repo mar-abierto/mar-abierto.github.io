@@ -17,7 +17,6 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px); }
 .hero__title em { display: block; margin-top: 0.35em; color: var(--ink-2); font-style: italic; font-weight: 500; }
 .hero__title em span { color: var(--gap); font-style: normal; }
 .hero__lede { max-width: 58ch; margin: 32px 0 0; color: var(--ink-2); font-size: clamp(16px, 1.6vw, 19px); }
-.hero__scroll { margin: 48px 0 0; color: var(--ink-3); font-size: 13px; letter-spacing: 0.08em; }
 
 /* ---------- Capítulos ---------- */
 .chapter {
@@ -88,7 +87,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px); }
 .series__note { margin: 10px 0 0; color: var(--ink-3); font-size: 12.5px; }
 .is-ready .chapter .series__fill { transform: scaleY(0); transition: transform 900ms var(--ease) 300ms; }
 .is-ready .chapter.is-in .series__fill { transform: none; }
-.caveat { padding: 12px 14px; border-left: 2px solid var(--amarillo); background: rgba(138, 90, 0, 0.06); border-radius: 0 8px 8px 0; font-size: 15px; }
+.caveat { padding: 12px 14px; background: rgba(138, 90, 0, 0.06); border-radius: 4px; font-size: 15px; }
 
 .bars { display: grid; gap: 18px; padding: 28px; border: 1px solid var(--line); border-radius: 4px; background: var(--sea-1); }
 .bars__title { margin: 0; color: var(--ink-3); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; }
@@ -107,10 +106,10 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px); }
 .cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
 .card a {
   display: grid; gap: 4px; height: 100%; padding: 20px; text-decoration: none;
-  border: 1px solid var(--line); border-left: 3px solid var(--rojo); border-radius: 4px; background: var(--sea-1);
+  border: 1px solid var(--line); border-radius: 4px; background: var(--sea-1);
   transition: border-color 200ms var(--ease), transform 200ms var(--ease), background 200ms var(--ease);
 }
-.card a:hover { border-color: var(--line-strong); border-left-color: var(--rojo); background: var(--sea-2); transform: translateY(-2px); }
+.card a:hover { border-color: var(--line-strong); background: var(--sea-2); transform: translateY(-2px); }
 .card__name { font-weight: 600; font-size: 17px; }
 .card__owner { color: var(--ink-3); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
 .card__big { margin-top: 12px; color: var(--rojo); font: 700 30px/1 var(--font-display); }
@@ -188,7 +187,6 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px); }
 .hero__title em { margin-top: 0.3em; color: var(--ink-2); font-style: normal; font-weight: 400; }
 .hero__lede { font-family: var(--font-read); font-size: clamp(18px, 1.7vw, 21px); color: var(--ink); }
 .hero__lede--small { font-family: var(--font-body); font-size: 15px; color: var(--ink-3); }
-.hero__scroll { display: none; }
 
 .chapter h2 { font: 700 clamp(26px, 3vw, 38px)/1.12 var(--font-display); letter-spacing: -0.015em; text-wrap: balance; }
 .chapter p { font-family: var(--font-read); font-size: 18px; line-height: 1.6; color: var(--ink-2); text-wrap: pretty; }
@@ -240,3 +238,10 @@ main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px); }
 .limits strong { color: var(--ink); }
 
 ::selection { background: var(--zee); color: var(--sea-0); }
+.bar__fill--con, .bar__fill--sin { background: var(--gap); }
+.zones__tag--can, .zones__tag--cant { background: var(--sea-1) !important; }
+.dots-legend { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 20px; margin: 14px 0 0; padding: 0; color: var(--ink-2); font-size: 14px; }
+.dots-legend li { display: flex; align-items: center; gap: 8px; }
+.dots-legend i { width: 14px; height: 14px; border-radius: 50%; }
+.dots-legend .is-obs { background: var(--zee); }
+.dots-legend .is-never { border: 1.5px solid var(--cell-line); }

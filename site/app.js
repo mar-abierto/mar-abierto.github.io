@@ -15,7 +15,7 @@
   let pinnedPopup = null;
   let minGapHours = null;
 
-  const { esc, num, plural, limitItems, loadJSON, fillNumbers, LABELS, GAP_STATUS, gapSummary, fichaURL } = window.openMar;
+  const { esc, num, plural, limitItems, loadJSON, fillNumbers, cutsLabel, LABELS, GAP_STATUS, gapSummary, fichaURL } = window.openMar;
 
   // ---------- Textos ----------
 
@@ -86,7 +86,7 @@
     list.innerHTML = visible
       .map((f) => {
         const p = f.properties;
-        const metric = Number(p.apagones) ? plural(p.apagones, "corte", "cortes") : `${num(p.captura_t)} t`;
+        const metric = Number(p.apagones) ? cutsLabel(p) : `${num(p.captura_t)} t`;
         return `<li><button class="vessel" data-name="${esc(p.buque)}">
           <span class="dot dot--${esc(p.semaforo)}" aria-hidden="true"></span>
           <span><span class="vessel__name">${esc(p.buque)}</span><span class="vessel__owner">${esc(p.armador || "Sin armador en el registro")}</span></span>

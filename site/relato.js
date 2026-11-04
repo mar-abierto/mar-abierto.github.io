@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  const { esc, num, plural, loadJSON, limitItems, fillNumbers, seriesHTML, fichaURL } = window.openMar;
+  const { esc, num, plural, ruleGaps, loadJSON, limitItems, fillNumbers, seriesHTML, fichaURL } = window.openMar;
   const $ = (selector) => document.querySelector(selector);
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -64,9 +64,6 @@
     );
   }
 
-  // Los cortes que cuenta la regla del semáforo: sin observador o fuera de las fechas de viaje.
-  const ruleCount = (v) => Number(v.en_marea_sin_observador || 0) + Number(v.fuera_de_marea || 0);
-
   function card(v) {
     const parts = [`${num(v.en_marea_sin_observador)} en viajes sin observador`];
     if (Number(v.fuera_de_marea)) parts.push(`${num(v.fuera_de_marea)} fuera de las fechas de viaje`);
@@ -79,7 +76,7 @@
       <a href="${fichaURL(v.buque)}">
         <span class="card__name">${esc(v.buque)}</span>
         <span class="card__owner">${esc(v.armador || "Sin armador en el registro")}</span>
-        <span class="card__big">${plural(ruleCount(v), "corte", "cortes")}</span>
+        <span class="card__big">${plural(ruleGaps(v), "corte", "cortes")}</span>
         <span class="card__detail">${esc(parts.join(" · "))}</span>
         ${withObserver ? `<span class="card__detail">${esc(withObserver)}</span>` : ""}
         <span class="card__history">${esc(history)}</span>
@@ -88,7 +85,7 @@
   }
 
   function renderStatic(summary) {
-    $("#cards-rojo").innerHTML = [...summary.relato.senales_repetidas].sort((a, b) => ruleCount(b) - ruleCount(a)).map(card).join("");
+    $("#cards-rojo").innerHTML = [...summary.relato.senales_repetidas].sort((a, b) => ruleGaps(b) - ruleGaps(a)).map(card).join("");
     $("#limits").innerHTML = limitItems(summary).map((item) => `<li>${item}</li>`).join("");
     $("#sources").innerHTML = summary.fuentes
       .map((s) => `<li><a href="${esc(s.url)}" rel="noopener">${esc(s.nombre)}</a>: ${esc(s.aporta)}</li>`)

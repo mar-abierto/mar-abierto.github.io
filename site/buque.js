@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  const { esc, num, plural, loadJSON, limitItems, fillNumbers, seriesHTML, LABELS, GAP_STATUS, gapSummary, fichaURL } =
+  const { esc, num, plural, loadJSON, limitItems, fillNumbers, seriesHTML, LABELS, GAP_STATUS, gapSummary, fichaURL, cutsLabel } =
     window.openMar;
   const $ = (selector) => document.querySelector(selector);
   const ORDER = { rojo: 0, amarillo: 1, verde: 2 };
@@ -238,7 +238,7 @@
       <span class="dot dot--${esc(p.semaforo)}" title="${esc(LABELS[p.semaforo])}"></span>
       <span class="dir-item__name">${esc(p.buque)}</span>
       <span class="dir-item__owner">${esc(p.armador || "Sin armador en el registro")}</span>
-      <span class="dir-item__meta">${plural(p.mareas_temporada, "viaje", "viajes")} · ${num(p.mareas_con_observador)} con observador · ${plural(p.apagones, "corte de señal", "cortes de señal")}</span>
+      <span class="dir-item__meta">${plural(p.mareas_temporada, "viaje", "viajes")} · ${num(p.mareas_con_observador)} con observador · ${esc(cutsLabel(p))}</span>
     </a></li>`;
     const render = (query) => {
       const shown = all.filter((p) => !query || `${p.buque} ${p.armador}`.toLowerCase().includes(query));
