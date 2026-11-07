@@ -1,0 +1,52 @@
+name: Réplica de una empresa o tripulación
+description: Sos parte de una empresa, armador o tripulación que aparece en openMar y querés dar tu versión.
+title: "[Réplica] "
+labels: ["replica"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        openMar muestra señales, no acusaciones: un corte de señal puede ser una falla del equipo, mala recepción o un apagado a propósito, y con datos públicos no se puede distinguir. Tu versión ayuda a contar la historia completa.
+
+        Este formulario es público. Si preferís escribir en privado, usá el correo que figura al pie del sitio, cuando esté publicado.
+  - type: input
+    id: barco
+    attributes:
+      label: Barco
+      placeholder: "Ej.: ARBUMASA XXIX"
+    validations:
+      required: true
+  - type: input
+    id: empresa
+    attributes:
+      label: Empresa o armador
+    validations:
+      required: true
+  - type: input
+    id: rol
+    attributes:
+      label: Tu relación con el barco o la empresa
+      description: "Por ejemplo: armador, gerente, capitán, tripulante."
+    validations:
+      required: true
+  - type: textarea
+    id: replica
+    attributes:
+      label: Tu réplica
+      description: Qué dato o lectura querés responder y cuál es tu explicación (por ejemplo, una falla del equipo de señal en tal fecha).
+    validations:
+      required: true
+  - type: textarea
+    id: respaldo
+    attributes:
+      label: Documentación de respaldo
+      description: Opcional. Links o referencias que respalden tu versión (registros de mantenimiento, constancias de la autoridad, etc.). No adjuntes documentos con datos personales.
+    validations:
+      required: false
+  - type: checkboxes
+    id: publico
+    attributes:
+      label: Antes de enviar
+      options:
+        - label: Entiendo que esta réplica queda publicada en el repositorio.
+          required: true

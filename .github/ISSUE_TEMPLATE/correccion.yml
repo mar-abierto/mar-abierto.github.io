@@ -1,0 +1,46 @@
+name: Corrección de un dato
+description: Encontraste un dato mal en el sitio, en una ficha o en el CSV.
+title: "[Corrección] "
+labels: ["correccion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por avisar. Para poder revisarlo necesitamos saber qué dato está mal y qué fuente muestra el dato correcto.
+
+        No pegues datos personales de nadie (por ejemplo, nombres de observadores o de tripulantes). Este formulario es público.
+  - type: input
+    id: barco
+    attributes:
+      label: Barco
+      description: Nombre del barco, si el error es de una ficha. Si no, dejalo vacío.
+      placeholder: "Ej.: ARBUMASA XXIX"
+    validations:
+      required: false
+  - type: input
+    id: pagina
+    attributes:
+      label: Dónde está el error
+      description: Link a la página o nombre del archivo (por ejemplo, buques.csv).
+    validations:
+      required: true
+  - type: textarea
+    id: dato
+    attributes:
+      label: Qué dice openMar y qué debería decir
+    validations:
+      required: true
+  - type: textarea
+    id: fuente
+    attributes:
+      label: Fuente
+      description: Link o referencia al documento que muestra el dato correcto (informe del INIDEP, registro, resolución, etc.).
+    validations:
+      required: true
+  - type: checkboxes
+    id: datos-personales
+    attributes:
+      label: Antes de enviar
+      options:
+        - label: El aviso no incluye datos personales de terceros.
+          required: true
