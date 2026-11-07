@@ -20,6 +20,7 @@ NEAR_200NM_KM = (300.0, 450.0)
 # Las mareas del INIDEP están en fechas locales; los eventos de GFW, en UTC.
 TRIP_TOLERANCE_DAYS = 3  # un apagón cerca del inicio o fin de marea se asigna a esa marea
 LOCAL_TZ = ZoneInfo("America/Argentina/Buenos_Aires")
+MIDDAY_HOUR = 12  # divide el día compartido entre dos viajes seguidos
 
 
 @dataclass(frozen=True)
@@ -63,8 +64,19 @@ def _match_one(gap: AisGap, vessel_trips: list[Trip], tolerance: timedelta) -> t
     candidates = [t for t in vessel_trips if _distance_days(day, t) <= tolerance.days]
     if not candidates:
         return None, STATUS_NO_TRIP
-    best = min(candidates, key=lambda t: (_distance_days(day, t), not t.observer))
+    best = min(candidates, key=lambda t: (_distance_days(day, t), _tie_breaker(gap, t)))
     return best, STATUS_WITH_OBSERVER if best.observer else STATUS_WITHOUT_OBSERVER
+
+
+def _tie_breaker(gap: AisGap, trip: Trip) -> int:
+    """Desempate neutral entre dos viajes a la misma distancia del día del corte.
+
+    Las mareas sólo tienen fecha, no hora. Un corte de la mañana (hora argentina) se
+    asigna al viaje más temprano y uno de la tarde, al más tardío. Nunca se mira si el
+    viaje llevó observador: hacerlo sesgaría el resultado.
+    """
+    afternoon = gap.start.astimezone(LOCAL_TZ).hour >= MIDDAY_HOUR
+    return -trip.start.toordinal() if afternoon else trip.start.toordinal()
 
 
 def resolve_vessel_name(name: str, mmsi: str, names_by_mmsi: dict[str, str] | None = None) -> str:

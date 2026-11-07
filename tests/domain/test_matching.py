@@ -1,4 +1,7 @@
+from dataclasses import replace
 from datetime import date, datetime, timezone
+
+import pytest
 
 from openmar.domain.matching import (
     STATUS_NO_TRIP,
@@ -91,6 +94,40 @@ def test_la_marea_que_contiene_el_dia_gana_a_la_vecina_por_tolerancia():
 
     assert m.status == STATUS_WITHOUT_OBSERVER
     assert m.trip.start == date(2025, 1, 1)
+
+
+def gap_at(name, utc_iso):
+    return replace(gap(name, utc_iso[:10]), start=datetime.fromisoformat(utc_iso), event_id=f"{name}-{utc_iso}")
+
+
+@pytest.mark.parametrize("first_has_observer", [True, False])
+def test_dia_compartido_lo_decide_la_hora_del_corte_no_el_observador(first_has_observer):
+    # Un viaje termina el 10 y el siguiente sale el 10: el día es de los dos.
+    trips = [
+        trip("NANINA", "2025-01-01", "2025-01-10", first_has_observer),
+        trip("NANINA", "2025-01-10", "2025-01-20", not first_has_observer),
+    ]
+    morning = gap_at("NANINA", "2025-01-10T11:00:00+00:00")  # 08:00 en Argentina
+    evening = gap_at("NANINA", "2025-01-10T23:00:00+00:00")  # 20:00 en Argentina
+
+    m_morning, m_evening = match_gaps_to_trips([morning, evening], trips)
+
+    assert m_morning.trip.start == date(2025, 1, 1)
+    assert m_evening.trip.start == date(2025, 1, 10)
+
+
+def test_empate_por_tolerancia_entre_dos_viajes_tambien_es_neutral():
+    trips = [
+        trip("NANINA", "2025-01-01", "2025-01-10", True),
+        trip("NANINA", "2025-01-14", "2025-01-20", False),
+    ]
+    morning = gap_at("NANINA", "2025-01-12T11:00:00+00:00")
+    evening = gap_at("NANINA", "2025-01-12T23:00:00+00:00")
+
+    m_morning, m_evening = match_gaps_to_trips([morning, evening], trips)
+
+    assert m_morning.status == STATUS_WITH_OBSERVER
+    assert m_evening.status == STATUS_WITHOUT_OBSERVER
 
 
 def test_fuera_de_marea_se_asigna_a_la_mas_cercana():
