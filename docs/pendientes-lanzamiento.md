@@ -31,7 +31,7 @@ dominio, la vista previa de un link no muestra la imagen.
 
 ## 2. Correo público
 
-**Valor provisorio:** `PENDIENTE@openmar.example`, en un solo lugar:
+**Valor provisorio:** vacío (`""`, el enlace no se muestra), en un solo lugar:
 `site/enlaces.js`, `ENLACES.correo` (sin `mailto:`).
 
 Lo usan el pie de las 4 páginas ("o escribinos") y el bloque de corrección y
@@ -40,7 +40,7 @@ queda sólo el link a GitHub.
 
 ## 3. Link de Cafecito
 
-**Valor provisorio:** `https://cafecito.app/PENDIENTE-openmar`, en un solo lugar:
+**Valor provisorio:** vacío (`""`, el enlace no se muestra), en un solo lugar:
 `site/enlaces.js`, `ENLACES.cafecito`.
 
 Lo usan el "Apoyá openMar" del pie de las 4 páginas y el párrafo de apoyo al final
@@ -93,7 +93,7 @@ No es un valor pendiente sino una decisión: la checklist exacta está en
 ## Comprobaciones después de reemplazar
 
 ```bash
-grep -rn 'openmar.example\|PENDIENTE' site src   # no debería quedar nada
+./scripts/verificar_lanzamiento.sh   # lista todo lo que falta para abrir; sale 0 cuando está listo
 uv run pytest
 python3 -m http.server -d site 8766    # y revisar el pie y la cita en el navegador
 ```

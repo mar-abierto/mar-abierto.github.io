@@ -6,9 +6,9 @@
 
   const ENLACES = Object.freeze({
     // A decidir: link de Cafecito.
-    cafecito: "https://cafecito.app/PENDIENTE-openmar",
+    cafecito: "", // PENDIENTE: p. ej. "https://cafecito.app/openmar"
     // A decidir: correo público (sin "mailto:").
-    correo: "PENDIENTE@openmar.example",
+    correo: "", // PENDIENTE: p. ej. "contacto@dominio"
     // A decidir: dominio. También está en el <head> de las 4 páginas, robots.txt,
     // sitemap.xml y src/openmar/application/exportar.py (mismo texto, se reemplaza junto).
     sitio: "https://openmar.example",
