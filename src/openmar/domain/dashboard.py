@@ -2,16 +2,20 @@
 
 from collections import defaultdict
 
+from openmar.domain.matching import STATUS_NO_TRIP, STATUS_UNMATCHED, STATUS_WITH_OBSERVER, STATUS_WITHOUT_OBSERVER
 from openmar.domain.model import PortVisit
 from openmar.domain.port_visits import MIN_CONFIDENCE, counts, is_abroad
 from openmar.domain.signals import RED
 
 NO_OWNER = "Sin armador en el registro"
+# El total de cortes es la cifra principal; el desglose usa las mismas claves que cada buque
+# y siempre suma el total.
+GAP_BREAKDOWN = (STATUS_WITHOUT_OBSERVER, STATUS_WITH_OBSERVER, STATUS_NO_TRIP, STATUS_UNMATCHED)
 _SUMS = {
     "mareas": "mareas_temporada",
     "mareas_con_observador": "mareas_con_observador",
     "apagones": "apagones",
-    "apagones_sin_observador": "en_marea_sin_observador",
+    **{status: status for status in GAP_BREAKDOWN},
     "escalas": "escalas",
     "escalas_exterior": "escalas_exterior",
     "captura_t": "captura_t",
@@ -25,7 +29,7 @@ def by_owner(vessels: list[dict]) -> list[dict]:
         groups[v["armador"] or NO_OWNER].append(v)
     owners = []
     for owner, items in groups.items():
-        totals = {key: sum(float(v[field] or 0) for v in items) for key, field in _SUMS.items()}
+        totals = {key: sum(float(v.get(field) or 0) for v in items) for key, field in _SUMS.items()}
         trips = int(totals["mareas"])
         owners.append(
             {
@@ -35,7 +39,7 @@ def by_owner(vessels: list[dict]) -> list[dict]:
                 "mareas_con_observador": int(totals["mareas_con_observador"]),
                 "pct_con_observador": round(100 * totals["mareas_con_observador"] / trips, 1) if trips else 0.0,
                 "apagones": int(totals["apagones"]),
-                "apagones_sin_observador": int(totals["apagones_sin_observador"]),
+                **{status: int(totals[status]) for status in GAP_BREAKDOWN},
                 "escalas": int(totals["escalas"]),
                 "escalas_exterior": int(totals["escalas_exterior"]),
                 "buques_senales_repetidas": sum(v["semaforo"] == RED for v in items),
