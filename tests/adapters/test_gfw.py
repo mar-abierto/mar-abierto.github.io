@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
 import pytest
+import requests
 
 from openmar.adapters.gfw import GFWClient, GFWError, parse_gap_event, parse_port_visit
 
@@ -23,7 +24,20 @@ class FakeSession:
 
     def get(self, url, params=None, headers=None, timeout=None):
         self.calls.append({"url": url, "params": params, "headers": headers})
-        return self._responses.pop(0)
+        response = self._responses.pop(0)
+        if isinstance(response, Exception):
+            raise response
+        return response
+
+
+class FakeSleep:
+    """Registra las esperas en lugar de dormir de verdad."""
+
+    def __init__(self):
+        self.waits = []
+
+    def __call__(self, seconds):
+        self.waits.append(seconds)
 
 
 def vessel_entry(vessel_id, name):
@@ -66,10 +80,34 @@ def test_busqueda_tiene_un_tope_de_paginas():
     session = FakeSession(pages)
     client = GFWClient("token", session=session, page_size=2, max_pages=3)
 
-    entries = client.search_vessels("flag='ARG'")
+    # Llegar al tope con páginas pendientes no corta en silencio: un padrón
+    # truncado dejaría buques afuera sin que nadie se entere.
+    with pytest.raises(GFWError, match="tope de 3 páginas"):
+        client.search_vessels("flag='ARG'")
 
     assert len(session.calls) == 3
-    assert len(entries) == 6
+
+
+def test_busqueda_no_confunde_entradas_sin_id():
+    sin_id_1 = {"selfReportedInfo": [{"shipname": "SIN ID UNO"}]}
+    sin_id_2 = {"selfReportedInfo": []}
+    session = FakeSession(
+        [FakeResponse({"entries": [sin_id_1, vessel_entry("a", "UNO"), sin_id_2, sin_id_1], "since": None})]
+    )
+    client = GFWClient("token", session=session, page_size=10)
+
+    entries = client.search_vessels("flag='ARG'")
+
+    assert entries == [sin_id_1, vessel_entry("a", "UNO"), sin_id_2]
+
+
+def test_busqueda_reconoce_un_buque_repetido_por_sus_identidades():
+    doble = {"selfReportedInfo": [{"id": "nueva"}, {"id": "vieja"}]}
+    mismo_otro_orden = {"selfReportedInfo": [{"id": "vieja"}, {"id": "nueva"}]}
+    session = FakeSession([FakeResponse({"entries": [doble, mismo_otro_orden], "since": None})])
+    client = GFWClient("token", session=session, page_size=10)
+
+    assert client.search_vessels("flag='ARG'") == [doble]
 
 
 def test_eventos_se_piden_en_lotes_y_siguen_next_offset():
@@ -104,6 +142,95 @@ def test_eventos_cortan_si_el_offset_no_avanza():
 
     assert [e["id"] for e in events] == ["e1", "e2"]
     assert len(session.calls) == 2
+
+
+def test_eventos_fallan_si_llegan_al_tope_de_paginas():
+    pages = [FakeResponse({"entries": [{"id": f"e{i}"}], "nextOffset": i + 1}) for i in range(5)]
+    client = GFWClient("token", session=FakeSession(pages), max_pages=3)
+
+    with pytest.raises(GFWError, match="tope de 3 páginas"):
+        client.get_events("ds", ["v1"], "2025-01-01", "2025-12-31")
+
+
+def test_eventos_se_deduplican_por_id():
+    session = FakeSession(
+        [
+            FakeResponse({"entries": [{"id": "e1"}, {"id": "e2"}], "nextOffset": None}),
+            FakeResponse({"entries": [{"id": "e2"}, {"id": "e3"}], "nextOffset": None}),
+        ]
+    )
+    client = GFWClient("token", session=session, batch_size=1)
+
+    events = client.get_events("ds", ["v1", "v2"], "2025-01-01", "2025-12-31")
+
+    assert [e["id"] for e in events] == ["e1", "e2", "e3"]
+
+
+def test_eventos_sin_id_se_conservan_sin_romper_la_deduplicacion():
+    sin_id = {"start": "2025-01-01"}
+    otro_sin_id = {"start": "2025-02-01"}
+    session = FakeSession(
+        [FakeResponse({"entries": [sin_id, {"id": "e1"}, otro_sin_id, sin_id], "nextOffset": None})]
+    )
+    client = GFWClient("token", session=session)
+
+    events = client.get_events("ds", ["v1"], "2025-01-01", "2025-12-31")
+
+    assert events == [sin_id, {"id": "e1"}, otro_sin_id]
+
+
+@pytest.mark.parametrize(
+    "falla",
+    [FakeResponse({}, status=429), FakeResponse({}, status=503), requests.Timeout(), requests.ConnectionError()],
+    ids=["429", "503", "timeout", "conexion"],
+)
+def test_reintenta_con_espera_creciente_ante_errores_transitorios(falla):
+    ok = FakeResponse({"entries": [vessel_entry("a", "UNO")], "since": None})
+    sleep = FakeSleep()
+    client = GFWClient("token", session=FakeSession([falla, falla, ok]), page_size=10, sleep=sleep)
+
+    entries = client.search_vessels("flag='ARG'")
+
+    assert len(entries) == 1
+    assert sleep.waits == [2, 4]
+
+
+@pytest.mark.parametrize(
+    "falla",
+    [FakeResponse({}, status=429), FakeResponse({}, status=500), requests.Timeout()],
+    ids=["429", "500", "timeout"],
+)
+def test_agotar_los_reintentos_levanta_gfw_error(falla):
+    sleep = FakeSleep()
+    client = GFWClient("secreto", session=FakeSession([falla] * 4), retries=3, sleep=sleep)
+
+    with pytest.raises(GFWError) as err:
+        client.search_vessels("flag='ARG'")
+
+    assert "4 intentos" in str(err.value)
+    assert "secreto" not in str(err.value)
+    assert sleep.waits == [2, 4, 8]
+
+
+def test_error_http_permanente_no_se_reintenta():
+    sleep = FakeSleep()
+    client = GFWClient("token", session=FakeSession([FakeResponse({}, status=404)]), sleep=sleep)
+
+    with pytest.raises(GFWError, match="404"):
+        client.search_vessels("flag='ARG'")
+
+    assert sleep.waits == []
+
+
+def test_respuesta_que_no_es_json_levanta_gfw_error():
+    class NoJson(FakeResponse):
+        def json(self):
+            raise ValueError("no es JSON")
+
+    client = GFWClient("token", session=FakeSession([NoJson({})]))
+
+    with pytest.raises(GFWError, match="JSON"):
+        client.search_vessels("flag='ARG'")
 
 
 def test_parse_gap_sin_distancias_deja_none():
