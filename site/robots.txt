@@ -1,0 +1,10 @@
+# openMar es un borrador en revisión: no indexar todavía.
+# Al abrir el sitio, reemplazar todo este archivo por las 3 líneas de abajo
+# (ver docs/despliegue.md, "Al abrir el sitio").
+#
+# User-agent: *
+# Allow: /
+# Sitemap: https://openmar.example/sitemap.xml
+
+User-agent: *
+Disallow: /
