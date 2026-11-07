@@ -5,6 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>openMar · Ficha de barco</title>
   <meta name="description" content="Ficha de un barco de la flota calamarera argentina: viajes de pesca, observadores a bordo, cortes de señal y escalas en puerto, cruzados desde fuentes públicas.">
+  <link rel="canonical" href="https://openmar.example/buque">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="openMar">
+  <meta property="og:locale" content="es_AR">
+  <meta property="og:title" content="Ficha de barco · openMar">
+  <meta property="og:description" content="Ficha de un barco de la flota calamarera argentina: viajes de pesca, observadores a bordo, cortes de señal y escalas en puerto, cruzados desde fuentes públicas.">
+  <meta property="og:url" content="https://openmar.example/buque">
+  <meta property="og:image" content="https://openmar.example/img/compartir.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="openMar: en la temporada de calamar 2025, sólo 1 de cada 15 viajes de la flota argentina llevó un observador del Estado a bordo.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Ficha de barco · openMar">
+  <meta name="twitter:description" content="Ficha de un barco de la flota calamarera argentina: viajes de pesca, observadores a bordo, cortes de señal y escalas en puerto, cruzados desde fuentes públicas.">
+  <meta name="twitter:image" content="https://openmar.example/img/compartir.png">
+  <meta name="twitter:image:alt" content="openMar: en la temporada de calamar 2025, sólo 1 de cada 15 viajes de la flota argentina llevó un observador del Estado a bordo.">
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#ffffff">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2315191f'/%3E%3Crect x='7' y='7' width='8' height='8' fill='%231d5fa6'/%3E%3Crect x='17' y='7' width='8' height='8' fill='%23ffffff' opacity='.35'/%3E%3Crect x='7' y='17' width='8' height='8' fill='%23ffffff' opacity='.35'/%3E%3Crect x='17' y='17' width='8' height='8' fill='%23ffffff' opacity='.35'/%3E%3C/svg%3E">
@@ -13,6 +30,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
   <link href="tokens.css" rel="stylesheet">
   <link href="cabecera.css" rel="stylesheet">
+  <link href="pie.css" rel="stylesheet">
+  <script src="enlaces.js" defer></script>
   <link href="relato.css" rel="stylesheet">
   <link href="tablero.css" rel="stylesheet">
   <link href="buque.css" rel="stylesheet">
@@ -91,6 +110,13 @@
         </div>
         <p class="how" id="ports-note" hidden><strong>*</strong> Global Fishing Watch no trae el nombre de ese puerto en la escala; se completó con el de otras escalas del mismo puerto.</p>
       </section>
+
+      <!-- Canal de corrección y réplica: enlaces.js completa el nombre del barco en los formularios -->
+      <section class="respond" aria-labelledby="respond-title">
+        <h2 id="respond-title">¿Algo de esta ficha no está bien?</h2>
+        <p>¿Encontraste un error? <a href="https://github.com/eroveda/openMar/issues/new?template=correccion.yml" data-issue="correccion">Avisanos con la fuente que lo muestra</a><span data-enlace="correo" hidden> o <a>escribinos</a></span>. Si el dato está mal, lo corregimos y queda anotado qué cambió.</p>
+        <p>¿Sos parte de la empresa o de la tripulación y querés dar tu versión? <a href="https://github.com/eroveda/openMar/issues/new?template=replica.yml" data-issue="replica">Mandá tu réplica</a>. La leemos antes de la próxima actualización de los datos.</p>
+      </section>
     </article>
 
     <!-- Índice: sin buque elegido, o con uno que no existe -->
@@ -114,7 +140,11 @@
         <h2 id="limits-title">Lo que no sabemos</h2>
       </div>
       <ul class="limits" id="limits"></ul>
-      <p class="foot">Código abierto (MIT) · Resultados CC BY 4.0 · <span id="generated"></span></p>
+      <div class="foot">
+        <p>Código abierto (<a href="https://github.com/eroveda/openMar/blob/main/LICENSE">MIT</a>) · Resultados <a href="https://github.com/eroveda/openMar/blob/main/LICENSE-DATOS.md">CC BY-NC 4.0</a> · <a href="https://globalfishingwatch.org" rel="noopener">Powered by Global Fishing Watch.</a> · <span id="generated"></span></p>
+        <p>¿Encontraste un error? <a href="https://github.com/eroveda/openMar/issues/new?template=correccion.yml" data-issue="correccion">Avisanos</a><span data-enlace="correo" hidden> o <a>escribinos</a></span>. ¿Sos parte de una empresa que aparece acá y querés responder? <a href="https://github.com/eroveda/openMar/issues/new?template=replica.yml" data-issue="replica">Mandá tu réplica</a>.</p>
+        <p data-enlace="cafecito" hidden><a>Apoyá openMar</a></p>
+      </div>
     </section>
   </main>
 

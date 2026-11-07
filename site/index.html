@@ -5,6 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>openMar · Afuera y adentro de la milla 200</title>
   <meta name="description" content="Afuera de la milla 200 nadie puede controlar. Adentro el Estado sí puede: cuántos viajes de la flota calamarera argentina llevaron un observador a bordo en 2025. Datos públicos, con su fuente.">
+  <link rel="canonical" href="https://openmar.example/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="openMar">
+  <meta property="og:locale" content="es_AR">
+  <meta property="og:title" content="Afuera y adentro de la milla 200 · openMar">
+  <meta property="og:description" content="Afuera de la milla 200 nadie puede controlar. Adentro el Estado sí puede: cuántos viajes de la flota calamarera argentina llevaron un observador a bordo en 2025. Datos públicos, con su fuente.">
+  <meta property="og:url" content="https://openmar.example/">
+  <meta property="og:image" content="https://openmar.example/img/compartir.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="openMar: en la temporada de calamar 2025, sólo 1 de cada 15 viajes de la flota argentina llevó un observador del Estado a bordo.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Afuera y adentro de la milla 200 · openMar">
+  <meta name="twitter:description" content="Afuera de la milla 200 nadie puede controlar. Adentro el Estado sí puede: cuántos viajes de la flota calamarera argentina llevaron un observador a bordo en 2025. Datos públicos, con su fuente.">
+  <meta name="twitter:image" content="https://openmar.example/img/compartir.png">
+  <meta name="twitter:image:alt" content="openMar: en la temporada de calamar 2025, sólo 1 de cada 15 viajes de la flota argentina llevó un observador del Estado a bordo.">
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#ffffff">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%2315191f'/%3E%3Crect x='7' y='7' width='8' height='8' fill='%231d5fa6'/%3E%3Crect x='17' y='7' width='8' height='8' fill='%23ffffff' opacity='.35'/%3E%3Crect x='7' y='17' width='8' height='8' fill='%23ffffff' opacity='.35'/%3E%3Crect x='17' y='17' width='8' height='8' fill='%23ffffff' opacity='.35'/%3E%3C/svg%3E">
@@ -13,6 +30,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
   <link href="tokens.css" rel="stylesheet">
   <link href="cabecera.css" rel="stylesheet">
+  <link href="pie.css" rel="stylesheet">
+  <script src="enlaces.js" defer></script>
   <link href="relato.css" rel="stylesheet">
 </head>
 <body>
@@ -132,7 +151,20 @@
         <p class="source">Glosario: un <em>viaje</em> es lo que el INIDEP llama marea. La señal abierta es el AIS; la privada, el VMS. INIDEP es el Instituto Nacional de Investigación y Desarrollo Pesquero. Entre 2021 y 2024, el texto del informe de observadores dice 61 barcos sin observador; su Tabla 9, sumada fila por fila, da <span data-n="relato.historico_2021_2024.buques_nunca_con_observador">–</span>.</p>
       </div>
       <ul class="sources" id="sources"></ul>
-      <p class="foot">Código abierto (MIT) · Resultados CC BY 4.0 · <span id="generated"></span></p>
+      <div class="cite" id="citar">
+        <h3>Datos y cómo citar</h3>
+        <p>La tabla con una fila por barco (viajes, observadores, cortes de señal y fuente de cada dato) está en <a href="data/buques.csv" download>buques.csv</a>. Se abre con Excel o cualquier planilla de cálculo. Los datos de cada fuente conservan sus propias condiciones de uso: <a href="https://github.com/eroveda/openMar/blob/main/LICENSE-DATOS.md">cómo usarlos y a quién citar</a>.</p>
+        <p>Cita sugerida:</p>
+        <p class="cite__text" id="cita">openMar. La flota calamarera argentina, barco por barco. Fuentes: INIDEP, Global Fishing Watch y Registro de Flota Pesquera.</p>
+      </div>
+      <aside class="support" data-enlace="cafecito" hidden aria-label="Apoyar el proyecto">
+        <p>openMar es un proyecto independiente y de código abierto. Si te sirvió, podés <a>apoyarlo con un aporte en Cafecito</a>.</p>
+      </aside>
+      <div class="foot">
+        <p>Código abierto (<a href="https://github.com/eroveda/openMar/blob/main/LICENSE">MIT</a>) · Resultados <a href="https://github.com/eroveda/openMar/blob/main/LICENSE-DATOS.md">CC BY-NC 4.0</a> · <a href="https://globalfishingwatch.org" rel="noopener">Powered by Global Fishing Watch.</a> · <span id="generated"></span></p>
+        <p>¿Encontraste un error? <a href="https://github.com/eroveda/openMar/issues/new?template=correccion.yml" data-issue="correccion">Avisanos</a><span data-enlace="correo" hidden> o <a>escribinos</a></span>. ¿Sos parte de una empresa que aparece acá y querés responder? <a href="https://github.com/eroveda/openMar/issues/new?template=replica.yml" data-issue="replica">Mandá tu réplica</a>.</p>
+        <p data-enlace="cafecito" hidden><a>Apoyá openMar</a></p>
+      </div>
     </section>
   </main>
 
