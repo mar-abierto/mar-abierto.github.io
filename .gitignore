@@ -27,3 +27,6 @@ htmlcov/
 
 # Herramientas de diseño locales (críticas de impeccable)
 .impeccable/
+
+# Borradores de difusión y contactos (no se publican)
+borradores/
