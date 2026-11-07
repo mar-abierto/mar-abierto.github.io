@@ -52,6 +52,20 @@ nombre. Reconocer que dos registros escritos distinto hablan del mismo barco
   extracción con modelo de lenguaje para las actas del CFP, guardando la página y
   el fragmento de origen de cada valor.
 
+## Descarga de GFW
+
+- **Buques**: la búsqueda se acota a los poteros argentinos que transmitieron en
+  el período. Sin acotar, la API anuncia más de 100 buques pero su paginación no
+  pasa de 100; si alguna vez entrega menos que el total anunciado, la descarga falla.
+- **Identidades**: GFW parte un buque en varias identidades de AIS y ata cada
+  evento a la que lo emitió. Se piden eventos para todas las identidades cuyo tramo
+  de transmisión se solapa con el período.
+- **Errores**: ante 429, 5xx, timeout o corte de conexión se reintenta tres veces
+  (esperas de 2, 4 y 8 s); después, `GFWError`. Llegar al tope de páginas con más
+  por venir también es `GFWError`: no se publican datos truncados en silencio.
+- **Duplicados**: los eventos se deduplican por `id`; los que no tienen id se
+  conservan.
+
 ## Código
 
 Arquitectura hexagonal ([ADR 0005](adr/0005-arquitectura-hexagonal.md)): las
