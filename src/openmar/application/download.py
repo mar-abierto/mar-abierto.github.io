@@ -2,6 +2,7 @@
 
 import json
 from collections.abc import Callable
+from datetime import date
 
 from openmar.adapters import geo, inidep, rfp
 from openmar.adapters.gfw import BASE_URL, FISHING_DATASET, GAPS_DATASET, PORT_VISITS_DATASET, GFWClient
@@ -24,6 +25,16 @@ SQUID_FLEET_QUERY = "flag='ARG' AND geartypes='SQUID_JIGGER'"
 Fetch = Callable[[str], bytes]
 
 
+def fleet_query(start: str, end: str) -> str:
+    """Poteros argentinos con alguna identidad que transmitió dentro del período.
+
+    Acotar por fechas no es sólo prolijidad: la paginación de GFW no pasa de unos 100
+    buques y la flota potera completa, histórica incluida, supera ese número.
+    """
+    start, end = date.fromisoformat(start).isoformat(), date.fromisoformat(end).isoformat()
+    return f"{SQUID_FLEET_QUERY} AND transmissionDateTo >= '{start}' AND transmissionDateFrom <= '{end}'"
+
+
 def active_vessel_ids(entry: dict, start: str, end: str) -> list[str]:
     """Ids de todas las identidades del buque que transmitieron dentro del período.
 
@@ -41,8 +52,9 @@ def active_vessel_ids(entry: dict, start: str, end: str) -> list[str]:
 
 def download_gfw(store: RawStore, client: GFWClient, start: str, end: str) -> dict[str, int]:
     """Poteros con bandera argentina: apagones de AIS, eventos de pesca y escalas en puerto."""
-    vessels = client.search_vessels(SQUID_FLEET_QUERY)
-    store.save(BRONZE["gfw_vessels"], json.dumps(vessels), source=f"{BASE_URL}/vessels/search", query=SQUID_FLEET_QUERY)
+    query = fleet_query(start, end)
+    vessels = client.search_vessels(query)
+    store.save(BRONZE["gfw_vessels"], json.dumps(vessels), source=f"{BASE_URL}/vessels/search", query=query)
     ids_by_vessel = [ids for ids in (active_vessel_ids(v, start, end) for v in vessels) if ids]
     # Una identidad puede figurar en más de un buque de la búsqueda: se pide una sola vez.
     active = list(dict.fromkeys(vid for ids in ids_by_vessel for vid in ids))

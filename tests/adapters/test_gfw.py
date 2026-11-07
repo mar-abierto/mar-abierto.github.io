@@ -88,6 +88,23 @@ def test_busqueda_tiene_un_tope_de_paginas():
     assert len(session.calls) == 3
 
 
+def test_busqueda_falla_si_trae_menos_buques_que_el_total_anunciado():
+    # La API real anuncia 121 buques pero su paginación sólo entrega 100 distintos.
+    first = {"entries": [vessel_entry("a", "UNO"), vessel_entry("b", "DOS")], "since": "s", "total": 3}
+    session = FakeSession([FakeResponse(first), FakeResponse(first)])
+    client = GFWClient("token", session=session, page_size=2)
+
+    with pytest.raises(GFWError, match="anuncia 3 buques.*2"):
+        client.search_vessels("flag='ARG'")
+
+
+def test_busqueda_completa_respeta_el_total_anunciado():
+    session = FakeSession([FakeResponse({"entries": [vessel_entry("a", "UNO")], "since": None, "total": 1})])
+    client = GFWClient("token", session=session, page_size=2)
+
+    assert len(client.search_vessels("flag='ARG'")) == 1
+
+
 def test_busqueda_no_confunde_entradas_sin_id():
     sin_id_1 = {"selfReportedInfo": [{"shipname": "SIN ID UNO"}]}
     sin_id_2 = {"selfReportedInfo": []}

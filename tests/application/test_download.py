@@ -7,6 +7,7 @@ from openmar.application.download import (
     download_eez,
     download_gfw,
     download_registry,
+    fleet_query,
 )
 
 
@@ -74,6 +75,31 @@ def test_gfw_consulta_todas_las_identidades_que_se_solapan_con_el_periodo(tmp_pa
     assert all(ids == ["nueva", "vieja-2025"] for _, ids in client.requested)
     assert stats["activos"] == 2
     assert stats["identidades"] == 2
+
+
+class RecordingClient(FakeClient):
+    def search_vessels(self, where):
+        self.where = where
+        return super().search_vessels(where)
+
+
+def test_gfw_acota_la_busqueda_al_periodo():
+    # Sin acotar, la búsqueda supera los 100 buques que la paginación de GFW entrega.
+    query = fleet_query("2025-01-01", "2025-12-31")
+
+    assert query.startswith("flag='ARG' AND geartypes='SQUID_JIGGER'")
+    assert "transmissionDateTo >= '2025-01-01'" in query
+    assert "transmissionDateFrom <= '2025-12-31'" in query
+
+
+def test_gfw_usa_la_consulta_acotada(tmp_path):
+    client = RecordingClient()
+
+    download_gfw(LocalRawStore(tmp_path), client, "2025-01-01", "2025-12-31")
+
+    assert client.where == fleet_query("2025-01-01", "2025-12-31")
+    meta = json.loads(LocalRawStore(tmp_path).path(BRONZE["gfw_vessels"] + ".meta.json").read_text())
+    assert meta["query"] == client.where
 
 
 def test_vessel_ids_activos_ignora_identidades_sin_id_y_fuera_de_periodo():

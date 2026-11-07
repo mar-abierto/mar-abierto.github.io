@@ -183,19 +183,30 @@ class GFWClient:
         """
         seen: dict[str, dict] = {}
         since = None
+        total = None
         for _ in range(self._max_pages):
             params = {"where": where, "datasets[0]": dataset, "limit": self._page_size}
             if since:
                 params["since"] = since
             page = self._get("/vessels/search", params)
             entries = page.get("entries", [])
+            total = page.get("total", total)
             before = len(seen)
             for entry in entries:
                 seen.setdefault(_entry_key(entry), entry)
             since = page.get("since")
             if not since or len(entries) < self._page_size or len(seen) == before:
-                return list(seen.values())
-        raise self._page_limit_error("Búsqueda de buques")
+                break
+        else:
+            raise self._page_limit_error("Búsqueda de buques")
+        # La paginación de GFW deja de avanzar pasados ~100 resultados y repite
+        # páginas: si faltan buques respecto del total anunciado, se avisa.
+        if isinstance(total, int) and len(seen) < total:
+            raise GFWError(
+                f"Búsqueda de buques: GFW anuncia {total} buques y la paginación entregó {len(seen)}. "
+                "Acotá la consulta (por ejemplo, por fechas de transmisión)."
+            )
+        return list(seen.values())
 
     def get_events(self, dataset: str, vessel_ids: Iterable[str], start_date: str, end_date: str) -> list[dict]:
         """Descarga eventos de un conjunto de datos para una lista de buques, sin repetir `id`."""
