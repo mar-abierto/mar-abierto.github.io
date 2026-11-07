@@ -1,8 +1,14 @@
+import subprocess
 from datetime import date
 
 import pytest
 
-from openmar.adapters.inidep import parse_observer_coverage, parse_observer_coverage_by_year, parse_trips_annex
+from openmar.adapters.inidep import (
+    parse_observer_coverage,
+    parse_observer_coverage_by_year,
+    parse_trips_annex,
+    pdf_to_text,
+)
 
 ANEXO = """
 Texto previo con 12/1/2025 y números 1 2 3 que no es el anexo.
@@ -73,16 +79,96 @@ def test_anexo_descarta_filas_sin_buque_conocido():
     assert parse_trips_annex(text) == []
 
 
-def test_pdf_to_text_rechaza_archivos_que_no_son_pdf(tmp_path):
-    from openmar.adapters.inidep import pdf_to_text
+HEADER = """
+                                              PRIMER          ÚLTIMO
+            BUQUE                  VIAJE         DÍA            DATO      DÍAS   CAPTURA    REND.       PF
+                                               PESCA           PESCA                (kg)    (t día-1)
+"""
+ROW_NANINA_1 = " NANINA                                1      12/1/2025        2/2/2025    22     680.592    30,94      1"
+ROW_CONT_2 = "                                       2       7/2/2025        9/2/2025     3     107.328    35,78      1"
+ROW_CONT_1 = "                                       1       7/2/2025        9/2/2025     3     107.328    35,78      1"
 
+
+def test_anexo_termina_en_el_anexo_2():
+    text = f"Anexo 1.{HEADER}{ROW_NANINA_1}\n\nAnexo 2. Longitudes\n{ROW_CONT_2}\n"
+
+    assert [(t.vessel, t.trip) for t in parse_trips_annex(text)] == [("NANINA", 1)]
+
+
+def test_anexo_termina_en_la_fila_de_totales_y_la_valida():
+    text = f"Anexo 1.{HEADER}{ROW_NANINA_1}\n{ROW_CONT_2}\n\n      1 barcos       2        02/01   05/06   25  787.920  20,74  2\n{ROW_CONT_2}\n"
+
+    assert [(t.vessel, t.trip) for t in parse_trips_annex(text)] == [("NANINA", 1), ("NANINA", 2)]
+
+
+def test_anexo_falla_si_las_mareas_no_suman_el_total_declarado():
+    text = f"Anexo 1.{HEADER}{ROW_NANINA_1}\n\n      1 barcos       5        02/01   05/06   25  787.920  20,74  2\n"
+
+    with pytest.raises(ValueError, match="1 mareas.*declara 5"):
+        parse_trips_annex(text)
+
+
+def test_anexo_no_arrastra_el_buque_a_traves_de_un_encabezado_nuevo():
+    # Tras un salto de página el PDF repite el nombre: una fila sin nombre allí no se adivina.
+    text = f"Anexo 1.{HEADER}{ROW_NANINA_1}\n\n  16\n{HEADER}{ROW_CONT_2}\n"
+
+    assert [(t.vessel, t.trip) for t in parse_trips_annex(text)] == [("NANINA", 1)]
+
+
+def test_anexo_falla_si_una_fila_sin_nombre_no_sigue_la_numeracion_del_buque():
+    text = f"Anexo 1.{HEADER}{ROW_NANINA_1}\n{ROW_CONT_1}\n"
+
+    with pytest.raises(ValueError, match="NANINA"):
+        parse_trips_annex(text)
+
+
+def test_pdf_to_text_rechaza_archivos_que_no_son_pdf(tmp_path):
     fake = tmp_path / "x.pdf"
     fake.write_bytes(b"<html>no soy un pdf</html>")
 
-    import pytest
-
     with pytest.raises(RuntimeError, match="no es un PDF"):
         pdf_to_text(fake)
+
+
+@pytest.fixture
+def fake_pdf(tmp_path):
+    path = tmp_path / "informe.pdf"
+    path.write_bytes(b"%PDF-1.7\n")
+    return path
+
+
+def test_pdf_to_text_decodifica_en_utf_8(fake_pdf, monkeypatch):
+    calls = []
+
+    def fake_run(cmd, **kwargs):
+        calls.append((cmd, kwargs))
+        return subprocess.CompletedProcess(cmd, 0, stdout="ÚLTIMO DÍA", stderr="")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+
+    assert pdf_to_text(fake_pdf) == "ÚLTIMO DÍA"
+    [(cmd, kwargs)] = calls
+    assert cmd[:4] == ["pdftotext", "-layout", "-enc", "UTF-8"]
+    assert kwargs["encoding"] == "utf-8"
+
+
+@pytest.mark.parametrize(
+    ("error", "message"),
+    [
+        (FileNotFoundError("pdftotext"), "Falta pdftotext"),
+        (subprocess.CalledProcessError(1, "pdftotext"), "no pudo leer"),
+        (subprocess.TimeoutExpired("pdftotext", 120), "no pudo leer"),
+    ],
+    ids=["sin-poppler", "falla", "timeout"],
+)
+def test_pdf_to_text_traduce_los_errores_de_pdftotext(fake_pdf, monkeypatch, error, message):
+    def fake_run(cmd, **kwargs):
+        raise error
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+
+    with pytest.raises(RuntimeError, match=message):
+        pdf_to_text(fake_pdf)
 
 
 def test_anexo_ignora_texto_antes_del_titulo():

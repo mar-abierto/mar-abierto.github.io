@@ -28,26 +28,51 @@ _FILA_MAREA = re.compile(
     rf"(?P<desde>{_FECHA})\s+(?P<hasta>{_FECHA})\s+(?P<dias>\d+)\s+"
     r"(?P<captura>[\d.]+)\s+(?P<rend>[\d,]+)"
 )
-_FILA_COBERTURA = re.compile(r"^\s(?P<buque>[A-Z][A-Z0-9 ]+?)\s{2,}(?P<numeros>[\d\s.]+)$")
+_ENCABEZADO_ANEXO = re.compile(r"^\s*BUQUE\s+VIAJE\b")
+_TOTALES_ANEXO = re.compile(r"^\s*(?P<barcos>\d+)\s+barcos\s+(?P<mareas>\d+)\b")
+_FILA_COBERTURA =re.compile(r"^\s(?P<buque>[A-Z][A-Z0-9 ]+?)\s{2,}(?P<numeros>[\d\s.]+)$")
 
 
 def _parse_date(text: str) -> date:
     return datetime.strptime(text, "%d/%m/%Y").date()
 
 
-def parse_trips_annex(text: str) -> list[Trip]:
-    """Lee el Anexo 1 (detalle de mareas por buque) de un informe de temporada."""
+def _annex_lines(text: str) -> list[str]:
+    """Líneas del Anexo 1: desde su título hasta el Anexo 2 (o el final del texto)."""
     start = text.find("Anexo 1.")
     if start < 0:
         return []
+    end = text.find("Anexo 2.", start)
+    return text[start : end if end >= 0 else len(text)].splitlines()
+
+
+def parse_trips_annex(text: str) -> list[Trip]:
+    """Lee el Anexo 1 (detalle de mareas por buque) de un informe de temporada.
+
+    Una fila sin nombre hereda el buque de la fila anterior, pero sólo dentro de la
+    misma página: tras un encabezado de columnas nuevo el PDF repite el nombre, y si
+    no lo hace la fila se descarta en lugar de adivinar. La sección termina en la fila
+    de totales; si las mareas leídas no suman las que ese total declara, o si una fila
+    heredada no sigue la numeración del buque, falla en lugar de atribuir mal.
+    """
     trips: list[Trip] = []
     current = ""
-    for line in text[start:].splitlines():
+    declared_trips = None
+    for line in _annex_lines(text):
+        if _ENCABEZADO_ANEXO.match(line):
+            current = ""
+            continue
+        totals = _TOTALES_ANEXO.match(line)
+        if totals:
+            declared_trips = int(totals["mareas"])
+            break
         match = _FILA_MAREA.match(line)
         if not match:
             continue
         if match["buque"]:
             current = normalize_vessel_name(match["buque"])
+        elif current and trips and int(match["marea"]) <= trips[-1].trip:
+            raise ValueError(f"Anexo 1: una fila sin nombre no sigue la numeración de {current}.")
         if not current:
             continue  # fila sin buque conocido: no se adivina a quién pertenece
         trips.append(
@@ -62,6 +87,8 @@ def parse_trips_annex(text: str) -> list[Trip]:
                 rate_t_per_day=float(match["rend"].replace(",", ".")),
             )
         )
+    if declared_trips is not None and declared_trips != len(trips):
+        raise ValueError(f"Anexo 1: se leyeron {len(trips)} mareas y la fila de totales declara {declared_trips}.")
     return trips
 
 
@@ -162,10 +189,10 @@ def pdf_to_text(pdf_path: Path) -> str:
             raise RuntimeError(f"{pdf_path} no es un PDF (la descarga pudo haber fallado).")
     try:
         result = subprocess.run(
-            ["pdftotext", "-layout", "--", str(pdf_path), "-"],
+            ["pdftotext", "-layout", "-enc", "UTF-8", "--", str(pdf_path), "-"],
             check=True,
             capture_output=True,
-            text=True,
+            encoding="utf-8",
             timeout=PDF_TIMEOUT_SECONDS,
         )
     except FileNotFoundError as exc:

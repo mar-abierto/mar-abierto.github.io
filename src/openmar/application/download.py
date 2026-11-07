@@ -72,7 +72,7 @@ def download_inidep(store: RawStore, fetch: Fetch) -> dict[str, int]:
     names = {"ito-026-2025": BRONZE["inidep_trips"], "observadores-2024": BRONZE["inidep_coverage"]}
     for name, url in inidep.REPORTS.items():
         pdf = store.save(f"inidep/{name}.pdf", fetch(url), source=url)
-        store.save(names[name], inidep.pdf_to_text(pdf), source=url, converted_with="pdftotext -layout")
+        store.save(names[name], inidep.pdf_to_text(pdf), source=url, converted_with="pdftotext -layout -enc UTF-8")
     return {"informes": len(inidep.REPORTS)}
 
 
