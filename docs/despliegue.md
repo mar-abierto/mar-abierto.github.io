@@ -50,5 +50,45 @@ defecto.
       derivados.
 - [ ] Avisar al Círculo de Políticas Ambientales que el mapa muestra datos de su
       registro.
-- [ ] Quitar `noindex` de `site/index.html` y `site/mapa.html`, y `X-Robots-Tag` de `site/vercel.json`.
-- [ ] Quitar el cartel "Borrador · en revisión" de la portada y del mapa.
+- [ ] Resolver los valores pendientes de
+      [`pendientes-lanzamiento.md`](pendientes-lanzamiento.md) (dominio, correo,
+      Cafecito, licencia).
+
+## Al abrir el sitio (salida del borrador)
+
+Hoy el sitio está cerrado a buscadores en cuatro lugares. Todos estos cambios van
+juntos, en un mismo commit, y **no se aplican mientras siga el borrador**.
+
+- [ ] **`noindex` en las 4 páginas.** Borrar la línea
+      `<meta name="robots" content="noindex, nofollow">` del `<head>` de
+      `site/index.html`, `site/tablero.html`, `site/buque.html` y
+      `site/mapa.html`.
+- [ ] **`X-Robots-Tag` en `site/vercel.json`.** Borrar la línea
+      `{ "key": "X-Robots-Tag", "value": "noindex, nofollow" },`.
+- [ ] **`site/robots.txt`.** Reemplazar el contenido por:
+
+      User-agent: *
+      Allow: /
+      Sitemap: https://DOMINIO/sitemap.xml
+
+- [ ] **Badge de borrador en las 4 páginas.** Borrar
+      `<p class="top__draft">Borrador · en revisión</p>` de la cabecera de
+      `site/index.html`, `site/tablero.html`, `site/buque.html` y
+      `site/mapa.html` (la regla `.top__draft` de `site/cabecera.css` puede
+      quedar o borrarse).
+- [ ] **HSTS, sólo si hay dominio propio con HTTPS ya funcionando.** Agregar en
+      `site/vercel.json`, en los headers de `"/(.*)"`:
+
+      { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains" },
+
+      Empezar sin `preload`: sólo sumarlo (y anotar el dominio en
+      <https://hstspreload.org>) cuando todos los subdominios sirvan HTTPS,
+      porque es difícil de deshacer.
+- [ ] **Dominio.** Reemplazar `https://openmar.example` en todo el repo (ver
+      `pendientes-lanzamiento.md`) y regenerar el CSV con `uv run openmar exportar`.
+- [ ] **Protección de Vercel.** En **Settings → Deployment Protection**, sacar la
+      protección de la URL de producción (dejarla en las vistas previas).
+- [ ] **Comprobar** con `curl -sI https://DOMINIO/ | grep -i robots` (no debe
+      aparecer `X-Robots-Tag`), `curl -s https://DOMINIO/robots.txt` y la vista
+      previa de un link en <https://www.opengraph.xyz> o en el depurador de
+      tarjetas de cada red.

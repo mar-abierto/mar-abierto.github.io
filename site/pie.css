@@ -1,0 +1,55 @@
+/* Pie, canal de corrección y réplica, aporte y cita. Discreto: texto, no banners. */
+.foot p,
+.chapter .foot p {
+  margin: 0 0 6px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-3);
+}
+.foot a,
+.respond a,
+.cite a,
+.support a { color: var(--ink-2); text-underline-offset: 3px; text-decoration-color: var(--line-strong); }
+.foot a:hover,
+.respond a:hover,
+.cite a:hover,
+.support a:hover { color: var(--zee); text-decoration-color: currentColor; }
+.foot a:focus-visible,
+.respond a:focus-visible,
+.cite a:focus-visible,
+.support a:focus-visible { outline: 2px solid var(--zee); outline-offset: 2px; }
+
+/* En la ficha y al cerrar la historia: una línea con filete arriba. */
+.respond,
+.support {
+  margin: 28px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.respond h2 { margin: 0 0 6px; font-family: var(--font-display); font-size: 16px; color: var(--ink); }
+.respond p,
+.support p,
+.chapter .support p {
+  margin: 0 0 6px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+/* Datos y cómo citar */
+.cite h3 { margin: 0 0 8px; font-family: var(--font-display); font-size: 17px; color: var(--ink); }
+.cite p,
+.chapter .cite p { font-family: var(--font-body); font-size: 14px; line-height: 1.55; color: var(--ink-2); margin: 0 0 8px; }
+.cite__text,
+.chapter .cite p.cite__text {
+  margin: 0;
+  padding: 10px 14px;
+  border-left: 3px solid var(--zee);
+  background: var(--sea-0);
+  font-family: var(--font-read);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+}

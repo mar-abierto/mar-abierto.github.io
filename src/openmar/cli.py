@@ -4,6 +4,7 @@
     openmar silver
     openmar gold
     openmar publicar
+    openmar exportar
 """
 
 import argparse
@@ -17,6 +18,7 @@ import requests
 from openmar.adapters.filesystem import LocalRawStore, load_token
 from openmar.adapters.gfw import GFWClient, GFWError
 from openmar.application import download
+from openmar.application.exportar import export_site
 from openmar.application.gold import build_gold, publish_site
 from openmar.application.silver import build_silver
 
@@ -64,6 +66,8 @@ def _parser() -> argparse.ArgumentParser:
     sub.add_parser("gold", help="cruza y arma el mapa: data/silver → data/gold")
     publicar = sub.add_parser("publicar", help="copia el mapa de data/gold al sitio")
     publicar.add_argument("--sitio", type=Path, default=Path("site/data"))
+    exportar = sub.add_parser("exportar", help="arma site/data/buques.csv desde las fichas publicadas")
+    exportar.add_argument("--sitio", type=Path, default=Path("site/data"))
     return parser
 
 
@@ -93,9 +97,12 @@ def main(argv: list[str] | None = None) -> int:
             _print("silver", build_silver(LocalRawStore(bronze), silver))
         elif args.comando == "gold":
             _print("gold", build_gold(silver, gold))
+        elif args.comando == "exportar":
+            _print("csv", export_site(args.sitio))
         else:
             copied = publish_site(gold, args.sitio)
             print(f"publicados {len(copied)} archivos en {args.sitio}")
+            _print("csv", export_site(args.sitio))
     except KNOWN_ERRORS as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1

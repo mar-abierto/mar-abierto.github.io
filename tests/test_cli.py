@@ -49,6 +49,34 @@ def test_descargar_todo_recorre_las_cuatro_fuentes(monkeypatch, tmp_path):
 
 def test_publicar_usa_la_carpeta_del_sitio(monkeypatch, tmp_path, capsys):
     monkeypatch.setattr(cli, "publish_site", lambda gold, site: [site / "a", site / "b"])
+    monkeypatch.setattr(cli, "export_site", lambda site: {"barcos": 0})
 
     assert cli.main(["--datos", str(tmp_path), "publicar", "--sitio", str(tmp_path / "web")]) == 0
     assert "publicados 2 archivos" in capsys.readouterr().out
+
+
+def test_publicar_tambien_exporta_el_csv(monkeypatch, tmp_path, capsys):
+    exported = {}
+
+    def fake_export(site):
+        exported["site"] = site
+        return {"barcos": 3}
+
+    monkeypatch.setattr(cli, "publish_site", lambda gold, site: [site / "fichas.json"])
+    monkeypatch.setattr(cli, "export_site", fake_export)
+
+    assert cli.main(["--datos", str(tmp_path), "publicar", "--sitio", str(tmp_path / "web")]) == 0
+    assert exported["site"] == tmp_path / "web"
+    assert "barcos: 3" in capsys.readouterr().out
+
+
+def test_exportar_solo_genera_el_csv_sobre_lo_publicado(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr(cli, "export_site", lambda site: {"barcos": 7, "archivo": str(site / "buques.csv")})
+
+    assert cli.main(["exportar", "--sitio", str(tmp_path)]) == 0
+    assert "barcos: 7" in capsys.readouterr().out
+
+
+def test_exportar_sin_fichas_sale_con_error(tmp_path, capsys):
+    assert cli.main(["exportar", "--sitio", str(tmp_path)]) == 1
+    assert "fichas.json" in capsys.readouterr().err

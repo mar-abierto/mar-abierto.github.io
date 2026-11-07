@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Cómo leer los datos (señales, no acusaciones)
+    url: https://github.com/eroveda/openMar/blob/main/docs/adr/0008-senales-no-acusaciones.md
+    about: Antes de reportar, mirá qué significa un corte de señal y el semáforo.
+  - name: Licencia de los datos y cómo citarlos
+    url: https://github.com/eroveda/openMar/blob/main/LICENSE-DATOS.md
+    about: Condiciones de uso de los resultados y atribución a cada fuente.
