@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  const { esc, num, plural, loadJSON, limitItems, fillNumbers, seriesHTML, LABELS, GAP_STATUS, gapSummary, fichaURL, cutsLabel } =
+  const { esc, num, plural, loadJSON, limitItems, fillNumbers, seriesHTML, LABELS, GAP_STATUS, gapSummary, fichaURL, cutsLabel, cutsBreakdown, ruleTexts } =
     window.openMar;
   const $ = (selector) => document.querySelector(selector);
   const ORDER = { rojo: 0, amarillo: 1, verde: 2 };
@@ -16,13 +16,9 @@
 
   // ---------- Encabezado y KPIs ----------
 
+  // La misma regla, con las mismas palabras, que el panel del mapa.
   function statusText(p, rules) {
-    const threshold = rules?.umbral_senales_repetidas;
-    const why = {
-      rojo: `${num(threshold)} o más cortes de señal sin observador a bordo.`,
-      amarillo: `Tuvo cortes de señal, pero menos de ${num(threshold)} sin observador a bordo.`,
-      verde: "Sin cortes de señal registrados en la temporada.",
-    }[p.semaforo];
+    const why = ruleTexts(rules)?.[p.semaforo] || "";
     return `<span class="dot dot--${esc(p.semaforo)}"></span><b>${esc(LABELS[p.semaforo])}.</b> ${esc(why)} El color dice dónde mirar primero, no quién es culpable.`;
   }
 
@@ -54,12 +50,17 @@
         noTrips ? "Sin viajes en el informe de observadores" : `${num(p.mareas_con_observador)} de ${plural(p.mareas_temporada, "viaje", "viajes")} · flota: ${num(c.pct_con_observador_flota, 1)} %`,
         "kpi__value--obs",
       ),
+      // La cifra principal es el total de la temporada, como en el resto del sitio. El promedio por
+      // viaje cuenta sólo los cortes durante los viajes, y lo dice.
       kpi(
-        noTrips ? num(p.apagones) : num(c.apagones_por_marea, 2),
-        noTrips ? "cortes de señal en la temporada" : "cortes de señal por viaje",
-        noTrips
-          ? "Sin viajes informados para comparar"
-          : `${plural(c.apagones_en_marea, "corte", "cortes")} durante sus viajes${Number(p.fuera_de_marea) ? ` y ${num(p.fuera_de_marea)} fuera de ellos` : ""} · flota: ${num(c.apagones_por_marea_flota, 2)} por viaje`,
+        num(p.apagones),
+        "cortes de señal en la temporada",
+        [
+          ...cutsBreakdown(p).map(esc),
+          noTrips
+            ? "Sin viajes informados para comparar"
+            : `Durante sus viajes, ${num(c.apagones_por_marea, 2)} por viaje; flota: ${num(c.apagones_por_marea_flota, 2)}`,
+        ].join(" · "),
         "kpi__value--gap",
       ),
       kpi(
@@ -274,5 +275,6 @@
     note.setAttribute("role", "alert");
     note.textContent = `No se pudieron cargar los datos: ${error.message}.`;
     $("#ficha").prepend(note);
+    $("#ficha").removeAttribute("aria-busy");
   });
 })();

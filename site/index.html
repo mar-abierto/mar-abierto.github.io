@@ -35,7 +35,7 @@
         Afuera de la milla 200, nadie puede controlar.
         <em>Adentro, el Estado sí puede. Y casi no controla.</em>
       </h1>
-      <p class="hero__lede">En 2025, <span data-n="relato.temporada.buques">–</span> barcos con permiso argentino pescaron calamar en nuestro mar. En <strong><span data-n="relato.temporada.mareas_sin_observador">–</span> de sus <span data-n="relato.temporada.mareas">–</span> viajes no había nadie del Estado a bordo</strong>.</p>
+      <p class="hero__lede">En 2025<span data-opcional>, hasta el <span data-n="relato.temporada.fecha_corte" data-fmt="fechaCorta">–</span></span>, <span data-n="relato.temporada.buques">–</span> barcos con permiso argentino pescaron calamar en nuestro mar. En <strong><span data-n="relato.temporada.mareas_sin_observador">–</span> de sus <span data-n="relato.temporada.mareas">–</span> viajes no había nadie del Estado a bordo</strong>.</p>
       <p class="hero__lede hero__lede--small">openMar junta datos públicos que están desparramados y los pone en un solo lugar. No acusa a nadie: muestra dónde mirar.</p>
       <p class="hero__scroll" aria-hidden="true">Bajá para ver los datos ↓</p>
     </section>
@@ -66,7 +66,8 @@
         <p>Acá sí hay reglas. Una de las más importantes: los barcos grandes tienen que llevar un <strong>observador</strong>, una persona del Estado que viaja a bordo y anota qué se pesca, cuánto y qué se tira al mar.</p>
         <p>Cada cuadrado es un viaje de pesca de 2025. Los <strong class="hl-obs">encendidos</strong> llevaron observador.</p>
         <p class="figure-big"><small>De cada</small> <span data-n="derivado.uno_de_cada" data-fmt="int">–</span><small>viajes, sólo uno llevó observador</small></p>
-        <p class="source">Fuente: instituto de investigación pesquera del Estado (INIDEP), viajes hasta el 5 de junio de 2025.</p>
+        <p class="figure-big__when" data-opcional>Son los viajes informados hasta el <strong><span data-n="relato.temporada.fecha_corte" data-fmt="fecha">–</span></strong>, el último regreso a puerto que trae el informe. Los posteriores todavía no están.</p>
+        <p class="source">Fuente: instituto de investigación pesquera del Estado (INIDEP), informe técnico 026/2025.</p>
       </div>
       <div class="waffle" id="waffle-mareas" role="img" aria-label="Viajes de la temporada con y sin observador"></div>
     </section>
@@ -87,7 +88,7 @@
         <figure class="series">
           <figcaption class="series__title">De cada 100 viajes, cuántos llevaron observador</figcaption>
           <ol class="series__bars" id="series-anual"></ol>
-          <p class="series__note">2025: viajes hasta el 5 de junio.</p>
+          <p class="series__note" data-opcional>2025: viajes hasta el <span data-n="relato.temporada.fecha_corte" data-fmt="fechaCorta">–</span>.</p>
         </figure>
       </div>
     </section>

@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  const { esc, num, plural, ruleGaps, loadJSON, limitItems, fillNumbers, seriesHTML, fichaURL } = window.openMar;
+  const { esc, num, plural, cutsBreakdown, safeURL, loadJSON, limitItems, fillNumbers, seriesHTML, fichaURL } = window.openMar;
   const $ = (selector) => document.querySelector(selector);
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -65,29 +65,24 @@
   }
 
   function card(v) {
-    const parts = [`${num(v.en_marea_sin_observador)} en viajes sin observador`];
-    if (Number(v.fuera_de_marea)) parts.push(`${num(v.fuera_de_marea)} fuera de las fechas de viaje`);
-    const withObserver = Number(v.en_marea_con_observador)
-      ? `Además, ${plural(v.en_marea_con_observador, "corte", "cortes")} con observador a bordo, que la regla no cuenta.`
-      : "";
     const history =
       v.viajes_2021_2024 === "" ? "Sin datos de 2021–2024" : `Llevó observador en ${num(v.viajes_con_observador_2021_2024)} de ${plural(v.viajes_2021_2024, "viaje", "viajes")} entre 2021 y 2024`;
     return `<li class="card">
       <a href="${fichaURL(v.buque)}">
         <span class="card__name">${esc(v.buque)}</span>
         <span class="card__owner">${esc(v.armador || "Sin armador en el registro")}</span>
-        <span class="card__big">${plural(ruleGaps(v), "corte", "cortes")}</span>
-        <span class="card__detail">${esc(parts.join(" · "))}</span>
-        ${withObserver ? `<span class="card__detail">${esc(withObserver)}</span>` : ""}
+        <span class="card__big">${plural(v.apagones, "corte", "cortes")}</span>
+        <span class="card__detail">${esc(cutsBreakdown(v).join(" · "))}</span>
         <span class="card__history">${esc(history)}</span>
       </a>
     </li>`;
   }
 
   function renderStatic(summary) {
-    $("#cards-rojo").innerHTML = [...summary.relato.senales_repetidas].sort((a, b) => ruleGaps(b) - ruleGaps(a)).map(card).join("");
+    $("#cards-rojo").innerHTML = [...summary.relato.senales_repetidas].sort((a, b) => Number(b.apagones) - Number(a.apagones)).map(card).join("");
     $("#limits").innerHTML = limitItems(summary).map((item) => `<li>${item}</li>`).join("");
-    $("#sources").innerHTML = summary.fuentes
+    $("#sources").innerHTML = (summary.fuentes || [])
+      .filter((s) => safeURL(s.url))
       .map((s) => `<li><a href="${esc(s.url)}" rel="noopener">${esc(s.nombre)}</a>: ${esc(s.aporta)}</li>`)
       .join("");
     const date = new Date(summary.generado);
