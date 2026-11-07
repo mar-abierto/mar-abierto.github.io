@@ -15,7 +15,7 @@ CSV_NAME = "buques.csv"
 PUBLICATION_NAME = "publicacion.json"
 FICHAS_NAME = "fichas.json"
 
-# Dominio público del sitio. PENDIENTE: reemplazar cuando haya dominio
+# Dominio público del sitio, a decidir: reemplazar cuando haya dominio
 # (ver docs/pendientes-lanzamiento.md).
 SITE_URL = "https://openmar.example"
 

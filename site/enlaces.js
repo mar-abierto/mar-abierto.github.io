@@ -5,11 +5,11 @@
   "use strict";
 
   const ENLACES = Object.freeze({
-    // PENDIENTE: link de Cafecito.
+    // A decidir: link de Cafecito.
     cafecito: "https://cafecito.app/PENDIENTE-openmar",
-    // PENDIENTE: correo público (sin "mailto:").
+    // A decidir: correo público (sin "mailto:").
     correo: "PENDIENTE@openmar.example",
-    // PENDIENTE: dominio. También está en el <head> de las 4 páginas, robots.txt,
+    // A decidir: dominio. También está en el <head> de las 4 páginas, robots.txt,
     // sitemap.xml y src/openmar/application/exportar.py (mismo texto, se reemplaza junto).
     sitio: "https://openmar.example",
   });

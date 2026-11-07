@@ -32,7 +32,7 @@ Requiere Python 3.12+, [uv](https://docs.astral.sh/uv/) y `pdftotext` (poppler).
 
 ```bash
 sudo apt install poppler-utils      # en Debian/Ubuntu
-git clone <url-del-repositorio> openMar && cd openMar
+git clone https://github.com/eroveda/openMar openMar && cd openMar
 uv sync
 ```
 
@@ -52,7 +52,7 @@ El `.env` está en `.gitignore`. No lo compartas ni lo pegues en issues.
 uv run openmar descargar todo --desde 2025-01-01 --hasta 2025-12-31
 uv run openmar silver      # limpia y unifica
 uv run openmar gold        # cruza y arma el mapa
-uv run openmar publicar    # copia el mapa a site/data
+uv run openmar publicar    # copia el mapa a site/data y arma buques.csv
 ```
 
 Los datos se organizan en tres capas ([ADR 0006](docs/adr/0006-capas-de-datos.md)):
@@ -94,7 +94,7 @@ los descarga de la fuente original, y cada usuario los baja por su cuenta.
 - [x] Cruce de apagones con mareas y observadores
 - [ ] Apagones contra la línea real de la ZEE
 - [x] Mapa con semáforo por buque
-- [ ] Ficha por buque
+- [x] Ficha por buque
 - [ ] Extracción de las actas del Consejo Federal Pesquero
 - [ ] Más pesquerías además del calamar
 
@@ -112,4 +112,13 @@ los descarga de la fuente original, y cada usuario los baja por su cuenta.
 
 ## Licencia
 
-Código: [MIT](LICENSE). Resultados publicados por el proyecto: CC BY 4.0.
+Código: [MIT](LICENSE). Resultados publicados por el proyecto: CC BY-NC 4.0
+(propuesta pendiente de aprobación; ver [`LICENSE-DATOS.md`](LICENSE-DATOS.md) y
+la revisión 2026-11 del [ADR 0003](docs/adr/0003-licencias.md)).
+
+## Para periodistas
+
+- Una fila por barco en [`site/data/buques.csv`](site/data/buques.csv) (UTF-8,
+  separado por comas). Se regenera con `uv run openmar exportar`.
+- Cómo citar a openMar y a cada fuente: [`LICENSE-DATOS.md`](LICENSE-DATOS.md).
+- ¿Un error o una réplica? [Abrí un issue](https://github.com/eroveda/openMar/issues/new/choose).
