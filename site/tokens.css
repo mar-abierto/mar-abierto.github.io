@@ -13,7 +13,7 @@
   --gap: #b3470f;      /* cortes de señal */
   --rojo: #b3470f;     /* señales repetidas: el mismo óxido, sin rojo alarma */
   --amarillo: #8a5a00; /* escala en el exterior, avisos */
-  --verde: #8b95a1;    /* sin señales: gris, no "aprobado" */
+  --verde: #6b7480;    /* sin señales: gris, no "aprobado"; ≥3,4:1 sobre todos los fondos */
   --cell-off: #d9dde2;
   --cell-line: #9aa3ae;
   --zone-in: #e3edf7;

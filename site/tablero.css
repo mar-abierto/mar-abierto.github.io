@@ -74,6 +74,7 @@ th[aria-sort="ascending"] .sort::after { content: "↑"; color: var(--zee); }
 .table tbody th, .table td { padding: 11px 14px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
 .table tbody th { text-align: left; font-weight: 500; white-space: normal; min-width: 220px; position: sticky; left: 0; background: var(--sea-1); }
 .table thead th:first-child { position: sticky; left: 0; z-index: 1; }
+.cell-detail { display: block; margin-top: 2px; color: var(--ink-3); font-size: 12px; white-space: normal; min-width: 200px; }
 .table tbody tr:hover { background: var(--sea-2); }
 .table tbody tr.is-aggregate th { color: var(--ink-3); font-style: italic; }
 .meter { display: inline-block; width: 46px; height: 6px; margin-right: 8px; vertical-align: middle; border-radius: 3px;

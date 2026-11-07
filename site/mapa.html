@@ -61,11 +61,11 @@
             </button>
           </div>
           <ul class="rules">
-            <li><span class="dot dot--rojo" aria-hidden="true"></span><span><strong>Señales repetidas:</strong> <span data-n="reglas.umbral_senales_repetidas">3</span> o más cortes de señal en viajes sin observador, o fuera de las fechas de viaje.</span></li>
-            <li><span class="dot dot--amarillo" aria-hidden="true"></span><span><strong>Señales aisladas:</strong> 1 o 2 cortes así, o cortes sólo con observador a bordo.</span></li>
+            <li><span class="dot dot--rojo" aria-hidden="true"></span><span><strong>Señales repetidas:</strong> <span id="rule-rojo">–</span></span></li>
+            <li><span class="dot dot--amarillo" aria-hidden="true"></span><span><strong>Señales aisladas:</strong> <span id="rule-amarillo">–</span></span></li>
             <li><span class="dot dot--verde" aria-hidden="true"></span><span><strong>Sin señales:</strong> Global Fishing Watch no registró cortes de señal. Eso no quiere decir que el barco cumpla: uno que casi no transmite tampoco tiene cortes.</span></li>
           </ul>
-          <p class="note">Un corte de señal es un lapso de <span data-n="reglas.horas_minimas_apagon">12</span> horas o más sin la señal abierta de posición, la que cualquiera puede seguir en internet. <strong>Un corte no prueba una infracción</strong>: los barcos también mandan su posición al Estado por una señal privada, que no se publica. El color indica dónde mirar primero.</p>
+          <p class="note">Un corte de señal es un lapso de <span data-n="reglas.horas_minimas_apagon">–</span> horas o más sin la señal abierta de posición, la que cualquiera puede seguir en internet. <strong>Un corte no prueba una infracción</strong>: los barcos también mandan su posición al Estado por una señal privada, que no se publica. El color indica dónde mirar primero.</p>
         </section>
 
         <section class="block" aria-labelledby="capas-title">
@@ -97,7 +97,7 @@
 
         <section class="block block--about" aria-labelledby="leer-title">
           <h2 class="block__title" id="leer-title">Sobre los datos</h2>
-          <p class="note">La posición es el punto típico donde pescó cada barco en 2025 (la mediana de sus eventos de pesca), no dónde está hoy. La "franja de la milla 200" se aproxima con la distancia a la costa (300 a 450 km).</p>
+          <p class="note">La posición es el punto típico donde pescó cada barco en 2025 (la mediana de sus eventos de pesca), no dónde está hoy. La "franja de la milla 200" se aproxima con la distancia a la costa (<span data-n="reglas.franja_milla_200_km.0" data-fmt="int">–</span> a <span data-n="reglas.franja_milla_200_km.1" data-fmt="int">–</span> km).</p>
           <h3 class="block__subtitle">Fuentes</h3>
           <ul class="sources" id="sources"></ul>
           <p class="foot">Código abierto (MIT) · Resultados CC BY 4.0 · <span id="generated"></span></p>
@@ -107,6 +107,7 @@
 
     <div class="map" id="map" role="region" aria-label="Mapa del Mar Argentino"></div>
     <div class="map-status" id="map-status" role="status">Cargando el mar…</div>
+    <p class="sr-only" id="map-announce" aria-live="polite"></p>
 
     <footer class="limits" id="limits" aria-labelledby="limits-title">
       <button class="limits__toggle" id="limits-toggle" aria-expanded="false" aria-controls="limits-list">

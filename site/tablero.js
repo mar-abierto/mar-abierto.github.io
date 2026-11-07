@@ -2,15 +2,8 @@
 (() => {
   "use strict";
 
-  const { esc, num, loadJSON, limitItems, fillNumbers } = window.openMar;
+  const { esc, num, loadJSON, limitItems, fillNumbers, cutsBreakdown } = window.openMar;
   const $ = (selector) => document.querySelector(selector);
-
-  const GAP_PARTS = [
-    { key: "en_marea_sin_observador", label: "en viajes sin observador", cls: "sin" },
-    { key: "en_marea_con_observador", label: "en viajes con observador", cls: "con" },
-    { key: "fuera_de_marea", label: "fuera de las fechas de viaje", cls: "fuera" },
-    { key: "sin_mareas_del_buque", label: "en barcos sin viajes informados", cls: "fuera" },
-  ];
 
   const COLUMNS = {
     armador: (o) => esc(o.armador),
@@ -18,7 +11,11 @@
     mareas: (o) => num(o.mareas),
     pct_con_observador: (o) =>
       `<span class="meter" style="--w:${Number(o.pct_con_observador)}%"></span>${num(o.pct_con_observador, 1)} %`,
-    apagones_sin_observador: (o) => num(o.apagones_sin_observador),
+    // El total de cortes, como en las fichas y la historia; debajo, el mismo desglose.
+    apagones: (o) => {
+      const parts = cutsBreakdown(o);
+      return `${num(o.apagones)}${parts.length ? `<small class="cell-detail">${esc(parts.join(" · "))}</small>` : ""}`;
+    },
     buques_senales_repetidas: (o) =>
       o.buques_senales_repetidas ? `<span class="pill pill--rojo">${num(o.buques_senales_repetidas)}</span>` : "0",
     escalas_exterior: (o) => num(o.escalas_exterior),
@@ -96,7 +93,10 @@
     const summary = await loadJSON("data/resumen.json");
     fillNumbers(summary);
     drawPorts(summary.tablero.puertos);
-    state.owners = summary.tablero.por_armador;
+    // Datos de una versión anterior traían sólo "apagones_sin_observador": se lee con el nombre nuevo.
+    state.owners = summary.tablero.por_armador.map((o) =>
+      "en_marea_sin_observador" in o ? o : { ...o, en_marea_sin_observador: o.apagones_sin_observador },
+    );
     bindTable();
     renderTable();
     $("#limits").innerHTML = limitItems(summary).map((item) => `<li>${item}</li>`).join("");

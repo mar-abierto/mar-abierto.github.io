@@ -9,6 +9,7 @@ from openmar.adapters.tabular import read_rows
 from openmar.application.download import BRONZE
 from openmar.application.gold import build_gold, publish_site
 from openmar.application.silver import build_silver
+from openmar.domain.coherence import gap_count_problems
 
 ANEXO = """
 Anexo 1. Detalle de las mareas. *Marea con observador a bordo.
@@ -161,6 +162,25 @@ def test_gold_arma_semaforo_ficha_y_capas_del_mapa(bronze, tmp_path):
     assert fichas["temporada"] == summary["temporada"]
     zee = json.loads((tmp_path / "gold" / "mapa" / "zee.geojson").read_text())
     assert zee["features"][0]["properties"]["nombre"] == "Argentinian Exclusive Economic Zone"
+
+
+def test_gold_trae_fecha_de_corte_y_cifra_de_prensa(bronze, tmp_path):
+    build_silver(bronze, tmp_path / "silver")
+
+    relato = build_gold(tmp_path / "silver", tmp_path / "gold")["relato"]
+
+    assert relato["temporada"]["fecha_corte"] == "2025-03-20"
+    assert relato["prensa"]["viajes_con_observador"] == 9
+    assert relato["prensa"]["url"].startswith("https://")
+
+
+def test_gold_da_la_misma_cifra_de_cortes_en_resumen_tablero_y_fichas(bronze, tmp_path):
+    build_silver(bronze, tmp_path / "silver")
+
+    summary = build_gold(tmp_path / "silver", tmp_path / "gold")
+
+    fichas = json.loads((tmp_path / "gold" / "mapa" / "fichas.json").read_text())
+    assert gap_count_problems(summary, fichas) == []
 
 
 def test_publicar_copia_las_capas_al_sitio(bronze, tmp_path):

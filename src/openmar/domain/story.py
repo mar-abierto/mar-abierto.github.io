@@ -10,7 +10,11 @@ def _pct(part: int, total: int) -> float:
 
 
 def season_figures(trips: list[Trip]) -> dict:
-    """Mareas de la temporada con y sin observador, buques y captura."""
+    """Mareas de la temporada con y sin observador, buques, captura y fecha de corte.
+
+    La fecha de corte es el regreso del último viaje informado: la temporada
+    publicada llega hasta ahí, no hasta fin de año.
+    """
     observed = sum(t.observer for t in trips)
     return {
         "mareas": len(trips),
@@ -20,6 +24,7 @@ def season_figures(trips: list[Trip]) -> dict:
         "buques": len({t.vessel for t in trips}),
         "buques_con_algun_observador": len({t.vessel for t in trips if t.observer}),
         "captura_t": round(sum(t.catch_kg for t in trips) / 1000, 1),
+        "fecha_corte": max(t.end for t in trips).isoformat() if trips else None,
     }
 
 
