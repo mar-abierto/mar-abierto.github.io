@@ -24,17 +24,28 @@ SQUID_FLEET_QUERY = "flag='ARG' AND geartypes='SQUID_JIGGER'"
 Fetch = Callable[[str], bytes]
 
 
-def _vessel_id(entry: dict) -> tuple[str, str]:
-    info = (entry.get("selfReportedInfo") or [{}])[0]
-    return info.get("id", ""), info.get("transmissionDateTo") or ""
+def active_vessel_ids(entry: dict, start: str, end: str) -> list[str]:
+    """Ids de todas las identidades del buque que transmitieron dentro del período.
+
+    GFW parte un mismo buque en varias identidades (una por cada tramo de AIS) y los
+    eventos quedan atados a la identidad que los emitió: si se consulta sólo una, se
+    pierden los de las otras. Una fecha que falta no descarta: mejor de más que perderlo.
+    """
+    ids = []
+    for info in entry.get("selfReportedInfo") or []:
+        first, last = info.get("transmissionDateFrom") or "", info.get("transmissionDateTo") or ""
+        if info.get("id") and (not last or last[:10] >= start) and (not first or first[:10] <= end):
+            ids.append(info["id"])
+    return ids
 
 
 def download_gfw(store: RawStore, client: GFWClient, start: str, end: str) -> dict[str, int]:
     """Poteros con bandera argentina: apagones de AIS, eventos de pesca y escalas en puerto."""
     vessels = client.search_vessels(SQUID_FLEET_QUERY)
     store.save(BRONZE["gfw_vessels"], json.dumps(vessels), source=f"{BASE_URL}/vessels/search", query=SQUID_FLEET_QUERY)
-    # Un buque sin fecha de última transmisión se conserva: mejor de más que perderlo.
-    active = [vid for vid, last in map(_vessel_id, vessels) if vid and (not last or last[:10] >= start)]
+    ids_by_vessel = [ids for ids in (active_vessel_ids(v, start, end) for v in vessels) if ids]
+    # Una identidad puede figurar en más de un buque de la búsqueda: se pide una sola vez.
+    active = list(dict.fromkeys(vid for ids in ids_by_vessel for vid in ids))
     period = f"{start}/{end}"
     gaps = client.get_events(GAPS_DATASET, active, start, end)
     store.save(BRONZE["gfw_gaps"], json.dumps(gaps), source=f"{BASE_URL}/events", dataset=GAPS_DATASET, period=period)
@@ -48,7 +59,8 @@ def download_gfw(store: RawStore, client: GFWClient, start: str, end: str) -> di
     )
     return {
         "buques": len(vessels),
-        "activos": len(active),
+        "activos": len(ids_by_vessel),
+        "identidades": len(active),
         "apagones": len(gaps),
         "eventos_de_pesca": len(fishing),
         "escalas_en_puerto": len(visits),
