@@ -26,11 +26,23 @@ def test_temporada_cuenta_mareas_con_y_sin_observador_y_buques():
         "buques": 3,
         "buques_con_algun_observador": 2,
         "captura_t": 5.5,
+        "fecha_corte": "2025-01-20",
     }
 
 
 def test_temporada_vacia_no_divide_por_cero():
     assert season_figures([])["pct_con_observador"] == 0.0
+
+
+def test_fecha_de_corte_es_el_regreso_del_ultimo_viaje():
+    early = Trip("A", 1, False, date(2025, 1, 1), date(2025, 2, 10), 41, 0, 0.0)
+    late = Trip("B", 1, True, date(2025, 5, 2), date(2025, 6, 5), 35, 0, 0.0)
+
+    assert season_figures([late, early])["fecha_corte"] == "2025-06-05"
+
+
+def test_temporada_vacia_no_tiene_fecha_de_corte():
+    assert season_figures([])["fecha_corte"] is None
 
 
 def test_historico_cuenta_buques_que_nunca_llevaron_observador():

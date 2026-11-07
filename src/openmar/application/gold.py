@@ -66,6 +66,16 @@ SOURCES = [
 ]
 
 
+# Cifra de la prensa que difiere del informe del INIDEP (docs/hallazgos-2025.md).
+# Se publica al lado de la nuestra hasta que el informe final de temporada la resuelva.
+PRESS_OBSERVED_TRIPS = {
+    "medio": "Mongabay",
+    "fecha": "febrero de 2026",
+    "url": "https://es.mongabay.com/2026/02/buques-argentinos-empresas-chinas-pesca-sin-observadores/",
+    "viajes_con_observador": 9,
+}
+
+
 def _registry_index(records: list[RegistryRecord]) -> dict[str, RegistryRecord]:
     """Índice por nombre normalizado; ante nombres repetidos prefiere el potero."""
     index: dict[str, RegistryRecord] = {}
@@ -190,6 +200,7 @@ def _story(vessels: list[dict], gaps: list[dict], silver_dir: Path) -> dict:
         "temporada": season,
         "historico_2021_2024": history,
         "cobertura_por_anio": coverage_by_year(yearly, trips, season_year=SEASON_YEAR),
+        "prensa": PRESS_OBSERVED_TRIPS,
         "horas_sin_ais": round(sum(g["horas"] for g in gaps), 1),
         "cerca_milla_200": {
             "apagones": sum(bool(g["franja_milla_200"]) for g in gaps),
