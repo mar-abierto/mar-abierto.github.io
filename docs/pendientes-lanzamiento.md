@@ -4,30 +4,10 @@ Lo que el dueño del proyecto todavía no decidió y quedó con un valor proviso
 Cada valor es un texto único, fácil de buscar y reemplazar. Cuando se decida,
 reemplazarlo, correr las comprobaciones del final y borrar la fila de esta lista.
 
-## 1. Dominio propio
+## 1. Dominio
 
-**Valor provisorio:** `https://openmar.example` (el TLD `.example` está reservado y
-no resuelve: nunca va a apuntar a un sitio de otro).
-
-| Dónde | Qué es |
-|---|---|
-| `site/index.html`, `site/tablero.html`, `site/buque.html`, `site/mapa.html` (`<head>`) | `canonical`, `og:url`, `og:image`, `twitter:image` (4 por página) |
-| `site/enlaces.js` (`ENLACES.sitio`) | URL que aparece en la cita sugerida de la portada |
-| `src/openmar/application/exportar.py` (`SITE_URL`) | Columna `ficha` de `buques.csv` |
-| `site/sitemap.xml` | Las 4 URL |
-| `site/robots.txt` | Línea `Sitemap:` (comentada mientras siga el borrador) |
-| `site/data/buques.csv` | Se regenera, no se edita a mano |
-
-Reemplazo (cambiar `DOMINIO` por el dominio real, sin barra final):
-
-```bash
-grep -rl 'https://openmar.example' site src \
-  | xargs sed -i 's#https://openmar.example#https://DOMINIO#g'
-uv run openmar exportar     # regenera buques.csv con el dominio nuevo
-```
-
-Las tarjetas para compartir (Open Graph) necesitan URL absolutas: hasta que haya
-dominio, la vista previa de un link no muestra la imagen.
+**Resuelto (13/11/2026):** `https://openmar.vercel.app`, el subdominio gratuito de
+Vercel. No se compra dominio propio: openMar se publica como proyecto demostrativo.
 
 ## 2. Correo público
 
@@ -40,12 +20,8 @@ queda sólo el link a GitHub.
 
 ## 3. Link de Cafecito
 
-**Valor provisorio:** vacío (`""`, el enlace no se muestra), en un solo lugar:
-`site/enlaces.js`, `ENLACES.cafecito`.
-
-Lo usan el "Apoyá openMar" del pie de las 4 páginas y el párrafo de apoyo al final
-de la portada. Es un link común (la CSP bloquea los widgets externos). Si se deja
-`cafecito: ""`, los dos desaparecen.
+**Resuelto (13/11/2026):** `https://cafecito.app/openmar`, en `site/enlaces.js`.
+Recibe aportes cuando la cuenta tenga un método de pago conectado.
 
 ## 4. Licencia de los resultados
 
@@ -71,13 +47,14 @@ cifra cambia.
 
 ## 6. GitHub
 
-- Crear las etiquetas `correccion` y `replica` en el repositorio: los formularios
-  de `.github/ISSUE_TEMPLATE/` las asignan, y GitHub las ignora si no existen.
-- Los links de corrección, réplica y licencia apuntan a
-  `https://github.com/eroveda/openMar`: funcionan cuando el repositorio sea
-  público.
+**Resuelto (13/11/2026):** el repositorio es público y tiene las etiquetas
+`correccion` y `replica` que asignan los formularios de `.github/ISSUE_TEMPLATE/`.
 
 ## 7. Salida del borrador
+
+**Parcial (13/11/2026):** el cartel dice "Proyecto demostrativo · datos 2025" y el
+sitio está online, pero sigue con `noindex` y `robots.txt` cerrado a propósito: se
+ve con el link y no aparece en buscadores.
 
 No es un valor pendiente sino una decisión: la checklist exacta está en
 `docs/despliegue.md`, "Al abrir el sitio".

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Las fichas por barco (buque?b=…) no se listan: se llega a ellas desde /buque. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://openmar.example/</loc></url>
-  <url><loc>https://openmar.example/tablero</loc></url>
-  <url><loc>https://openmar.example/buque</loc></url>
-  <url><loc>https://openmar.example/mapa</loc></url>
-</urlset>
+  <url><loc>https://openmar.vercel.app/</loc></url>
+  <url><loc>https://openmar.vercel.app/historia</loc></url>
+  <url><loc>https://openmar.vercel.app/tablero</loc></url>
+  <url><loc>https://openmar.vercel.app/buque</loc></url>
+  </urlset>

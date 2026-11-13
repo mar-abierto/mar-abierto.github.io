@@ -1,2 +1,4 @@
 # Se publica todo site/, incluido data/ (generado con `openmar publicar`).
 .vercel
+.env*
+.gitignore

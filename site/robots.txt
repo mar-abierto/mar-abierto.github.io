@@ -4,7 +4,7 @@
 #
 # User-agent: *
 # Allow: /
-# Sitemap: https://openmar.example/sitemap.xml
+# Sitemap: https://openmar.vercel.app/sitemap.xml
 
 User-agent: *
 Disallow: /

@@ -3,24 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>openMar · Afuera y adentro de la milla 200</title>
-  <meta name="description" content="Afuera de la milla 200 nadie puede controlar. Adentro el Estado sí puede: cuántos viajes de la flota calamarera argentina llevaron un observador a bordo en 2025. Datos públicos, con su fuente.">
-  <link rel="canonical" href="https://openmar.example/">
+  <title>openMar · Mapa de la flota calamarera</title>
+  <meta name="description" content="Mapa abierto de la flota calamarera argentina: cortes de señal, viajes con y sin observador y empresas titulares, barco por barco, con la fuente de cada dato.">
+  <link rel="canonical" href="https://openmar.vercel.app/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="openMar">
   <meta property="og:locale" content="es_AR">
-  <meta property="og:title" content="Afuera y adentro de la milla 200 · openMar">
-  <meta property="og:description" content="Afuera de la milla 200 nadie puede controlar. Adentro el Estado sí puede: cuántos viajes de la flota calamarera argentina llevaron un observador a bordo en 2025. Datos públicos, con su fuente.">
-  <meta property="og:url" content="https://openmar.example/">
-  <meta property="og:image" content="https://openmar.example/img/compartir.png">
+  <meta property="og:title" content="Mapa de la flota calamarera · openMar">
+  <meta property="og:description" content="Mapa abierto de la flota calamarera argentina: cortes de señal, viajes con y sin observador y empresas titulares, barco por barco, con la fuente de cada dato.">
+  <meta property="og:url" content="https://openmar.vercel.app/">
+  <meta property="og:image" content="https://openmar.vercel.app/img/compartir.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="openMar: en la temporada de calamar 2025, sólo 1 de cada 15 viajes de la flota argentina llevó un observador del Estado a bordo.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Afuera y adentro de la milla 200 · openMar">
-  <meta name="twitter:description" content="Afuera de la milla 200 nadie puede controlar. Adentro el Estado sí puede: cuántos viajes de la flota calamarera argentina llevaron un observador a bordo en 2025. Datos públicos, con su fuente.">
-  <meta name="twitter:image" content="https://openmar.example/img/compartir.png">
+  <meta name="twitter:title" content="Mapa de la flota calamarera · openMar">
+  <meta name="twitter:description" content="Mapa abierto de la flota calamarera argentina: cortes de señal, viajes con y sin observador y empresas titulares, barco por barco, con la fuente de cada dato.">
+  <meta name="twitter:image" content="https://openmar.vercel.app/img/compartir.png">
   <meta name="twitter:image:alt" content="openMar: en la temporada de calamar 2025, sólo 1 de cada 15 viajes de la flota argentina llevó un observador del Estado a bordo.">
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#ffffff">
@@ -28,149 +28,122 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+  <link href="vendor/maplibre-gl@4.7.1/maplibre-gl.css" rel="stylesheet">
   <link href="tokens.css" rel="stylesheet">
   <link href="cabecera.css" rel="stylesheet">
   <link href="pie.css" rel="stylesheet">
   <script src="enlaces.js" defer></script>
-  <link href="relato.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
 </head>
-<body>
-  <a class="skip" href="#relato">Saltar al contenido</a>
+<body class="is-map">
+  <a class="skip" href="#panel">Saltar al panel del mapa</a>
   <header class="top">
     <a class="top__brand" href="./">open<span>Mar</span></a>
-    <p class="top__draft">Borrador · en revisión</p>
+    <p class="top__draft">Proyecto demostrativo · datos 2025</p>
     <nav class="top__nav" aria-label="Secciones">
-      <a href="./" aria-current="page">La historia</a>
+      <a href="./" aria-current="page">Mapa</a>
+      <a href="historia.html">La historia</a>
       <a href="tablero.html">Empresas</a>
       <a href="buque.html">Barcos</a>
-      <a href="mapa.html">Mapa</a>
     </nav>
   </header>
+  <main class="app">
+    <aside class="panel" id="panel" aria-label="Capas y barcos">
+      <button class="panel__handle" id="panel-toggle" aria-expanded="true" aria-controls="panel-body">
+        <span class="panel__handle-bar" aria-hidden="true"></span>
+        <span class="sr-only">Mostrar u ocultar el panel</span>
+      </button>
 
-  <main id="relato" aria-busy="true">
-    <section class="hero">
-      <p class="kicker">Calamar · temporada 2025</p>
-      <h1 class="hero__title">
-        Afuera de la milla 200, nadie puede controlar.
-        <em>Adentro, el Estado sí puede. Y casi no controla.</em>
-      </h1>
-      <p class="hero__lede">En 2025<span data-opcional>, hasta el <span data-n="relato.temporada.fecha_corte" data-fmt="fechaCorta">–</span></span>, <span data-n="relato.temporada.buques">–</span> barcos con permiso argentino pescaron calamar en nuestro mar. En <strong><span data-n="relato.temporada.mareas_sin_observador">–</span> de sus <span data-n="relato.temporada.mareas">–</span> viajes no había nadie del Estado a bordo</strong>.</p>
-      <p class="hero__lede hero__lede--small">openMar junta datos públicos que están desparramados y los pone en un solo lugar. No acusa a nadie: muestra dónde mirar.</p>
-      <p class="hero__scroll" aria-hidden="true">Bajá para ver los datos ↓</p>
-    </section>
+      <header class="brand">
+        <h1 class="brand__title">Mapa de la flota</h1>
+        <p class="brand__lede">Los barcos argentinos que pescan calamar, en la temporada 2025, uno por uno. Cada punto es un barco en su zona habitual de pesca.</p>
+      </header>
 
-    <section class="chapter" aria-labelledby="c1">
-      <div class="chapter__text">
-        <p class="chapter__n">1</p>
-        <h2 id="c1">Lo que ya vimos: afuera</h2>
-        <p>Del otro lado de la milla 200 pescan cientos de barcos extranjeros, la mayoría chinos. De noche sus luces se ven desde el espacio.</p>
-        <p>Ahí es alta mar: pescar es legal y ningún país puede controlarlos. En 2021, Enrique Piñeyro lo mostró sobrevolando la zona con su avión.</p>
-        <p class="source">Fuentes: <a href="https://www.infobae.com/economia/2026/04/04/impresionante-las-fotos-del-artemis-delatan-la-masiva-presencia-de-buques-chinos-pescando-al-borde-del-mar-argentino/" rel="noopener">Prefectura Naval, en Infobae (2026)</a>; <a href="https://www.meteored.com.ar/noticias/actualidad/pesca-extranjera-ilegal-en-el-mar-argentino-sobrevuelo-con-enrique-pineyro-milla-200-depredacion-avion-calamar-buque-meteored.html" rel="noopener">Meteored, sobrevuelo de 2021</a>.</p>
-      </div>
-      <figure class="zones" aria-label="Del lado de la costa, el mar argentino, donde el Estado puede controlar. Después de la milla 200, alta mar, donde nadie controla.">
-        <div class="zones__band">
-          <div class="zones__in"><b>Mar argentino</b><span>Pescan barcos con permiso del Estado</span><span class="zones__tag zones__tag--can">El Estado puede controlar</span></div>
-          <div class="zones__line"><span>milla 200</span></div>
-          <div class="zones__out"><b>Alta mar</b><span>Pescan barcos extranjeros</span><span class="zones__tag zones__tag--cant">Nadie puede controlar</span></div>
-        </div>
-        <figcaption class="zones__cap">El calamar es el mismo de los dos lados.</figcaption>
-      </figure>
-    </section>
+      <div class="panel__body" id="panel-body">
+        <section class="block" aria-labelledby="semaforo-title">
+          <h2 class="block__title" id="semaforo-title">Señales para revisar</h2>
+          <div class="lights" role="group" aria-label="Filtrar por color">
+            <button class="light light--rojo is-on" data-color="rojo" aria-pressed="true">
+              <span class="light__dot" aria-hidden="true"></span>
+              <span class="light__count" data-count="rojo">–</span>
+              <span class="light__label">Repetidas</span>
+            </button>
+            <button class="light light--amarillo is-on" data-color="amarillo" aria-pressed="true">
+              <span class="light__dot" aria-hidden="true"></span>
+              <span class="light__count" data-count="amarillo">–</span>
+              <span class="light__label">Aisladas</span>
+            </button>
+            <button class="light light--verde is-on" data-color="verde" aria-pressed="true">
+              <span class="light__dot" aria-hidden="true"></span>
+              <span class="light__count" data-count="verde">–</span>
+              <span class="light__label">Sin señales</span>
+            </button>
+          </div>
+          <ul class="rules">
+            <li><span class="dot dot--rojo" aria-hidden="true"></span><span><strong>Señales repetidas:</strong> <span id="rule-rojo">–</span></span></li>
+            <li><span class="dot dot--amarillo" aria-hidden="true"></span><span><strong>Señales aisladas:</strong> <span id="rule-amarillo">–</span></span></li>
+            <li><span class="dot dot--verde" aria-hidden="true"></span><span><strong>Sin señales:</strong> Global Fishing Watch no registró cortes de señal. Eso no quiere decir que el barco cumpla: uno que casi no transmite tampoco tiene cortes.</span></li>
+          </ul>
+          <p class="note">Un corte de señal es un lapso de <span data-n="reglas.horas_minimas_apagon">–</span> horas o más sin la señal abierta de posición, la que cualquiera puede seguir en internet. <strong>Un corte no prueba una infracción</strong>: los barcos también mandan su posición al Estado por una señal privada, que no se publica. El color indica dónde mirar primero.</p>
+        </section>
 
-    <section class="chapter" aria-labelledby="c2">
-      <div class="chapter__text">
-        <p class="chapter__n">2</p>
-        <h2 id="c2">Lo que nadie mira: adentro</h2>
-        <p>Del lado argentino pescan <span data-n="relato.temporada.buques">–</span> barcos con bandera argentina. En la temporada 2025 sacaron <strong><span data-n="relato.temporada.captura_t" data-fmt="int">–</span> toneladas</strong> de calamar.</p>
-        <p>Acá sí hay reglas. Una de las más importantes: los barcos grandes tienen que llevar un <strong>observador</strong>, una persona del Estado que viaja a bordo y anota qué se pesca, cuánto y qué se tira al mar.</p>
-        <p>Cada cuadrado es un viaje de pesca de 2025. Los <strong class="hl-obs">encendidos</strong> llevaron observador.</p>
-        <p class="figure-big"><small>De cada</small> <span data-n="derivado.uno_de_cada" data-fmt="int">–</span><small>viajes, sólo uno llevó observador</small></p>
-        <p class="figure-big__when" data-opcional>Son los viajes informados hasta el <strong><span data-n="relato.temporada.fecha_corte" data-fmt="fecha">–</span></strong>, el último regreso a puerto que trae el informe. Los posteriores todavía no están.</p>
-        <p class="source">Fuente: instituto de investigación pesquera del Estado (INIDEP), informe técnico 026/2025.</p>
-      </div>
-      <div class="waffle" id="waffle-mareas" role="img" aria-label="Viajes de la temporada con y sin observador"></div>
-    </section>
+        <section class="block" aria-labelledby="capas-title">
+          <h2 class="block__title" id="capas-title">Capas</h2>
+          <ul class="layers">
+            <li><label class="switch"><input type="checkbox" data-layer="buques" checked><span class="switch__ui" aria-hidden="true"></span>Barcos y nombres</label></li>
+            <li><label class="switch"><input type="checkbox" data-layer="apagones" checked><span class="switch__ui" aria-hidden="true"></span>Cortes de señal <span class="swatch swatch--ring" aria-hidden="true"></span></label></li>
+            <li><label class="switch"><input type="checkbox" data-layer="pesca"><span class="switch__ui" aria-hidden="true"></span>Actividad de pesca <span class="swatch swatch--glow" aria-hidden="true"></span></label></li>
+            <li><label class="switch"><input type="checkbox" data-layer="zee" checked><span class="switch__ui" aria-hidden="true"></span>Límite de las 200 millas <span class="swatch swatch--line" aria-hidden="true"></span></label></li>
+          </ul>
+        </section>
 
-    <section class="chapter" aria-labelledby="c3">
-      <div class="chapter__text">
-        <p class="chapter__n">3</p>
-        <h2 id="c3">No es un mal año: pasa hace años</h2>
-        <p>Entre 2021 y 2024 la flota hizo <span data-n="relato.historico_2021_2024.viajes">–</span> viajes. Sólo <span data-n="relato.historico_2021_2024.viajes_con_observador">–</span> llevaron observador.</p>
-        <p>De <span data-n="relato.historico_2021_2024.buques">–</span> barcos, <strong class="hl-dim"><span data-n="relato.historico_2021_2024.buques_nunca_con_observador">–</span> no llevaron un observador ni una sola vez</strong> en cuatro años.</p>
-        <p class="source">Fuente: INIDEP, informe de observadores 2024.</p>
-      </div>
-      <div class="viz-stack">
-        <div>
-          <div class="dots" id="dots-buques" role="img" aria-label="Barcos que llevaron o no observador entre 2021 y 2024"></div>
-          <ul class="dots-legend" aria-hidden="true"><li><i class="is-obs"></i>Llevó observador alguna vez</li><li><i class="is-never"></i>Nunca, entre 2021 y 2024</li></ul>
-        </div>
-        <figure class="series">
-          <figcaption class="series__title">De cada 100 viajes, cuántos llevaron observador</figcaption>
-          <ol class="series__bars" id="series-anual"></ol>
-          <p class="series__note" data-opcional>2025: viajes hasta el <span data-n="relato.temporada.fecha_corte" data-fmt="fechaCorta">–</span>.</p>
-        </figure>
-      </div>
-    </section>
+        <section class="block block--list" aria-labelledby="buques-title">
+          <div class="block__head">
+            <h2 class="block__title" id="buques-title">Barcos</h2>
+            <span class="block__meta" id="list-count" aria-live="polite"></span>
+          </div>
+          <label class="search">
+            <span class="sr-only">Buscar barco o empresa</span>
+            <input type="search" id="search" placeholder="Buscar barco o empresa" autocomplete="off">
+          </label>
+          <ol class="vessels" id="vessels"></ol>
+          <details class="missing">
+            <summary>Sin recorrido en 2025 <span id="missing-count"></span></summary>
+            <p class="note">Pescaron según el instituto de investigación pesquera del Estado (INIDEP), pero Global Fishing Watch no tiene su recorrido, así que no aparecen en el mapa.</p>
+            <ul id="missing"></ul>
+          </details>
+        </section>
 
-    <section class="chapter" aria-labelledby="c4">
-      <div class="chapter__text">
-        <p class="chapter__n">4</p>
-        <h2 id="c4">Y a veces no se sabe dónde están</h2>
-        <p>Los barcos transmiten su posición por una señal abierta, que cualquiera puede seguir en internet. En 2025 esa señal se cortó <strong><span data-n="apagones">–</span> veces</strong> por <span data-n="reglas.horas_minimas_apagon">–</span> horas o más: unas <span data-n="relato.horas_sin_ais" data-fmt="int">–</span> horas sin saber dónde estaban.</p>
-        <p><span data-n="relato.cerca_milla_200.apagones">–</span> de esos cortes, en <span data-n="relato.cerca_milla_200.buques">–</span> barcos, fueron cerca de la milla 200, donde empieza la flota extranjera. Esa zona también es de pesca habitual de calamar.</p>
-        <p>¿Apagan la señal para que no se los vea? Con estos datos no se puede saber. <strong>Por viaje, hubo más cortes cuando había un observador a bordo que cuando no había nadie</strong>: <span data-n="relato.apagones_por_marea.con_observador" data-fmt="dec2">–</span> contra <span data-n="relato.apagones_por_marea.sin_observador" data-fmt="dec2">–</span>. Los viajes con observador son pocos (<span data-n="relato.temporada.mareas_con_observador">–</span>) y sus cortes se concentran en unos pocos barcos, así que no es una tendencia firme. Sí muestra que la señal abierta, sola, no distingue un apagado a propósito de una falla del equipo o de mala recepción.</p>
-        <p>El Estado recibe otra señal de cada barco, privada, que permitiría distinguirlo. <strong>No la publica.</strong></p>
-        <p class="source">Fuente: Global Fishing Watch. De los <span data-n="apagones">–</span> cortes, <span data-n="apagones_por_estado.en_marea_sin_observador">–</span> fueron en viajes sin observador, <span data-n="apagones_por_estado.en_marea_con_observador">–</span> en viajes con observador y <span data-n="derivado.apagones_fuera">–</span> fuera de las fechas de viaje informadas.</p>
-      </div>
-      <div class="bars" id="bars-tasa" role="img" aria-label="Cortes de señal por viaje, con y sin observador"></div>
-    </section>
-
-    <section class="chapter chapter--list" aria-labelledby="c5">
-      <div class="chapter__text">
-        <p class="chapter__n">5</p>
-        <h2 id="c5">Por dónde empezar a mirar</h2>
-        <p><span data-n="por_color.rojo">–</span> barcos tuvieron <span data-n="reglas.umbral_senales_repetidas">–</span> o más cortes de señal en viajes sin observador o fuera de las fechas de viaje. La regla es pública y es la misma para todos, sea quien sea el dueño.</p>
-        <p>Que un barco esté en esta lista no quiere decir que haya hecho algo malo. Son los primeros casos que el Estado podría aclarar con la señal privada.</p>
-      </div>
-      <ol class="cards" id="cards-rojo"></ol>
-      <p class="cards__more"><a class="btn" href="buque.html">La ficha de cada barco →</a> <a class="btn btn--ghost" href="mapa.html">Verlos en el mapa</a></p>
-    </section>
-
-    <section class="chapter chapter--limits" aria-labelledby="c6">
-      <div class="chapter__text">
-        <p class="chapter__n">6</p>
-        <h2 id="c6">Lo que no sabemos (y el Estado sí)</h2>
-        <p>Preferimos decir lo que falta antes que completarlo con suposiciones. Casi todo lo que falta existe: lo tiene el Estado y no lo publica.</p>
-      </div>
-      <ul class="limits" id="limits"></ul>
-    </section>
-
-    <section class="chapter chapter--sources" id="fuentes" aria-labelledby="c7">
-      <div class="chapter__text">
-        <h2 id="c7">Fuentes y método</h2>
-        <p>Todo sale de datos públicos, con el código abierto para reproducirlo. Cada cifra de esta página se calcula a partir de las fuentes; ninguna está escrita a mano.</p>
-        <p class="source">Glosario: un <em>viaje</em> es lo que el INIDEP llama marea. La señal abierta es el AIS; la privada, el VMS. INIDEP es el Instituto Nacional de Investigación y Desarrollo Pesquero. Entre 2021 y 2024, el texto del informe de observadores dice 61 barcos sin observador; su Tabla 9, sumada fila por fila, da <span data-n="relato.historico_2021_2024.buques_nunca_con_observador">–</span>.</p>
-      </div>
-      <ul class="sources" id="sources"></ul>
-      <div class="cite" id="citar">
-        <h3>Datos y cómo citar</h3>
-        <p>La tabla con una fila por barco (viajes, observadores, cortes de señal y fuente de cada dato) está en <a href="data/buques.csv" download>buques.csv</a>. Se abre con Excel o cualquier planilla de cálculo. Los datos de cada fuente conservan sus propias condiciones de uso: <a href="https://github.com/eroveda/openMar/blob/main/LICENSE-DATOS.md">cómo usarlos y a quién citar</a>.</p>
-        <p>Cita sugerida:</p>
-        <p class="cite__text" id="cita">openMar. La flota calamarera argentina, barco por barco. Fuentes: INIDEP, Global Fishing Watch y Registro de Flota Pesquera.</p>
-      </div>
-      <aside class="support" data-enlace="cafecito" hidden aria-label="Apoyar el proyecto">
-        <p>openMar es un proyecto independiente y de código abierto. Si te sirvió, podés <a>apoyarlo con un aporte en Cafecito</a>.</p>
-      </aside>
-      <div class="foot">
+        <section class="block block--about" aria-labelledby="leer-title">
+          <h2 class="block__title" id="leer-title">Sobre los datos</h2>
+          <p class="note">La posición es el punto típico donde pescó cada barco en 2025 (la mediana de sus eventos de pesca), no dónde está hoy. La "franja de la milla 200" se aproxima con la distancia a la costa (<span data-n="reglas.franja_milla_200_km.0" data-fmt="int">–</span> a <span data-n="reglas.franja_milla_200_km.1" data-fmt="int">–</span> km).</p>
+          <h3 class="block__subtitle">Fuentes</h3>
+          <ul class="sources" id="sources"></ul>
+          <div class="foot">
         <p>Código abierto (<a href="https://github.com/eroveda/openMar/blob/main/LICENSE">MIT</a>) · Resultados <a href="https://github.com/eroveda/openMar/blob/main/LICENSE-DATOS.md">CC BY-NC 4.0</a> · <a href="https://globalfishingwatch.org" rel="noopener">Powered by Global Fishing Watch.</a> · <span id="generated"></span></p>
         <p>¿Encontraste un error? <a href="https://github.com/eroveda/openMar/issues/new?template=correccion.yml" data-issue="correccion">Avisanos</a><span data-enlace="correo" hidden> o <a>escribinos</a></span>. ¿Sos parte de una empresa que aparece acá y querés responder? <a href="https://github.com/eroveda/openMar/issues/new?template=replica.yml" data-issue="replica">Mandá tu réplica</a>.</p>
         <p data-enlace="cafecito" hidden><a>Apoyá openMar</a></p>
       </div>
-    </section>
+        </section>
+      </div>
+    </aside>
+
+    <div class="map" id="map" role="region" aria-label="Mapa del Mar Argentino"></div>
+    <div class="map-status" id="map-status" role="status">Cargando el mar…</div>
+    <p class="sr-only" id="map-announce" aria-live="polite"></p>
+
+    <footer class="limits" id="limits" aria-labelledby="limits-title">
+      <button class="limits__toggle" id="limits-toggle" aria-expanded="false" aria-controls="limits-list">
+        <span class="limits__icon" aria-hidden="true">!</span>
+        <span id="limits-title"><strong>Lo que este mapa no muestra.</strong> <span id="limits-short">Datos faltantes y límites de las fuentes.</span></span>
+        <span class="limits__more">Ver detalle</span>
+      </button>
+      <ul class="limits__list" id="limits-list" hidden></ul>
+    </footer>
   </main>
 
-  <noscript><p class="noscript">Esta página necesita JavaScript para dibujar los gráficos. Los datos están en <a href="data/resumen.json">resumen.json</a>.</p></noscript>
+  <script src="vendor/maplibre-gl@4.7.1/maplibre-gl.js"></script>
   <script src="comun.js"></script>
-  <script src="relato.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

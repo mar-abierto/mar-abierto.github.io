@@ -12,6 +12,8 @@ quiera mirar el mar con datos.
 
 ![openMar: sólo 1 de cada 15 viajes llevó un observador del Estado a bordo](site/img/compartir.png)
 
+**Sitio en vivo:** <https://openmar.vercel.app> (proyecto demostrativo, datos de la temporada 2025)
+
 ## Qué hace hoy
 
 Para la flota potera (calamar) de 2025:
@@ -66,8 +68,8 @@ Los datos se organizan en tres capas ([ADR 0006](docs/adr/0006-capas-de-datos.md
 | `data/silver/` | Una tabla limpia por concepto: buques, mareas, apagones, pesca, registro |
 | `data/gold/` | Cruces listos para usar y las capas del mapa |
 
-Para ver el mapa en tu máquina: `python3 -m http.server -d site` y abrí
-<http://localhost:8000>.
+Para ver el sitio en tu máquina: `python3 -m http.server -d site` y abrí
+<http://localhost:8000>. La portada es el mapa; el relato está en `historia.html`.
 
 ## Fuentes y cómo citarlas
 

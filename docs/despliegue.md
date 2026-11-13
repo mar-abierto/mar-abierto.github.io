@@ -18,6 +18,19 @@ y abrí <http://localhost:8765>.
 
 ## Publicarlo en Vercel
 
+**Hoy:** el sitio está en <https://openmar.vercel.app> (proyecto `openmar` de Vercel,
+sin conexión a GitHub). Como el repositorio no versiona `site/data/`, se publica
+desde la máquina que generó los datos. Vercel bloquea los despliegues hechos desde
+una carpeta con git si no reconoce al autor del último commit, así que se sube una
+copia de `site/` sin git:
+
+```bash
+rm -rf /tmp/sitio && cp -r site /tmp/sitio && cd /tmp/sitio && npx vercel deploy --prod --yes
+```
+
+`site/.vercel/project.json` (no versionado) liga la carpeta al proyecto.
+
+
 Hay dos caminos. Cualquiera de los dos deja el despliegue **protegido**: sólo lo
 ven las cuentas de tu equipo de Vercel hasta que decidas abrirlo.
 

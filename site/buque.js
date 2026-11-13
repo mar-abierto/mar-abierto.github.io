@@ -216,7 +216,7 @@
     $("#v-summary").hidden = !Number(p.apagones);
     const map = $("#v-map");
     if (p.lat_zona_pesca === "") map.replaceWith(Object.assign(document.createElement("span"), { className: "muted", textContent: "Sin recorrido en Global Fishing Watch: no aparece en el mapa." }));
-    else map.href = `mapa.html?buque=${encodeURIComponent(p.buque)}`;
+    else map.href = `./?buque=${encodeURIComponent(p.buque)}`;
     renderKpis(f);
     if (year) timeline(f, year);
     $("#v-series").innerHTML = seriesHTML(f.observador_por_anio);
