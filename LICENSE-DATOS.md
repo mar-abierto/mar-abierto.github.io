@@ -1,9 +1,5 @@
 # Licencia de los datos y resultados de openMar
 
-> **Propuesta pendiente de aprobación del dueño del proyecto** (ver la revisión
-> 2026-11 del [ADR 0003](docs/adr/0003-licencias.md)). Hasta que se apruebe, este
-> texto describe la licencia que se propone para los resultados.
-
 El **código** de openMar se publica bajo la [licencia MIT](LICENSE). Este archivo
 cubre otra cosa: los **resultados** que publica el proyecto.
 
@@ -15,7 +11,7 @@ Los resultados derivados que openMar publica en el sitio y en `site/data/`:
   las fichas por barco y el mapa);
 - los archivos de `site/data/`: `buques.csv`, `fichas.json`, `resumen.json` y los
   GeoJSON del mapa;
-- los informes de `docs/` con hallazgos (por ejemplo `docs/hallazgos-2025.md`).
+- los informes con hallazgos que publique el proyecto.
 
 **No cubre** los datos de las fuentes originales, que openMar no redistribuye
 (ver [ADR 0004](docs/adr/0004-no-redistribuir-datos-de-terceros.md)). Cada fuente

@@ -30,3 +30,10 @@ htmlcov/
 
 # Borradores de difusión y contactos (no se publican)
 borradores/
+
+# Resultados con nombres de barcos y armadores: se generan localmente con el
+# pipeline y no se versionan en el repositorio público.
+site/data/
+docs/hallazgos-*.md
+docs/auditoria-*.md
+docs/img/mapa*.png

@@ -49,16 +49,8 @@ de la portada. Es un link común (la CSP bloquea los widgets externos). Si se de
 
 ## 4. Licencia de los resultados
 
-**Propuesta:** CC BY-NC 4.0, por la condición no comercial de la API de Global
-Fishing Watch. Detalle en `LICENSE-DATOS.md` y en la "Revisión 2026-11" de
-`docs/adr/0003-licencias.md`.
-
-- **Si se aprueba:** cambiar en el ADR 0003 el estado de la revisión a
-  "Aceptada", sacar el aviso de "Propuesta" del principio de `LICENSE-DATOS.md`
-  y el "(propuesta pendiente de aprobación…)" de `README.md`.
-- **Si no se aprueba:** volver "CC BY-NC 4.0" a "CC BY 4.0" en el `.foot` de las 4
-  páginas (`grep -rn 'CC BY-NC' site README.md`), ajustar `LICENSE-DATOS.md` y
-  resolver de otra forma la condición no comercial de GFW.
+**Resuelto (13/11/2026):** CC BY-NC 4.0, aprobada. Queda registrada en la
+"Revisión 2026-11" de `docs/adr/0003-licencias.md` y en `LICENSE-DATOS.md`.
 
 ## 5. Imagen para compartir: regenerar si cambian los datos
 

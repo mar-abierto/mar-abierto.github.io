@@ -10,7 +10,7 @@ flota). Cada resultado guarda de qué fuente salió.
 Pensada para periodistas de datos, investigadores, organizaciones y cualquiera que
 quiera mirar el mar con datos.
 
-![Mapa de openMar: la flota potera argentina con su semáforo de señales](docs/img/mapa.png)
+![openMar: sólo 1 de cada 15 viajes llevó un observador del Estado a bordo](site/img/compartir.png)
 
 ## Qué hace hoy
 
@@ -23,8 +23,11 @@ Para la flota potera (calamar) de 2025:
 
 El resultado es un resumen por buque con un semáforo de señales
 ([ADR 0008](docs/adr/0008-senales-no-acusaciones.md)), el detalle de cada apagón y
-un mapa. Los hallazgos de la primera corrida están en
-[`docs/hallazgos-2025.md`](docs/hallazgos-2025.md).
+un mapa.
+
+> **El repositorio trae sólo el código.** Los resultados por barco no se versionan:
+> cada uno los genera en su máquina corriendo el pipeline (ver [Uso](#uso)), a partir
+> de las fuentes originales.
 
 ## Instalación
 
@@ -106,19 +109,18 @@ los descarga de la fuente original, y cada usuario los baja por su cuenta.
 | [`docs/propuesta-de-valor.md`](docs/propuesta-de-valor.md) | Qué aporta openMar, qué no hace y qué sumar |
 | [`docs/contexto.md`](docs/contexto.md) | El problema y quién ya trabaja en esto |
 | [`docs/arquitectura.md`](docs/arquitectura.md) | Fuentes, modelo y flujo |
-| [`docs/hallazgos-2025.md`](docs/hallazgos-2025.md) | Resultados de la primera corrida |
 | [`docs/despliegue.md`](docs/despliegue.md) | Cómo ver y publicar el mapa |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Cómo sumarse |
 
 ## Licencia
 
 Código: [MIT](LICENSE). Resultados publicados por el proyecto: CC BY-NC 4.0
-(propuesta pendiente de aprobación; ver [`LICENSE-DATOS.md`](LICENSE-DATOS.md) y
-la revisión 2026-11 del [ADR 0003](docs/adr/0003-licencias.md)).
+(ver [`LICENSE-DATOS.md`](LICENSE-DATOS.md) y la revisión 2026-11 del
+[ADR 0003](docs/adr/0003-licencias.md)).
 
 ## Para periodistas
 
-- Una fila por barco en [`site/data/buques.csv`](site/data/buques.csv) (UTF-8,
-  separado por comas). Se regenera con `uv run openmar exportar`.
+- Una fila por barco en `site/data/buques.csv` (UTF-8, separado por comas), que se
+  genera al correr el pipeline o con `uv run openmar exportar`.
 - Cómo citar a openMar y a cada fuente: [`LICENSE-DATOS.md`](LICENSE-DATOS.md).
 - ¿Un error o una réplica? [Abrí un issue](https://github.com/eroveda/openMar/issues/new/choose).

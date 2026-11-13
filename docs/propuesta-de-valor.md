@@ -75,7 +75,7 @@ No se discute: se convierte en indicador, igual para todas las empresas.
 
 | Pregunta | Dato | Estado |
 |---|---|---|
-| ¿Dónde paran? | Escalas en puerto de Global Fishing Watch | **Hecho.** 2025: 470 llegadas a puerto, 1 detectada fuera del país (ver `hallazgos-2025.md`) |
+| ¿Dónde paran? | Escalas en puerto de Global Fishing Watch | **Hecho.** 2025: 470 llegadas a puerto, 1 detectada fuera del país |
 | ¿Cuánto se procesa en tierra? | Desembarques y exportaciones por especie y producto | Datos públicos, a buscar |
 | ¿Tripulación argentina? | Rol de tripulación | No es público; los gremios (SOMU) podrían aportar |
 

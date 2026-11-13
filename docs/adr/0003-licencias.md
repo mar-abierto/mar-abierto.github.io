@@ -1,6 +1,6 @@
 # 0003. MIT para el código, CC BY 4.0 para los resultados
 
-**Estado:** Aceptada · 3 de noviembre de 2026
+**Estado:** Reemplazada en parte por la revisión 2026-11 (resultados en CC BY-NC 4.0)
 
 ## Contexto
 
@@ -21,10 +21,10 @@ medios y organismos que podrían usarlo.
 - Los datos de terceros conservan su propia licencia y no se relicencian (ver ADR
   0004).
 
-## Revisión 2026-11 — PROPUESTA, pendiente de aprobación del dueño
+## Revisión 2026-11 — resultados en CC BY-NC 4.0
 
-**Estado de la revisión:** Propuesta · 7 de noviembre de 2026. No reemplaza la
-decisión de arriba hasta que el dueño la apruebe.
+**Estado de la revisión:** Aceptada · 13 de noviembre de 2026 (propuesta el 7 de
+noviembre, aprobada por el dueño del proyecto).
 
 ### Contexto
 
@@ -35,7 +35,7 @@ Los cortes de señal, las escalas y la identidad de los barcos salen de esa API.
 Publicar esos resultados bajo CC BY 4.0, que permite el uso comercial, daría más
 permisos de los que da la fuente.
 
-### Decisión propuesta
+### Decisión
 
 - **Código:** sigue en MIT.
 - **Resultados:** pasan de CC BY 4.0 a **CC BY-NC 4.0**, con las condiciones y
@@ -49,5 +49,3 @@ permisos de los que da la fuente.
   afuera es revender o empaquetar los datos como producto comercial.
 - Si más adelante GFW da un permiso distinto, o los resultados dejan de depender
   de su API, se puede volver a CC BY 4.0.
-- Si el dueño no aprueba la propuesta, hay que volver el pie y el README a
-  CC BY 4.0 y resolver de otra forma la condición no comercial de GFW.
