@@ -1,5 +1,8 @@
 # openMar
 
+**Qué hace:** cruza, barco por barco, datos públicos de la flota pesquera argentina (señal satelital, observadores a bordo y armador) y los muestra en un mapa.<br>
+**Cómo se prueba:** abrí <https://openmar.vercel.app>, o en tu máquina `uv sync && uv run pytest`.
+
 **El Mar Argentino, a la vista de todos.**
 
 Herramienta abierta para cruzar, barco por barco, datos públicos sobre la flota
