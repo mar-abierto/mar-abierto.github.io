@@ -39,7 +39,7 @@ esa condición.
 Publicar una nota en un medio que se financia con publicidad o suscripciones,
 usando y citando estos datos, es el uso periodístico que el proyecto busca. Si
 tenés dudas sobre otro uso, abrí un issue en
-<https://github.com/eroveda/openMar/issues>.
+<https://github.com/mar-abierto/mar-abierto.github.io/issues>.
 
 ## Cómo atribuir
 
@@ -102,4 +102,4 @@ resultados debería conservar esa advertencia.
 
 Si encontrás un error o sos parte de una empresa que aparece en los datos y
 querés responder, abrí un issue en
-<https://github.com/eroveda/openMar/issues/new/choose>.
+<https://github.com/mar-abierto/mar-abierto.github.io/issues/new/choose>.

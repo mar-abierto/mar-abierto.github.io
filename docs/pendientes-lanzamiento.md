@@ -6,8 +6,8 @@ reemplazarlo, correr las comprobaciones del final y borrar la fila de esta lista
 
 ## 1. Dominio
 
-**Resuelto (13/11/2026):** `https://openmar.vercel.app`, el subdominio gratuito de
-Vercel. No se compra dominio propio: openMar se publica como proyecto demostrativo.
+**Resuelto (25/11/2026):** `https://mar-abierto.github.io`, en GitHub Pages (ADR 0013).
+No se compra dominio propio: openMar se publica como proyecto demostrativo.
 
 ## 2. Correo público
 
@@ -47,7 +47,8 @@ cifra cambia.
 
 ## 6. GitHub
 
-**Resuelto (13/11/2026):** el repositorio es público y tiene las etiquetas
+**Resuelto (25/11/2026):** el repositorio es público, en
+<https://github.com/mar-abierto/mar-abierto.github.io>, y tiene las etiquetas
 `correccion` y `replica` que asignan los formularios de `.github/ISSUE_TEMPLATE/`.
 
 ## 7. Salida del borrador

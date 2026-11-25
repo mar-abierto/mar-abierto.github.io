@@ -18,6 +18,7 @@ probablemente esté en uno de estos archivos.
 | [0010](0010-conductas-no-pasaportes.md) | Conductas, no pasaportes | Aceptada |
 | [0011](0011-alcance-flota-extranjera-y-malvinas.md) | Alcance: flota extranjera, incursiones y Malvinas | Propuesta |
 | [0012](0012-personas-en-datos-societarios.md) | Personas en los datos societarios | Propuesta |
+| [0013](0013-publicar-con-github-pages.md) | Publicar con GitHub Pages desde un robot diario | Aceptada |
 
 ## Cómo escribir uno nuevo
 

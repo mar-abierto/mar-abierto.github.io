@@ -17,7 +17,7 @@ FICHAS_NAME = "fichas.json"
 
 # Dominio público del sitio, a decidir: reemplazar cuando haya dominio
 # (ver docs/pendientes-lanzamiento.md).
-SITE_URL = "https://openmar.vercel.app"
+SITE_URL = "https://mar-abierto.github.io"
 
 SOURCE = (
     "Viajes y observadores: INIDEP; cortes de señal y escalas: Global Fishing Watch; "

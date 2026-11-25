@@ -1,7 +1,7 @@
 # openMar
 
 **Qué hace:** cruza, barco por barco, datos públicos de la flota pesquera argentina (señal satelital, observadores a bordo y armador) y los muestra en un mapa.<br>
-**Cómo se prueba:** abrí <https://openmar.vercel.app>, o en tu máquina `uv sync && uv run pytest`.
+**Cómo se prueba:** abrí <https://mar-abierto.github.io>, o en tu máquina `uv sync && uv run pytest`.
 
 **El Mar Argentino, a la vista de todos.**
 
@@ -15,7 +15,7 @@ quiera mirar el mar con datos.
 
 ![openMar: sólo 1 de cada 15 viajes llevó un observador del Estado a bordo](site/img/compartir.png)
 
-**Sitio en vivo:** <https://openmar.vercel.app> (proyecto demostrativo, datos de la temporada 2025)
+**Sitio en vivo:** <https://mar-abierto.github.io> (proyecto demostrativo, datos de la temporada 2025)
 
 ## Qué hace hoy
 
@@ -40,7 +40,7 @@ Requiere Python 3.12+, [uv](https://docs.astral.sh/uv/) y `pdftotext` (poppler).
 
 ```bash
 sudo apt install poppler-utils      # en Debian/Ubuntu
-git clone https://github.com/eroveda/openMar openMar && cd openMar
+git clone https://github.com/mar-abierto/mar-abierto.github.io openMar && cd openMar
 uv sync
 ```
 
@@ -128,4 +128,4 @@ Código: [MIT](LICENSE). Resultados publicados por el proyecto: CC BY-NC 4.0
 - Una fila por barco en `site/data/buques.csv` (UTF-8, separado por comas), que se
   genera al correr el pipeline o con `uv run openmar exportar`.
 - Cómo citar a openMar y a cada fuente: [`LICENSE-DATOS.md`](LICENSE-DATOS.md).
-- ¿Un error o una réplica? [Abrí un issue](https://github.com/eroveda/openMar/issues/new/choose).
+- ¿Un error o una réplica? [Abrí un issue](https://github.com/mar-abierto/mar-abierto.github.io/issues/new/choose).

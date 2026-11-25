@@ -11,10 +11,10 @@
     correo: "", // PENDIENTE: p. ej. "contacto@dominio"
     // A decidir: dominio. También está en el <head> de las 4 páginas, robots.txt,
     // sitemap.xml y src/openmar/application/exportar.py (mismo texto, se reemplaza junto).
-    sitio: "https://openmar.vercel.app",
+    sitio: "https://mar-abierto.github.io",
   });
 
-  const REPO = "https://github.com/eroveda/openMar";
+  const REPO = "https://github.com/mar-abierto/mar-abierto.github.io";
 
   const hrefs = {
     cafecito: () => ENLACES.cafecito,

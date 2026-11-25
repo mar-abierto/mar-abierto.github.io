@@ -1,0 +1,65 @@
+# Publica el sitio en GitHub Pages sin depender de la PC local: todos los días baja las
+# fuentes (Global Fishing Watch, INIDEP, Registro de Flota Pesquera, Marine Regions),
+# arma los datos y sube site/ a Pages.
+# Los datos no se versionan (ADR 0004): sólo viajan dentro del sitio publicado.
+# Si una fuente falla, el job se corta y queda publicada la versión anterior: preferimos
+# no publicar antes que publicar datos incompletos.
+# Necesita el secreto GFW_API_TOKEN (Settings → Secrets and variables → Actions).
+# Ojo: GitHub demora los cron en horas pico y los desactiva tras 60 días sin commits.
+name: publicar
+
+on:
+  schedule:
+    - cron: "17 9 * * *" # 06:17 hora argentina
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["site/**", "src/**", ".github/workflows/publicar.yml"]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: publicar
+  cancel-in-progress: false
+
+jobs:
+  armar-y-publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+
+      - name: Instalar pdftotext (informes del INIDEP)
+        run: sudo apt-get update -q && sudo apt-get install -y -q poppler-utils
+
+      - name: Instalar dependencias
+        run: uv sync --frozen
+
+      - name: Pruebas
+        run: uv run pytest -q
+
+      - name: Bajar las fuentes y armar los datos
+        env:
+          GFW_API_TOKEN: ${{ secrets.GFW_API_TOKEN }}
+        run: |
+          uv run openmar descargar todo --desde 2025-01-01 --hasta 2025-12-31
+          uv run openmar silver
+          uv run openmar gold
+          uv run openmar publicar
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4
